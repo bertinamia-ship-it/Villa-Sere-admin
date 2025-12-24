@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { InventoryItem } from '@/lib/types/database'
 import { CATEGORIES, ROOMS } from '@/lib/constants'
-import { Plus, Search, Pencil, Trash2, Package, AlertCircle, Download } from 'lucide-react'
+import { Plus, Search, Pencil, Trash2, Package, AlertCircle, Download, Upload } from 'lucide-react'
 import InventoryForm from './InventoryForm'
 import QuickAdjust from './QuickAdjust'
+import CSVImport from './CSVImport'
 import { exportToCSV } from '@/lib/utils/export'
 
 export default function InventoryList() {
@@ -17,6 +18,7 @@ export default function InventoryList() {
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [roomFilter, setRoomFilter] = useState('all')
   const [showForm, setShowForm] = useState(false)
+  const [showImport, setShowImport] = useState(false)
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null)
   const supabase = createClient()
 
@@ -125,6 +127,13 @@ export default function InventoryList() {
           <p className="text-gray-600 mt-1">{items.length} total items</p>
         </div>
         <div className="flex gap-2">
+          <button
+            onClick={() => setShowImport(true)}
+            className="flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+          >
+            <Upload className="h-5 w-5" />
+            Import CSV
+          </button>
           <button
             onClick={handleExportCSV}
             className="flex items-center justify-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
@@ -253,6 +262,27 @@ export default function InventoryList() {
           item={editingItem}
           onClose={handleFormClose}
         />
+      )}
+
+      {/* Import Modal */}
+      {showImport && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">Import Inventory</h2>
+              <button
+                onClick={() => {
+                  setShowImport(false)
+                  fetchItems() // Refresh list after import
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+            <CSVImport />
+          </div>
+        </div>
       )}
     </div>
   )

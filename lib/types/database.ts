@@ -202,6 +202,53 @@ export interface Database {
           created_by?: string | null
         }
       }
+      bookings: {
+        Row: {
+          id: string
+          guest_name: string | null
+          platform: string
+          check_in: string
+          check_out: string
+          nightly_rate: number | null
+          total_amount: number
+          cleaning_fee: number
+          notes: string | null
+          status: 'confirmed' | 'cancelled' | 'completed'
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          guest_name?: string | null
+          platform?: string
+          check_in: string
+          check_out: string
+          nightly_rate?: number | null
+          total_amount: number
+          cleaning_fee?: number
+          notes?: string | null
+          status?: 'confirmed' | 'cancelled' | 'completed'
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          guest_name?: string | null
+          platform?: string
+          check_in?: string
+          check_out?: string
+          nightly_rate?: number | null
+          total_amount?: number
+          cleaning_fee?: number
+          notes?: string | null
+          status?: 'confirmed' | 'cancelled' | 'completed'
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+      }
     }
   }
 }
@@ -211,3 +258,4 @@ export type InventoryItem = Database['public']['Tables']['inventory_items']['Row
 export type MaintenanceTicket = Database['public']['Tables']['maintenance_tickets']['Row']
 export type Expense = Database['public']['Tables']['expenses']['Row']
 export type Profile = Database['public']['Tables']['profiles']['Row']
+export type Booking = Database['public']['Tables']['bookings']['Row']

@@ -11,7 +11,9 @@ import {
   Users, 
   LogOut,
   Menu,
-  X
+  X,
+  BarChart3,
+  Calendar
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -21,6 +23,8 @@ const navigation = [
   { name: 'Maintenance', href: '/maintenance', icon: Wrench },
   { name: 'Expenses', href: '/expenses', icon: DollarSign },
   { name: 'Vendors', href: '/vendors', icon: Users },
+  { name: 'Reports', href: '/reports', icon: BarChart3 },
+  { name: 'Rentals', href: '/rentals', icon: Calendar },
 ]
 
 export default function DashboardLayout({
