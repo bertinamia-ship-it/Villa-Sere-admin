@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head><title>Generate Icons</title></head>
+<body>
+<canvas id="c192" width="192" height="192"></canvas>
+<canvas id="c512" width="512" height="512"></canvas>
+<script>
+function createIcon(canvas, size) {
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createLinearGradient(0, 0, size, size);
+  gradient.addColorStop(0, '#2563eb');
+  gradient.addColorStop(1, '#1d4ed8');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = 'white';
+  ctx.font = `bold ${size/3}px Arial`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('VS', size/2, size/2);
+}
+createIcon(document.getElementById('c192'), 192);
+createIcon(document.getElementById('c512'), 512);
+console.log('Icons created! Right-click each canvas and "Save image as..." to icon-192.png and icon-512.png');
+</script>
+</body>
+</html>
