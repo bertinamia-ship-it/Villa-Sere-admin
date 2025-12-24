@@ -10,6 +10,7 @@ export default function LoginPage() {
   const [fullName, setFullName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
   const [isSignUp, setIsSignUp] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -37,6 +38,7 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    setSuccess(null)
 
     // Basic validation
     if (password.length < 6) {
@@ -72,10 +74,9 @@ export default function LoginPage() {
       } else {
         // Email confirmation required
         setError(null)
+        setSuccess('Account created! Please check your email to confirm your account. After confirming, you can sign in here.')
         setLoading(false)
-        // Show success message
-        alert('Account created! Please check your email to confirm your account before signing in.')
-        setIsSignUp(false)
+        // Keep user on the same page with message
         setEmail('')
         setPassword('')
         setFullName('')
@@ -93,6 +94,12 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Villa Sere</h1>
           <p className="text-gray-600">Management System</p>
         </div>
+
+        {success && (
+          <div className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            {success}
+          </div>
+        )}
 
         <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-6">
           {error && (
