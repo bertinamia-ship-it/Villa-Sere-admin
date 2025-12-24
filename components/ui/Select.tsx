@@ -21,12 +21,13 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           ref={ref}
           className={`
             w-full px-3.5 py-2.5 
-            text-gray-900 placeholder-gray-400
-            bg-white border rounded-lg
+            text-slate-900 placeholder-slate-400
+            bg-white border border-gray-300 rounded-lg
             transition-all duration-200
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+            focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
             disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
-            ${error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'}
+            autofill:!text-slate-900 autofill:!bg-white
+            ${error ? 'border-red-300 focus:ring-red-500' : ''}
             ${className}
           `}
           {...props}

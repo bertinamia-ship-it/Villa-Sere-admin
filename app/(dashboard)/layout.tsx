@@ -13,13 +13,15 @@ import {
   Menu,
   X,
   BarChart3,
-  Calendar
+  Calendar,
+  ShoppingCart
 } from 'lucide-react'
 import { useState } from 'react'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Inventory', href: '/inventory', icon: Package },
+  { name: 'To Buy', href: '/to-buy', icon: ShoppingCart },
   { name: 'Maintenance', href: '/maintenance', icon: Wrench },
   { name: 'Expenses', href: '/expenses', icon: DollarSign },
   { name: 'Vendors', href: '/vendors', icon: Users },

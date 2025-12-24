@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Booking } from '@/lib/types/database'
@@ -106,27 +108,44 @@ export default function RentalsPage() {
 
   async function handleSave(booking: Partial<Booking>) {
     try {
+      console.log('📝 Saving booking:', booking)
+      
       if (editingBooking) {
-        const { error } = await supabase
+        console.log('✏️ Updating booking:', editingBooking.id)
+        const { data, error } = await supabase
           .from('bookings')
           .update(booking)
           .eq('id', editingBooking.id)
-        if (error) throw error
+          .select()
+        
+        if (error) {
+          console.error('❌ Update error:', error)
+          throw error
+        }
+        console.log('✅ Booking updated:', data)
         showToast('Booking updated successfully', 'success')
       } else {
-        const { error } = await supabase
+        console.log('➕ Creating new booking')
+        const { data, error } = await supabase
           .from('bookings')
           .insert([booking])
-        if (error) throw error
+          .select()
+        
+        if (error) {
+          console.error('❌ Insert error:', error)
+          throw error
+        }
+        console.log('✅ Booking created:', data)
         showToast('Booking created successfully', 'success')
       }
       
       setShowForm(false)
       setEditingBooking(null)
-      loadData()
+      await loadData()
     } catch (error) {
-      console.error('Error saving booking:', error)
-      showToast('Failed to save booking', 'error')
+      console.error('❌ Error saving booking:', error)
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      showToast(`Failed to save booking: ${errorMsg}`, 'error')
     }
   }
 

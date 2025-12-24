@@ -67,6 +67,23 @@ CREATE TABLE public.expenses (
   ticket_id UUID REFERENCES public.maintenance_tickets,
   notes TEXT,
   receipt_url TEXT,
+
+  -- Bookings table
+  CREATE TABLE public.bookings (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    guest_name TEXT,
+    platform TEXT DEFAULT 'Airbnb',
+    check_in DATE NOT NULL,
+    check_out DATE NOT NULL,
+    nightly_rate DECIMAL(10, 2),
+    total_amount DECIMAL(10, 2) NOT NULL,
+    cleaning_fee DECIMAL(10, 2) DEFAULT 0,
+    notes TEXT,
+    status TEXT NOT NULL CHECK (status IN ('confirmed', 'cancelled', 'completed')) DEFAULT 'confirmed',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    created_by UUID REFERENCES auth.users
+  );
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
   created_by UUID REFERENCES auth.users
@@ -78,6 +95,7 @@ ALTER TABLE public.vendors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.inventory_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.maintenance_tickets ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.expenses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
 
 -- Profiles policies
 CREATE POLICY "Users can view their own profile" ON public.profiles
@@ -136,6 +154,19 @@ CREATE POLICY "Authenticated users can update expenses" ON public.expenses
   FOR UPDATE USING (auth.role() = 'authenticated');
 
 CREATE POLICY "Authenticated users can delete expenses" ON public.expenses
+
+  -- Bookings policies
+  CREATE POLICY "Anyone authenticated can view bookings" ON public.bookings
+    FOR SELECT USING (auth.role() = 'authenticated');
+
+  CREATE POLICY "Authenticated users can create bookings" ON public.bookings
+    FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+  CREATE POLICY "Authenticated users can update bookings" ON public.bookings
+    FOR UPDATE USING (auth.role() = 'authenticated');
+
+  CREATE POLICY "Authenticated users can delete bookings" ON public.bookings
+    FOR DELETE USING (auth.role() = 'authenticated');
   FOR DELETE USING (auth.role() = 'authenticated');
 
 -- Function to automatically create profile on user signup
@@ -176,4 +207,7 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.maintenance_tickets
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.expenses
+
+  CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.bookings
+    FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();

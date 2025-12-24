@@ -249,6 +249,47 @@ export interface Database {
           created_by?: string | null
         }
       }
+      purchase_items: {
+        Row: {
+          id: string
+          area: string | null
+          item: string
+          quantity: number
+          est_cost: number | null
+          link: string | null
+          status: 'to_buy' | 'ordered' | 'received'
+          notes: string | null
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          area?: string | null
+          item: string
+          quantity?: number
+          est_cost?: number | null
+          link?: string | null
+          status?: 'to_buy' | 'ordered' | 'received'
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          area?: string | null
+          item?: string
+          quantity?: number
+          est_cost?: number | null
+          link?: string | null
+          status?: 'to_buy' | 'ordered' | 'received'
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+      }
     }
   }
 }
@@ -259,3 +300,4 @@ export type MaintenanceTicket = Database['public']['Tables']['maintenance_ticket
 export type Expense = Database['public']['Tables']['expenses']['Row']
 export type Profile = Database['public']['Tables']['profiles']['Row']
 export type Booking = Database['public']['Tables']['bookings']['Row']
+export type PurchaseItem = Database['public']['Tables']['purchase_items']['Row']
