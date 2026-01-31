@@ -22,8 +22,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             w-full px-3.5 py-2.5 
             text-slate-900 placeholder-slate-400
             bg-white border border-gray-300 rounded-lg
-            transition-all duration-200
-            focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+            transition-all duration-200 ease-out
+            focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600
             disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
             autofill:!text-slate-900 autofill:!bg-white
             ${error ? 'border-red-300 focus:ring-red-500' : ''}

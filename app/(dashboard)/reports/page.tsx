@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { getActivePropertyId } from '@/lib/utils/property-client'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Select } from '@/components/ui/Select'
@@ -43,10 +44,26 @@ export default function ReportsPage() {
   const [expenseSummary, setExpenseSummary] = useState<MonthlyExpenseSummary | null>(null)
   const [maintenanceSummary, setMaintenanceSummary] = useState<MaintenanceCostSummary | null>(null)
   const [inventoryInsights, setInventoryInsights] = useState<InventoryInsights | null>(null)
+  const [propertyName, setPropertyName] = useState<string>('CasaPilot')
 
   useEffect(() => {
+    loadPropertyName()
     loadReports()
   }, [selectedMonth])
+
+  async function loadPropertyName() {
+    const propertyId = await getActivePropertyId()
+    if (propertyId) {
+      const { data } = await supabase
+        .from('properties')
+        .select('name')
+        .eq('id', propertyId)
+        .single()
+      if (data?.name) {
+        setPropertyName(data.name)
+      }
+    }
+  }
 
   async function loadReports() {
     setLoading(true)
@@ -69,10 +86,17 @@ export default function ReportsPage() {
     const startDate = `${year}-${month}-01`
     const endDate = new Date(parseInt(year), parseInt(month), 0).toISOString().split('T')[0]
 
-    // Get all expenses for the month
+    // Get expenses for the month filtered by active property
+    const propertyId = await getActivePropertyId()
+    if (!propertyId) {
+      setExpenseSummary({ total: 0, byCategory: [], byVendor: [], maintenance: 0, other: 0 })
+      return
+    }
+
     const { data: expenses, error } = await supabase
       .from('expenses')
       .select('amount, category, vendor_id, ticket_id, vendors(company_name)')
+      .eq('property_id', propertyId)
       .gte('date', startDate)
       .lte('date', endDate)
 
@@ -105,13 +129,20 @@ export default function ReportsPage() {
   }
 
   async function loadMaintenanceSummary() {
-    // Get maintenance tickets with costs for the last 6 months
+    const propertyId = await getActivePropertyId()
+    if (!propertyId) {
+      setMaintenanceSummary({ byMonth: [], byRoom: [] })
+      return
+    }
+
+    // Get maintenance tickets with costs for the last 6 months (filtered by property_id)
     const sixMonthsAgo = new Date()
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
 
     const { data: tickets, error } = await supabase
       .from('maintenance_tickets')
       .select('date, cost, room')
+      .eq('property_id', propertyId)
       .gte('date', sixMonthsAgo.toISOString().split('T')[0])
       .not('cost', 'is', null)
 
@@ -140,9 +171,16 @@ export default function ReportsPage() {
   }
 
   async function loadInventoryInsights() {
+    const propertyId = await getActivePropertyId()
+    if (!propertyId) {
+      setInventoryInsights({ lowStockCount: 0, lowStockItems: [], byCategory: [], byLocation: [] })
+      return
+    }
+
     const { data: items, error } = await supabase
       .from('inventory_items')
       .select('*')
+      .eq('property_id', propertyId)
 
     if (error) throw error
 
@@ -170,7 +208,7 @@ export default function ReportsPage() {
     if (!expenseSummary) return
 
     const rows = [
-      ['Villa Sere - Monthly Expense Report'],
+      [`${propertyName} - Monthly Expense Report`],
       [`Month: ${selectedMonth}`],
       [''],
       ['Summary'],
@@ -219,8 +257,8 @@ export default function ReportsPage() {
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reports & Analytics</h1>
-          <p className="mt-1 text-sm text-gray-500">Financial insights and operational metrics</p>
+          <h1 className="text-2xl font-semibold text-gray-900">Reports & Analytics</h1>
+          <p className="mt-1 text-sm text-gray-700">Financial insights and operational metrics</p>
         </div>
       </div>
 

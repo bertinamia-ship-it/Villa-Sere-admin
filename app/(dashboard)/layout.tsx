@@ -14,9 +14,14 @@ import {
   X,
   BarChart3,
   Calendar,
-  ShoppingCart
+  ShoppingCart,
+  CreditCard
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import PropertySelector from '@/components/PropertySelector'
+import BillingGuard from './BillingGuard'
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
+import { getActivePropertyId } from '@/lib/utils/property-client'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -27,6 +32,7 @@ const navigation = [
   { name: 'Vendors', href: '/vendors', icon: Users },
   { name: 'Reports', href: '/reports', icon: BarChart3 },
   { name: 'Rentals', href: '/rentals', icon: Calendar },
+  { name: 'Billing', href: '/billing', icon: CreditCard },
 ]
 
 export default function DashboardLayout({
@@ -38,6 +44,47 @@ export default function DashboardLayout({
   const pathname = usePathname()
   const supabase = createClient()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [propertyName, setPropertyName] = useState<string>('')
+
+  // Load property name from active property
+  useEffect(() => {
+    async function loadPropertyName() {
+      try {
+        const activePropertyId = await getActivePropertyId()
+        if (!activePropertyId) {
+          setPropertyName('')
+          return
+        }
+
+        // Fetch property name from Supabase
+        const { data: property, error } = await supabase
+          .from('properties')
+          .select('name')
+          .eq('id', activePropertyId)
+          .maybeSingle()
+
+        if (error) {
+          console.error('[Layout] Error fetching property:', error)
+          setPropertyName('')
+          return
+        }
+
+        setPropertyName(property?.name || '')
+      } catch (error) {
+        console.error('[Layout] Error loading property name:', error)
+        setPropertyName('')
+      }
+    }
+
+    loadPropertyName()
+
+    // Listen for property changes
+    const handlePropertyChange = () => {
+      loadPropertyName()
+    }
+    window.addEventListener('propertyChanged', handlePropertyChange)
+    return () => window.removeEventListener('propertyChanged', handlePropertyChange)
+  }, [supabase])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -46,12 +93,15 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <BillingGuard>
+    <ErrorBoundary moduleName="Dashboard">
+    <div className="min-h-screen bg-gray-50/50">
       {/* Desktop Sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white border-r border-gray-200 px-6 pb-4">
-          <div className="flex h-16 shrink-0 items-center border-b border-gray-200">
-            <h1 className="text-xl font-bold text-gray-900">Villa Sere</h1>
+          <div className="flex h-16 shrink-0 items-center justify-between border-b border-gray-200">
+            <h1 className="text-xl font-semibold text-gray-900">{propertyName || 'CasaPilot'}</h1>
+            <PropertySelector />
           </div>
           <nav className="flex flex-1 flex-col">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -94,7 +144,10 @@ export default function DashboardLayout({
       {/* Mobile top bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-40">
         <div className="flex items-center justify-between h-16 px-4">
-          <h1 className="text-xl font-bold text-gray-900">Villa Sere</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-semibold text-gray-900">{propertyName || 'CasaPilot'}</h1>
+            <PropertySelector />
+          </div>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="text-gray-700"
@@ -139,13 +192,13 @@ export default function DashboardLayout({
 
       {/* Main content */}
       <div className="lg:pl-64">
-        <main className="py-6 px-4 sm:px-6 lg:px-8 pt-20 lg:pt-6 pb-20 lg:pb-6">
+        <main className="py-6 px-4 sm:px-6 lg:px-8 pt-20 lg:pt-8 pb-20 lg:pb-8">
           {children}
         </main>
       </div>
 
       {/* Mobile bottom navigation */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200/60 z-40 shadow-sm">
         <nav className="flex justify-around py-2">
           {navigation.map((item) => {
             const isActive = pathname === item.href
@@ -165,5 +218,7 @@ export default function DashboardLayout({
         </nav>
       </div>
     </div>
+    </ErrorBoundary>
+    </BillingGuard>
   )
 }

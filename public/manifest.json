@@ -1,7 +1,7 @@
 {
-  "name": "Villa Sere Management",
-  "short_name": "Villa Sere",
-  "description": "Villa management system for inventory, maintenance, vendors, and expenses",
+  "name": "CasaPilot",
+  "short_name": "CasaPilot",
+  "description": "Property management system for inventory, maintenance, vendors, and expenses",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

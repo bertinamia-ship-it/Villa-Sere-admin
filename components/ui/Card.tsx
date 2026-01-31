@@ -15,7 +15,7 @@ const paddings = {
 
 export function Card({ children, className = '', padding = 'md' }: CardProps) {
   return (
-    <div className={`bg-white rounded-xl border border-gray-200 shadow-sm ${paddings[padding]} ${className}`}>
+    <div className={`bg-white rounded-lg border border-gray-200/60 shadow-sm transition-shadow duration-200 hover:shadow-sm ${paddings[padding]} ${className}`}>
       {children}
     </div>
   )
@@ -31,9 +31,9 @@ export function CardHeader({ children, className = '' }: { children: ReactNode; 
 
 export function CardTitle({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <h3 className={`text-lg font-semibold text-gray-900 ${className}`}>
+    <h2 className={`text-lg font-semibold text-gray-900 ${className}`}>
       {children}
-    </h3>
+    </h2>
   )
 }
 

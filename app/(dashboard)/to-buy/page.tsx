@@ -10,11 +10,13 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/Toast'
 import { Plus, ShoppingCart, Edit, Trash2, ExternalLink, Search } from 'lucide-react'
 import PurchaseItemForm from './PurchaseItemForm'
+import { getActivePropertyId } from '@/lib/utils/property-client'
 
 export default function ToBuyPage() {
   const supabase = createClient()
   const { showToast } = useToast()
   const [loading, setLoading] = useState(true)
+  const [hasProperty, setHasProperty] = useState(true)
   const [items, setItems] = useState<PurchaseItem[]>([])
   const [filteredItems, setFilteredItems] = useState<PurchaseItem[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -23,20 +25,22 @@ export default function ToBuyPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingItem, setEditingItem] = useState<PurchaseItem | null>(null)
 
-  useEffect(() => {
-    loadItems()
-  }, [])
-
-  useEffect(() => {
-    filterItems()
-  }, [items, searchTerm, statusFilter, areaFilter])
-
-  async function loadItems() {
+  const loadItems = async () => {
     setLoading(true)
     try {
+      const propertyId = await getActivePropertyId()
+      if (!propertyId) {
+        setItems([])
+        setHasProperty(false)
+        setLoading(false)
+        return
+      }
+
+      setHasProperty(true)
       const { data, error } = await supabase
         .from('purchase_items')
         .select('*')
+        .eq('property_id', propertyId)
         .order('created_at', { ascending: false })
 
       if (error) throw error
@@ -48,6 +52,21 @@ export default function ToBuyPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    loadItems()
+    
+    // Listen for property changes
+    const handlePropertyChange = () => {
+      loadItems()
+    }
+    window.addEventListener('propertyChanged', handlePropertyChange)
+    return () => window.removeEventListener('propertyChanged', handlePropertyChange)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    filterItems()
+  }, [items, searchTerm, statusFilter, areaFilter])
 
   function filterItems() {
     let filtered = items
@@ -72,17 +91,26 @@ export default function ToBuyPage() {
 
   async function handleSave(item: Partial<PurchaseItem>) {
     try {
+      const propertyId = await getActivePropertyId()
+      if (!propertyId) {
+        showToast('No active property selected', 'error')
+        return
+      }
+
       if (editingItem) {
+        // Update: filter by id + property_id for security
         const { error } = await supabase
           .from('purchase_items')
-          .update(item)
+          .update({ ...item, property_id: propertyId })
           .eq('id', editingItem.id)
+          .eq('property_id', propertyId)
         if (error) throw error
         showToast('Item updated successfully', 'success')
       } else {
+        // Insert: include property_id
         const { error } = await supabase
           .from('purchase_items')
-          .insert([item])
+          .insert([{ ...item, property_id: propertyId }])
         if (error) throw error
         showToast('Item added successfully', 'success')
       }
@@ -100,10 +128,17 @@ export default function ToBuyPage() {
     if (!confirm('Are you sure you want to delete this item?')) return
 
     try {
+      const propertyId = await getActivePropertyId()
+      if (!propertyId) {
+        showToast('No active property selected', 'error')
+        return
+      }
+
       const { error } = await supabase
         .from('purchase_items')
         .delete()
         .eq('id', id)
+        .eq('property_id', propertyId) // Security: ensure property matches
       
       if (error) throw error
       showToast('Item deleted successfully', 'success')
@@ -150,24 +185,43 @@ export default function ToBuyPage() {
     )
   }
 
-  return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+  if (!hasProperty) {
+    return (
+      <div className="max-w-7xl mx-auto space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Shopping List</h1>
-          <p className="mt-1 text-sm text-gray-500">Items to purchase for the villa</p>
+          <p className="mt-1 text-sm text-gray-500">Items to purchase for your property</p>
         </div>
-        <Button onClick={() => {
-          setEditingItem(null)
-          setShowForm(true)
-        }}>
+        <EmptyState
+          icon={<ShoppingCart className="h-12 w-12" />}
+          title="No Property Selected"
+          description="Please select or create a property to manage your shopping list."
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900">Shopping List</h1>
+          <p className="mt-1 text-sm text-gray-700">Items to purchase for the villa</p>
+        </div>
+        <Button 
+          onClick={() => {
+            setEditingItem(null)
+            setShowForm(true)
+          }}
+          className="w-full sm:w-auto"
+        >
           <Plus className="h-4 w-4" />
           Add Item
         </Button>
       </div>
 
       {/* Status Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Card padding="sm">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-100 rounded-lg">
@@ -288,7 +342,7 @@ export default function ToBuyPage() {
                     <div>
                       <h3 className="font-semibold text-gray-900">{item.item}</h3>
                       {item.area && (
-                        <p className="text-sm text-gray-600">{item.area}</p>
+                        <p className="text-sm text-gray-700">{item.area}</p>
                       )}
                     </div>
                     <span className={`px-3 py-1 text-xs font-medium rounded-full border ${statusColors[item.status]}`}>

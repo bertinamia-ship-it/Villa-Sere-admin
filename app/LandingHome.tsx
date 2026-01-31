@@ -52,7 +52,7 @@ export default function LandingHome() {
                 <Sparkles className="h-3.5 w-3.5" /> Premium villa ops
               </div>
               <div className="space-y-3">
-                <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">Villa Serena, always guest-ready.</h1>
+                <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">CasaPilot, always guest-ready.</h1>
                 <p className="max-w-xl text-base text-white/80 sm:text-lg">
                   Stay on top of bookings, expenses, inventory, and your to-buy list. A single, elegant control center for your villa.
                 </p>

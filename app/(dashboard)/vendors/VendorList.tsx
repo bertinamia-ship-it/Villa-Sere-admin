@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Vendor } from '@/lib/types/database'
 import { Plus, Search, Pencil, Trash2, Phone, Mail, MessageCircle } from 'lucide-react'
 import VendorForm from './VendorForm'
+import { getCurrentTenantId } from '@/lib/utils/tenant'
 
 export default function VendorList() {
   const [vendors, setVendors] = useState<Vendor[]>([])
@@ -25,15 +26,54 @@ export default function VendorList() {
 
   const fetchVendors = async () => {
     setLoading(true)
-    const { data, error } = await supabase
-      .from('vendors')
-      .select('*')
-      .order('company_name')
+    try {
+      // Get tenant_id from profile (vendors are shared by tenant, not by property)
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setLoading(false)
+        return
+      }
 
-    if (!error && data) {
-      setVendors(data)
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      if (profileError) {
+        console.error('[VendorList] Error fetching profile:', {
+          message: profileError.message,
+          details: profileError.details,
+          hint: profileError.hint,
+          code: profileError.code
+        })
+        setVendors([])
+        setLoading(false)
+        return
+      }
+
+      if (!profile || !profile.tenant_id) {
+        console.warn('[VendorList] No profile or tenant_id found')
+        setVendors([])
+        setLoading(false)
+        return
+      }
+
+      // Fetch vendors filtered by tenant_id (shared across all properties in tenant)
+      const { data, error } = await supabase
+        .from('vendors')
+        .select('*')
+        .eq('tenant_id', profile.tenant_id)
+        .order('company_name')
+
+      if (!error && data) {
+        setVendors(data)
+      }
+    } catch (error) {
+      console.error('Error fetching vendors:', error)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const filterVendors = () => {
@@ -52,13 +92,31 @@ export default function VendorList() {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this vendor?')) return
 
-    const { error } = await supabase
-      .from('vendors')
-      .delete()
-      .eq('id', id)
+    try {
+      // Get tenant_id for security
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
 
-    if (!error) {
-      setVendors(vendors.filter(vendor => vendor.id !== id))
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .single()
+
+      if (!profile?.tenant_id) return
+
+      // Delete with tenant_id filter for security
+      const { error } = await supabase
+        .from('vendors')
+        .delete()
+        .eq('id', id)
+        .eq('tenant_id', profile.tenant_id)
+
+      if (!error) {
+        setVendors(vendors.filter(vendor => vendor.id !== id))
+      }
+    } catch (error) {
+      console.error('Error deleting vendor:', error)
     }
   }
 

@@ -14,6 +14,8 @@ import { Calendar as CalendarIcon, Plus, DollarSign, TrendingUp, Percent } from 
 import BookingForm from './BookingForm'
 import BookingList from './BookingList'
 import BookingCalendar from './BookingCalendar'
+import { getActivePropertyId } from '@/lib/utils/property-client'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 
 interface MonthlyStats {
   income: number
@@ -27,6 +29,7 @@ export default function RentalsPage() {
   const supabase = createClient()
   const { showToast } = useToast()
   const [loading, setLoading] = useState(true)
+  const [hasProperty, setHasProperty] = useState(true)
   const [bookings, setBookings] = useState<Booking[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null)
@@ -36,9 +39,18 @@ export default function RentalsPage() {
   })
   const [monthlyStats, setMonthlyStats] = useState<MonthlyStats | null>(null)
   const [view, setView] = useState<'calendar' | 'list'>('calendar')
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; bookingId: string | null }>({ isOpen: false, bookingId: null })
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     loadData()
+    
+    // Listen for property changes
+    const handlePropertyChange = () => {
+      loadData()
+    }
+    window.addEventListener('propertyChanged', handlePropertyChange)
+    return () => window.removeEventListener('propertyChanged', handlePropertyChange)
   }, [selectedMonth])
 
   async function loadData() {
@@ -54,9 +66,18 @@ export default function RentalsPage() {
   }
 
   async function loadBookings() {
+    const propertyId = await getActivePropertyId()
+    if (!propertyId) {
+      setBookings([])
+      setHasProperty(false)
+      return
+    }
+
+    setHasProperty(true)
     const { data, error } = await supabase
       .from('bookings')
       .select('*')
+      .eq('property_id', propertyId)
       .order('check_in', { ascending: false })
 
     if (error) throw error
@@ -64,14 +85,21 @@ export default function RentalsPage() {
   }
 
   async function loadMonthlyStats() {
+    const propertyId = await getActivePropertyId()
+    if (!propertyId) {
+      setMonthlyStats({ income: 0, expenses: 0, profit: 0, bookingCount: 0, occupancyRate: 0 })
+      return
+    }
+
     const [year, month] = selectedMonth.split('-')
     const startDate = `${year}-${month}-01`
     const endDate = new Date(parseInt(year), parseInt(month), 0).toISOString().split('T')[0]
 
-    // Get bookings for the month
+    // Get bookings for the month (filtered by property_id)
     const { data: bookingsData, error: bookingsError } = await supabase
       .from('bookings')
       .select('*')
+      .eq('property_id', propertyId)
       .gte('check_in', startDate)
       .lte('check_in', endDate)
       .eq('status', 'confirmed')
@@ -81,10 +109,11 @@ export default function RentalsPage() {
     const income = bookingsData?.reduce((sum, b) => sum + b.total_amount + b.cleaning_fee, 0) || 0
     const bookingCount = bookingsData?.length || 0
 
-    // Get expenses for the month
+    // Get expenses for the month (filtered by property_id)
     const { data: expensesData, error: expensesError } = await supabase
       .from('expenses')
       .select('amount')
+      .eq('property_id', propertyId)
       .gte('date', startDate)
       .lte('date', endDate)
 
@@ -108,14 +137,73 @@ export default function RentalsPage() {
 
   async function handleSave(booking: Partial<Booking>) {
     try {
+      const propertyId = await getActivePropertyId()
+      if (!propertyId) {
+        showToast('No active property selected', 'error')
+        return
+      }
+
+      // Validation
+      if (!booking.check_in || !booking.check_out) {
+        showToast('Check-in and check-out dates are required', 'error')
+        return
+      }
+
+      const checkIn = new Date(booking.check_in)
+      const checkOut = new Date(booking.check_out)
+
+      if (checkOut <= checkIn) {
+        showToast('Check-out date must be after check-in date', 'error')
+        return
+      }
+
+      if (!booking.guest_name || booking.guest_name.trim() === '') {
+        showToast('Guest name is required', 'error')
+        return
+      }
+
+      if (booking.total_amount && parseFloat(String(booking.total_amount)) < 0) {
+        showToast('Total amount cannot be negative', 'error')
+        return
+      }
+
       console.log('📝 Saving booking:', booking)
+      
+      // Validate date overlap for same property (only for new bookings or if dates changed)
+      if (!editingBooking || booking.check_in !== editingBooking.check_in || booking.check_out !== editingBooking.check_out) {
+        if (booking.check_in && booking.check_out) {
+          const { data: overlappingBookings } = await supabase
+            .from('bookings')
+            .select('id, check_in, check_out, guest_name')
+            .eq('property_id', propertyId)
+            .eq('status', 'confirmed')
+            .neq('id', editingBooking?.id || '') // Exclude current booking if editing
+          
+          const checkIn = new Date(booking.check_in)
+          const checkOut = new Date(booking.check_out)
+          
+          const hasOverlap = overlappingBookings?.some(existing => {
+            const existingCheckIn = new Date(existing.check_in)
+            const existingCheckOut = new Date(existing.check_out)
+            
+            // Check if dates overlap
+            return (checkIn < existingCheckOut && checkOut > existingCheckIn)
+          })
+          
+          if (hasOverlap) {
+            showToast('Booking dates overlap with an existing booking for this property', 'error')
+            return
+          }
+        }
+      }
       
       if (editingBooking) {
         console.log('✏️ Updating booking:', editingBooking.id)
         const { data, error } = await supabase
           .from('bookings')
-          .update(booking)
+          .update({ ...booking, property_id: propertyId })
           .eq('id', editingBooking.id)
+          .eq('property_id', propertyId) // Security: ensure property matches
           .select()
         
         if (error) {
@@ -128,7 +216,7 @@ export default function RentalsPage() {
         console.log('➕ Creating new booking')
         const { data, error } = await supabase
           .from('bookings')
-          .insert([booking])
+          .insert([{ ...booking, property_id: propertyId }])
           .select()
         
         if (error) {
@@ -149,14 +237,28 @@ export default function RentalsPage() {
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Are you sure you want to delete this booking?')) return
+  function handleDeleteClick(id: string) {
+    setDeleteConfirm({ isOpen: true, bookingId: id })
+  }
 
+  async function handleDelete() {
+    if (!deleteConfirm.bookingId) return
+
+    setDeleting(true)
     try {
+      const propertyId = await getActivePropertyId()
+      if (!propertyId) {
+        showToast('No active property selected', 'error')
+        setDeleting(false)
+        setDeleteConfirm({ isOpen: false, bookingId: null })
+        return
+      }
+
       const { error } = await supabase
         .from('bookings')
         .delete()
-        .eq('id', id)
+        .eq('id', deleteConfirm.bookingId)
+        .eq('property_id', propertyId) // Security: ensure property matches
       
       if (error) throw error
       showToast('Booking deleted successfully', 'success')
@@ -164,6 +266,9 @@ export default function RentalsPage() {
     } catch (error) {
       console.error('Error deleting booking:', error)
       showToast('Failed to delete booking', 'error')
+    } finally {
+      setDeleting(false)
+      setDeleteConfirm({ isOpen: false, bookingId: null })
     }
   }
 
@@ -180,17 +285,37 @@ export default function RentalsPage() {
     )
   }
 
-  return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+  if (!hasProperty) {
+    return (
+      <div className="max-w-7xl mx-auto space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Rental Management</h1>
           <p className="mt-1 text-sm text-gray-500">Track bookings, income, and occupancy</p>
         </div>
-        <Button onClick={() => {
-          setEditingBooking(null)
-          setShowForm(true)
-        }}>
+        <EmptyState
+          icon={<CalendarIcon className="h-12 w-12" />}
+          title="No Property Selected"
+          description="Please select or create a property to manage bookings."
+        />
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Rental Management</h1>
+          <p className="mt-1 text-sm text-gray-500">Track bookings, income, and occupancy</p>
+        </div>
+        <Button 
+          onClick={() => {
+            setEditingBooking(null)
+            setShowForm(true)
+          }}
+          className="w-full sm:w-auto"
+        >
           <Plus className="h-4 w-4" />
           Add Booking
         </Button>
@@ -198,14 +323,14 @@ export default function RentalsPage() {
 
       {/* Monthly Stats */}
       {monthlyStats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           <Card padding="sm">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <DollarSign className="h-5 w-5 text-green-600" />
+              <div className="p-2 bg-emerald-100 rounded-lg">
+                <DollarSign className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Income</p>
+                <p className="text-sm text-gray-700">Income</p>
                 <p className="text-xl font-bold text-gray-900">${monthlyStats.income.toFixed(0)}</p>
               </div>
             </div>
@@ -217,7 +342,7 @@ export default function RentalsPage() {
                 <DollarSign className="h-5 w-5 text-red-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Expenses</p>
+                <p className="text-sm text-gray-700">Expenses</p>
                 <p className="text-xl font-bold text-gray-900">${monthlyStats.expenses.toFixed(0)}</p>
               </div>
             </div>
@@ -229,7 +354,7 @@ export default function RentalsPage() {
                 <TrendingUp className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Profit</p>
+                <p className="text-sm text-gray-700">Profit</p>
                 <p className={`text-xl font-bold ${monthlyStats.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   ${monthlyStats.profit.toFixed(0)}
                 </p>
@@ -255,7 +380,7 @@ export default function RentalsPage() {
                 <Percent className="h-5 w-5 text-amber-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Occupancy</p>
+                <p className="text-sm text-gray-700">Occupancy</p>
                 <p className="text-xl font-bold text-gray-900">{monthlyStats.occupancyRate.toFixed(0)}%</p>
               </div>
             </div>
@@ -288,7 +413,7 @@ export default function RentalsPage() {
       {view === 'calendar' ? (
         <BookingCalendar bookings={bookings} onEdit={handleEdit} />
       ) : (
-        <BookingList bookings={bookings} onEdit={handleEdit} onDelete={handleDelete} />
+        <BookingList bookings={bookings} onEdit={handleEdit} onDelete={handleDeleteClick} />
       )}
 
       {/* Booking Form Modal */}
@@ -306,6 +431,17 @@ export default function RentalsPage() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+
+      <ConfirmModal
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, bookingId: null })}
+        onConfirm={handleDelete}
+        title="Delete Booking"
+        message="Are you sure you want to delete this booking? This action cannot be undone."
+        confirmText="Delete"
+        loading={deleting}
+      />
+    </>
   )
 }

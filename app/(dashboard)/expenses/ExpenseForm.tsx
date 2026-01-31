@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Expense, Vendor, MaintenanceTicket } from '@/lib/types/database'
 import { EXPENSE_CATEGORIES } from '@/lib/constants'
 import { X, Upload } from 'lucide-react'
+import { getActivePropertyId } from '@/lib/utils/property-client'
 
 interface ExpenseFormProps {
   expense?: Expense | null
@@ -31,6 +32,32 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
     e.preventDefault()
     setLoading(true)
 
+    const propertyId = await getActivePropertyId()
+    if (!propertyId) {
+      alert('Please select a property first')
+      setLoading(false)
+      return
+    }
+
+    // Validation
+    if (!formData.amount || parseFloat(formData.amount) <= 0) {
+      alert('Amount must be greater than 0')
+      setLoading(false)
+      return
+    }
+
+    if (!formData.date) {
+      alert('Date is required')
+      setLoading(false)
+      return
+    }
+
+    if (!formData.category) {
+      alert('Category is required')
+      setLoading(false)
+      return
+    }
+
     const { data: { user } } = await supabase.auth.getUser()
 
     const dataToSave = {
@@ -40,18 +67,22 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
       ticket_id: formData.ticket_id || null,
       receipt_url: receiptUrl || null,
       created_by: user?.id,
+      property_id: propertyId,
     }
 
     if (expense) {
+      // Update: filter by id + property_id for security
       const { error } = await supabase
         .from('expenses')
         .update(dataToSave)
         .eq('id', expense.id)
+        .eq('property_id', propertyId)
 
       if (!error) {
         onClose()
       }
     } else {
+      // Insert: property_id included automatically
       const { error } = await supabase
         .from('expenses')
         .insert([dataToSave])

@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react'
+import { getActivePropertyId } from '@/lib/utils/property-client'
 
 interface ImportResult {
   success: number
@@ -73,6 +74,12 @@ export default function CSVImport() {
         const min_threshold = parseInt(row.min_threshold || row.minthreshold || '5')
 
         try {
+          const propertyId = await getActivePropertyId()
+          if (!propertyId) {
+            errors.push(`Line ${i + 1}: No active property selected`)
+            continue
+          }
+
           const { error } = await supabase
             .from('inventory_items')
             .insert({
@@ -82,6 +89,7 @@ export default function CSVImport() {
               quantity,
               min_threshold,
               notes: row.notes || null,
+              property_id: propertyId,
             })
 
           if (error) {
@@ -89,8 +97,9 @@ export default function CSVImport() {
           } else {
             success++
           }
-        } catch (error: any) {
-          errors.push(`Line ${i + 1}: ${error.message}`)
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Unknown error'
+          errors.push(`Line ${i + 1}: ${message}`)
         }
       }
 
@@ -102,8 +111,9 @@ export default function CSVImport() {
       if (errors.length > 0) {
         showToast(`${errors.length} items failed to import`, 'warning')
       }
-    } catch (error: any) {
-      showToast(error.message || 'Failed to import CSV', 'error')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to import CSV'
+      showToast(message, 'error')
     } finally {
       setImporting(false)
       e.target.value = '' // Reset input

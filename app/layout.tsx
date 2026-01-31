@@ -14,13 +14,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Villa Sere Management",
-  description: "Villa management system for inventory, maintenance, and expenses",
+  title: "CasaPilot",
+  description: "Property management system for inventory, maintenance, and expenses",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Villa Sere",
+    title: "CasaPilot",
   },
 };
 
@@ -44,6 +44,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <div id="portal-root" />
         <ToastProvider>
           {children}
         </ToastProvider>

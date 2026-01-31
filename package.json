@@ -1,5 +1,5 @@
 {
-  "name": "villa-sere-admin",
+  "name": "casapilot",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "import:inventory": "tsx scripts/import-inventory.ts"
+    "import:inventory": "tsx scripts/import-inventory.ts",
+    "reset:data": "tsx scripts/reset-data.ts",
+    "seed:data": "tsx scripts/seed-data.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",

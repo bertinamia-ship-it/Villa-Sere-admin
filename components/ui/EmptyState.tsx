@@ -9,9 +9,9 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       {icon && (
-        <div className="mb-4 text-gray-400">
+        <div className="mb-6 text-gray-400 transition-transform duration-200 hover:scale-110">
           {icon}
         </div>
       )}
@@ -19,12 +19,12 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
         {title}
       </h3>
       {description && (
-        <p className="text-sm text-gray-500 mb-6 max-w-sm">
+        <p className="text-sm text-gray-700 mb-6 max-w-sm leading-relaxed">
           {description}
         </p>
       )}
       {action && (
-        <div>
+        <div className="mt-2">
           {action}
         </div>
       )}

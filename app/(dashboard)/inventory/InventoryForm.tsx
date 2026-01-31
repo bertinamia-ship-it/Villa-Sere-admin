@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { InventoryItem } from '@/lib/types/database'
 import { CATEGORIES, ROOMS } from '@/lib/constants'
 import { X, Upload } from 'lucide-react'
+import { getActivePropertyId } from '@/lib/utils/property-client'
 
 interface InventoryFormProps {
   item?: InventoryItem | null
@@ -29,12 +30,20 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
     e.preventDefault()
     setLoading(true)
 
+    const propertyId = await getActivePropertyId()
+    if (!propertyId) {
+      alert('Please select a property first')
+      setLoading(false)
+      return
+    }
+
     const { data: { user } } = await supabase.auth.getUser()
 
     const dataToSave = {
       ...formData,
       photo_url: photoUrl || null,
       created_by: user?.id,
+      property_id: propertyId,
     }
 
     if (item) {
@@ -43,6 +52,7 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
         .from('inventory_items')
         .update(dataToSave)
         .eq('id', item.id)
+        .eq('property_id', propertyId)
 
       if (!error) {
         onClose()

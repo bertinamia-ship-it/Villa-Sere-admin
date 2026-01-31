@@ -9,32 +9,40 @@ import InventoryForm from './InventoryForm'
 import QuickAdjust from './QuickAdjust'
 import CSVImport from './CSVImport'
 import { exportToCSV } from '@/lib/utils/export'
+import { getActivePropertyId } from '@/lib/utils/property-client'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 
 export default function InventoryList() {
   const [items, setItems] = useState<InventoryItem[]>([])
   const [filteredItems, setFilteredItems] = useState<InventoryItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [hasProperty, setHasProperty] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [roomFilter, setRoomFilter] = useState('all')
   const [showForm, setShowForm] = useState(false)
   const [showImport, setShowImport] = useState(false)
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; itemId: string | null }>({ isOpen: false, itemId: null })
+  const [deleting, setDeleting] = useState(false)
   const supabase = createClient()
-
-  useEffect(() => {
-    fetchItems()
-  }, [])
-
-  useEffect(() => {
-    filterItems()
-  }, [items, searchTerm, categoryFilter, roomFilter])
 
   const fetchItems = async () => {
     setLoading(true)
+    const propertyId = await getActivePropertyId()
+    if (!propertyId) {
+      setItems([])
+      setHasProperty(false)
+      setLoading(false)
+      return
+    }
+
+    setHasProperty(true)
     const { data, error } = await supabase
       .from('inventory_items')
       .select('*')
+      .eq('property_id', propertyId)
       .order('name')
 
     if (!error && data) {
@@ -42,6 +50,21 @@ export default function InventoryList() {
     }
     setLoading(false)
   }
+
+  useEffect(() => {
+    fetchItems()
+    
+    // Listen for property changes
+    const handlePropertyChange = () => {
+      fetchItems()
+    }
+    window.addEventListener('propertyChanged', handlePropertyChange)
+    return () => window.removeEventListener('propertyChanged', handlePropertyChange)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    filterItems()
+  }, [items, searchTerm, categoryFilter, roomFilter])
 
   const filterItems = () => {
     let filtered = items
@@ -64,17 +87,33 @@ export default function InventoryList() {
     setFilteredItems(filtered)
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this item?')) return
+  const handleDeleteClick = (id: string) => {
+    setDeleteConfirm({ isOpen: true, itemId: id })
+  }
+
+  const handleDelete = async () => {
+    if (!deleteConfirm.itemId) return
+
+    setDeleting(true)
+    const propertyId = await getActivePropertyId()
+    if (!propertyId) {
+      setDeleting(false)
+      setDeleteConfirm({ isOpen: false, itemId: null })
+      return
+    }
 
     const { error } = await supabase
       .from('inventory_items')
       .delete()
-      .eq('id', id)
+      .eq('id', deleteConfirm.itemId)
+      .eq('property_id', propertyId)
 
     if (!error) {
-      setItems(items.filter(item => item.id !== id))
+      setItems(items.filter(item => item.id !== deleteConfirm.itemId))
     }
+    
+    setDeleting(false)
+    setDeleteConfirm({ isOpen: false, itemId: null })
   }
 
   const handleEdit = (item: InventoryItem) => {
@@ -89,10 +128,14 @@ export default function InventoryList() {
   }
 
   const handleQuantityChange = async (itemId: string, newQuantity: number) => {
+    const propertyId = await getActivePropertyId()
+    if (!propertyId) return
+
     const { error } = await supabase
       .from('inventory_items')
       .update({ quantity: newQuantity })
       .eq('id', itemId)
+      .eq('property_id', propertyId)
 
     if (!error) {
       setItems(items.map(item => 
@@ -116,6 +159,22 @@ export default function InventoryList() {
 
   if (loading) {
     return <div className="flex justify-center p-8">Loading...</div>
+  }
+
+  if (!hasProperty) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Inventory</h1>
+          <p className="text-gray-600 mt-1">Manage your property inventory</p>
+        </div>
+        <EmptyState
+          icon={<Package className="h-12 w-12" />}
+          title="No Property Selected"
+          description="Please select or create a property to manage inventory items."
+        />
+      </div>
+    )
   }
 
   return (
@@ -227,7 +286,7 @@ export default function InventoryList() {
                       <Pencil className="h-4 w-4" />
                     </button>
                     <button
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => handleDeleteClick(item.id)}
                       className="p-1 text-gray-600 hover:text-red-600 transition"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -284,6 +343,16 @@ export default function InventoryList() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, itemId: null })}
+        onConfirm={handleDelete}
+        title="Delete Inventory Item"
+        message="Are you sure you want to delete this item? This action cannot be undone."
+        confirmText="Delete"
+        loading={deleting}
+      />
     </div>
   )
 }

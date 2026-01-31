@@ -3,16 +3,19 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { MaintenanceTicket, Vendor } from '@/lib/types/database'
-import { ROOMS, PRIORITIES, TICKET_STATUSES } from '@/lib/constants'
-import { Plus, Search, Filter, AlertCircle } from 'lucide-react'
+import { ROOMS, PRIORITIES } from '@/lib/constants'
+import { Plus, Search, AlertCircle } from 'lucide-react'
 import TicketCard from './TicketCard'
 import TicketForm from './TicketForm'
+import { getActivePropertyId } from '@/lib/utils/property-client'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 export default function MaintenanceList() {
   const [tickets, setTickets] = useState<MaintenanceTicket[]>([])
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [filteredTickets, setFilteredTickets] = useState<MaintenanceTicket[]>([])
   const [loading, setLoading] = useState(true)
+  const [hasProperty, setHasProperty] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [priorityFilter, setPriorityFilter] = useState('all')
@@ -21,25 +24,69 @@ export default function MaintenanceList() {
   const [editingTicket, setEditingTicket] = useState<MaintenanceTicket | null>(null)
   const supabase = createClient()
 
-  useEffect(() => {
-    fetchData()
-  }, [])
-
-  useEffect(() => {
-    filterTickets()
-  }, [tickets, searchTerm, statusFilter, priorityFilter, roomFilter])
-
   const fetchData = async () => {
     setLoading(true)
+    const propertyId = await getActivePropertyId()
+    
+    if (!propertyId) {
+      setTickets([])
+      setVendors([])
+      setHasProperty(false)
+      setLoading(false)
+      return
+    }
+
+    setHasProperty(true)
+    
+    // Get tenant_id for vendors (vendors shared by tenant, not property)
+    const { data: { user } } = await supabase.auth.getUser()
+    let tenantId: string | null = null
+    if (user) {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .maybeSingle()
+      
+      if (profileError) {
+        console.error('[MaintenanceList] Error fetching profile:', {
+          message: profileError.message,
+          details: profileError.details,
+          hint: profileError.hint,
+          code: profileError.code
+        })
+      }
+      
+      tenantId = profile?.tenant_id || null
+    }
+    
+    // Tickets filtered by property_id, vendors shared (only tenant_id)
     const [ticketsResult, vendorsResult] = await Promise.all([
-      supabase.from('maintenance_tickets').select('*').order('created_at', { ascending: false }),
-      supabase.from('vendors').select('*').order('company_name')
+      supabase.from('maintenance_tickets').select('*').eq('property_id', propertyId).order('created_at', { ascending: false }),
+      tenantId
+        ? supabase.from('vendors').select('*').eq('tenant_id', tenantId).order('company_name')
+        : { data: [], error: null }
     ])
 
     if (ticketsResult.data) setTickets(ticketsResult.data)
     if (vendorsResult.data) setVendors(vendorsResult.data)
     setLoading(false)
   }
+
+  useEffect(() => {
+    fetchData()
+    
+    // Listen for property changes
+    const handlePropertyChange = () => {
+      fetchData()
+    }
+    window.addEventListener('propertyChanged', handlePropertyChange)
+    return () => window.removeEventListener('propertyChanged', handlePropertyChange)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    filterTickets()
+  }, [tickets, searchTerm, statusFilter, priorityFilter, roomFilter])
 
   const filterTickets = () => {
     let filtered = tickets
@@ -69,10 +116,14 @@ export default function MaintenanceList() {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this ticket?')) return
 
+    const propertyId = await getActivePropertyId()
+    if (!propertyId) return
+
     const { error } = await supabase
       .from('maintenance_tickets')
       .delete()
       .eq('id', id)
+      .eq('property_id', propertyId)
 
     if (!error) {
       setTickets(tickets.filter(ticket => ticket.id !== id))
@@ -116,6 +167,22 @@ export default function MaintenanceList() {
 
   if (loading) {
     return <div className="flex justify-center p-8">Loading...</div>
+  }
+
+  if (!hasProperty) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Maintenance</h1>
+          <p className="text-gray-600 mt-1">Track maintenance tickets</p>
+        </div>
+        <EmptyState
+          icon={<AlertCircle className="h-12 w-12" />}
+          title="No Property Selected"
+          description="Please select or create a property to manage maintenance tickets."
+        />
+      </div>
+    )
   }
 
   const openTickets = tickets.filter(t => t.status !== 'done').length

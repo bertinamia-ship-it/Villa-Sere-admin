@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { MaintenanceTicket, Vendor } from '@/lib/types/database'
 import { ROOMS, PRIORITIES, TICKET_STATUSES } from '@/lib/constants'
 import { X, Upload } from 'lucide-react'
+import { getActivePropertyId } from '@/lib/utils/property-client'
 
 interface TicketFormProps {
   ticket?: MaintenanceTicket | null
@@ -32,6 +33,13 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
     e.preventDefault()
     setLoading(true)
 
+    const propertyId = await getActivePropertyId()
+    if (!propertyId) {
+      alert('Please select a property first')
+      setLoading(false)
+      return
+    }
+
     const { data: { user } } = await supabase.auth.getUser()
 
     const dataToSave = {
@@ -40,16 +48,20 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
       cost: formData.cost ? parseFloat(formData.cost) : null,
       photo_url: photoUrl || null,
       created_by: user?.id,
+      property_id: propertyId,
     }
 
     if (ticket) {
+      // Update: filter by id + property_id for security
       const { error } = await supabase
         .from('maintenance_tickets')
         .update(dataToSave)
         .eq('id', ticket.id)
+        .eq('property_id', propertyId)
 
       if (!error) onClose()
     } else {
+      // Insert: property_id included automatically
       const { error } = await supabase
         .from('maintenance_tickets')
         .insert([dataToSave])

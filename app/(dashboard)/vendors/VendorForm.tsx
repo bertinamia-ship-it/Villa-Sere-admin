@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Vendor } from '@/lib/types/database'
 import { X } from 'lucide-react'
+import { getCurrentTenantId } from '@/lib/utils/tenant'
 
 interface VendorFormProps {
   vendor?: Vendor | null
@@ -26,35 +27,71 @@ export default function VendorForm({ vendor, onClose }: VendorFormProps) {
     e.preventDefault()
     setLoading(true)
 
-    const { data: { user } } = await supabase.auth.getUser()
-
-    const dataToSave = {
-      ...formData,
-      created_by: user?.id,
-    }
-
-    if (vendor) {
-      // Update
-      const { error } = await supabase
-        .from('vendors')
-        .update(dataToSave)
-        .eq('id', vendor.id)
-
-      if (!error) {
-        onClose()
+    try {
+      // Get tenant_id (vendors are shared by tenant, not by property)
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setLoading(false)
+        return
       }
-    } else {
-      // Insert
-      const { error } = await supabase
-        .from('vendors')
-        .insert([dataToSave])
 
-      if (!error) {
-        onClose()
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      if (profileError) {
+        console.error('[VendorForm] Error fetching profile:', {
+          message: profileError.message,
+          details: profileError.details,
+          hint: profileError.hint,
+          code: profileError.code
+        })
+        alert(`Error: ${profileError.message || 'Failed to fetch profile'}`)
+        setLoading(false)
+        return
       }
-    }
 
-    setLoading(false)
+      if (!profile || !profile.tenant_id) {
+        console.error('[VendorForm] No profile or tenant_id found')
+        alert('Error: No tenant found. Please contact support.')
+        setLoading(false)
+        return
+      }
+
+      const dataToSave = {
+        ...formData,
+        created_by: user.id,
+        tenant_id: profile.tenant_id,
+      }
+
+      if (vendor) {
+        // Update: filter by id + tenant_id for security
+        const { error } = await supabase
+          .from('vendors')
+          .update(dataToSave)
+          .eq('id', vendor.id)
+          .eq('tenant_id', profile.tenant_id)
+
+        if (!error) {
+          onClose()
+        }
+      } else {
+        // Insert: include tenant_id (vendors shared across all properties in tenant)
+        const { error } = await supabase
+          .from('vendors')
+          .insert([dataToSave])
+
+        if (!error) {
+          onClose()
+        }
+      }
+    } catch (error) {
+      console.error('Error saving vendor:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
