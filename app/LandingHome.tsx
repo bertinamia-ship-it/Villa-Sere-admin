@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type ComponentType, type SVGProps } from 
 import { ArrowRight, CalendarDays, ShoppingBag, Sparkles, TrendingUp, Wallet2, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { t } from '@/lib/i18n/es'
 
 const heroImages = [
   'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1600&q=80',
@@ -41,92 +42,94 @@ export default function LandingHome() {
   }), [activeImage])
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-indigo-50 text-slate-900">
-      <div className="mx-auto max-w-6xl px-6 py-12 space-y-12 page-soft">
-        <section className="relative overflow-hidden rounded-3xl bg-white/70 shadow-2xl ring-1 ring-indigo-100">
+    <main className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
+      <div className="mx-auto max-w-6xl px-6 py-8 space-y-8">
+        <section className="relative overflow-hidden rounded-xl bg-white border border-[#E2E8F0] shadow-lg">
           <div className="absolute inset-0 transition-[background-image] duration-700 ease-in-out" style={backgroundStyle} />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/55 to-slate-900/35" />
-          <div className="relative grid gap-8 px-8 py-12 md:grid-cols-2 lg:px-12">
-            <div className="space-y-6 text-white">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] shadow-sm backdrop-blur">
-                <Sparkles className="h-3.5 w-3.5" /> Premium villa ops
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A]/75 via-[#0F172A]/60 to-[#0F172A]/45" />
+          <div className="relative grid gap-6 px-6 py-8 md:grid-cols-2 lg:px-10">
+            <div className="space-y-5 text-white">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide shadow-sm backdrop-blur">
+                <Sparkles className="h-3 w-3 stroke-[1.5]" /> Operaciones Premium
               </div>
-              <div className="space-y-3">
-                <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">CasaPilot, always guest-ready.</h1>
-                <p className="max-w-xl text-base text-white/80 sm:text-lg">
-                  Stay on top of bookings, expenses, inventory, and your to-buy list. A single, elegant control center for your villa.
+              <div className="space-y-2.5">
+                <h1 className="text-2xl font-semibold leading-tight sm:text-3xl lg:text-4xl">CasaPilot, siempre listo para huéspedes.</h1>
+                <p className="max-w-xl text-sm text-white/90 sm:text-base">
+                  Controla reservas, gastos, inventario y tu lista de compras. Un centro de control elegante para tu propiedad.
                 </p>
               </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <Button className="shadow-lg shadow-indigo-300/40" onClick={() => window.location.href = '/login'}>
-                  <span className="inline-flex items-center gap-2">Go to Login <ArrowRight className="h-4 w-4" /></span>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <Button size="sm" onClick={() => window.location.href = '/login'}>
+                  <span className="inline-flex items-center gap-1.5 text-xs">Ir a Iniciar Sesión <ArrowRight className="h-3.5 w-3.5 stroke-[1.5]" /></span>
                 </Button>
-                <Button variant="secondary" onClick={() => window.location.href = '/dashboard'}>
-                  <span className="inline-flex items-center gap-2">Open Dashboard</span>
+                <Button variant="secondary" size="sm" onClick={() => window.location.href = '/dashboard'}>
+                  <span className="inline-flex items-center gap-1.5 text-xs">Abrir Dashboard</span>
                 </Button>
               </div>
-              <div className="mt-4 flex flex-wrap gap-4 text-sm text-white/80">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-emerald-400" /> Live occupancy
+              <div className="mt-3 flex flex-wrap gap-3 text-xs text-white/80">
+                <div className="flex items-center gap-1.5">
+                  <div className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" /> Ocupación en vivo
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-amber-300" /> Smart to-buy alerts
+                <div className="flex items-center gap-1.5">
+                  <div className="h-1.5 w-1.5 rounded-full bg-[#F59E0B]" /> Alertas inteligentes
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-sky-300" /> Calendar-first bookings
+                <div className="flex items-center gap-1.5">
+                  <div className="h-1.5 w-1.5 rounded-full bg-[#2563EB]" /> Reservas por calendario
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col gap-4">
-              <Card className="bg-white/90 backdrop-blur-lg shadow-xl shadow-indigo-200/40 border-indigo-50">
-                <CardHeader className="border-0 pb-2">
-                  <CardTitle>At a glance</CardTitle>
+            <div className="flex flex-col gap-3">
+              <Card className="bg-white/95 backdrop-blur-lg shadow-lg border-[#E2E8F0]" padding="sm">
+                <CardHeader>
+                  <CardTitle className="text-sm">Vista General</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <Metric label="Occupancy" value="82%" trend="up" detail="This month" />
-                    <Metric label="ADR" value="$245" trend="up" detail="+6% vs last month" />
-                    <Metric label="Net profit" value="$8.4k" trend="up" detail="Projected" />
-                    <Metric label="Expenses" value="$4.8k" trend="down" detail="Month-to-date" />
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <Metric label="Ocupación" value="82%" trend="up" detail="Este mes" />
+                    <Metric label="ADR" value="$245" trend="up" detail="+6% vs mes pasado" />
+                    <Metric label="Ganancia Neta" value="$8.4k" trend="up" detail="Proyectado" />
+                    <Metric label="Gastos" value="$4.8k" trend="down" detail="Mes actual" />
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-white to-indigo-50/60 border-indigo-100 shadow-lg shadow-indigo-100/60">
-                <CardHeader className="border-0 pb-1">
-                  <CardTitle>Upcoming stays</CardTitle>
+              <Card className="bg-white/95 backdrop-blur-lg shadow-lg border-[#E2E8F0]" padding="sm">
+                <CardHeader>
+                  <CardTitle className="text-sm">Próximas Estancias</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  {upcomingBookings.map((booking) => (
-                    <div key={booking.guest} className="flex items-center justify-between rounded-xl border border-indigo-100 bg-white/80 px-4 py-3 shadow-sm">
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">{booking.guest}</p>
-                        <p className="text-xs text-slate-500">{booking.platform} · {booking.dates}</p>
+                <CardContent>
+                  <div className="space-y-2">
+                    {upcomingBookings.map((booking) => (
+                      <div key={booking.guest} className="flex items-center justify-between rounded-md border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2">
+                        <div>
+                          <p className="text-xs font-medium text-[#0F172A]">{booking.guest}</p>
+                          <p className="text-[10px] text-[#64748B]">{booking.platform} · {booking.dates}</p>
+                        </div>
+                        <span className="text-xs font-semibold text-[#2563EB]">{booking.value}</span>
                       </div>
-                      <span className="text-sm font-semibold text-indigo-600">{booking.value}</span>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             </div>
           </div>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <section className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
           {quickCards.map(({ title, value, icon: Icon, tone, badge }) => (
-            <Card key={title} className={`border-0 bg-gradient-to-br ${tone} shadow-lg shadow-gray-200/40`}>
-              <CardContent className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold text-slate-700">{title}</p>
-                  <span className="text-[11px] rounded-full bg-white/70 px-2 py-0.5 text-indigo-700 font-semibold">
+            <Card key={title} className={`border border-[#E2E8F0] bg-white shadow-sm`} padding="sm">
+              <CardContent>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-medium text-[#64748B]">{title}</p>
+                  <span className="text-[9px] rounded-full bg-[#2563EB]/10 px-1.5 py-0.5 text-[#2563EB] font-semibold">
                     {badge}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <p className="text-xl font-bold text-slate-900">{value}</p>
-                  <div className="rounded-full bg-white/70 p-2 text-indigo-700 shadow-sm">
-                    <Icon className="h-4 w-4" />
+                  <p className="text-lg font-bold text-[#0F172A]">{value}</p>
+                  <div className="rounded-md bg-[#F8FAFC] p-1.5 text-[#2563EB]">
+                    <Icon className="h-3.5 w-3.5 stroke-[1.5]" />
                   </div>
                 </div>
               </CardContent>
@@ -134,35 +137,39 @@ export default function LandingHome() {
           ))}
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-2">
-          <Card className="shadow-lg shadow-slate-200/60">
+        <section className="grid gap-4 lg:grid-cols-2">
+          <Card className="shadow-sm border-[#E2E8F0]" padding="sm">
             <CardHeader>
-              <CardTitle>Stay operations dashboard</CardTitle>
+              <CardTitle className="text-sm">Dashboard de Operaciones</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-3 md:grid-cols-2">
-              <MiniFeature icon={CalendarDays} title="Calendar-first" description="Book, edit, and inspect stays directly on a color-coded calendar." />
-              <MiniFeature icon={TrendingUp} title="Profit clarity" description="Instant view of ADR, occupancy, and profit trends." />
-              <MiniFeature icon={ShoppingBag} title="Smart stock" description="Low-stock signals and a curated to-buy queue." />
-              <MiniFeature icon={Sparkles} title="Premium UI" description="Fast, clean interactions with hover/press animations." />
+            <CardContent>
+              <div className="grid gap-2.5 md:grid-cols-2">
+                <MiniFeature icon={CalendarDays} title="Calendario primero" description="Reserva, edita e inspecciona estancias directamente en un calendario codificado por colores." />
+                <MiniFeature icon={TrendingUp} title="Claridad de ganancias" description="Vista instantánea de ADR, ocupación y tendencias de ganancias." />
+                <MiniFeature icon={ShoppingBag} title="Stock inteligente" description="Señales de stock bajo y una cola de compras curada." />
+                <MiniFeature icon={Sparkles} title="UI Premium" description="Interacciones rápidas y limpias con animaciones hover/press." />
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-indigo-600 to-indigo-500 text-white shadow-xl shadow-indigo-300/50">
-            <CardHeader className="border-0">
-              <CardTitle className="text-white">What’s next</CardTitle>
+          <Card className="bg-gradient-to-br from-[#0F172A] to-[#1E293B] text-white shadow-lg border-[#0F172A]" padding="sm">
+            <CardHeader>
+              <CardTitle className="text-sm text-white">Próximos Pasos</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="rounded-2xl bg-white/10 p-4 backdrop-blur">
-                <p className="text-sm font-semibold">Deploy</p>
-                <p className="text-sm text-white/80">Set Vercel env vars and run the bookings migration.</p>
-              </div>
-              <div className="rounded-2xl bg-white/10 p-4 backdrop-blur">
-                <p className="text-sm font-semibold">Verify rentals</p>
-                <p className="text-sm text-white/80">Add a booking and confirm it appears in the calendar instantly.</p>
-              </div>
-              <div className="rounded-2xl bg-white/10 p-4 backdrop-blur">
-                <p className="text-sm font-semibold">Stay in control</p>
-                <p className="text-sm text-white/80">Track expenses and inventory with unified UI states.</p>
+            <CardContent>
+              <div className="space-y-2.5">
+                <div className="rounded-lg bg-white/10 p-3 backdrop-blur">
+                  <p className="text-xs font-semibold">Desplegar</p>
+                  <p className="text-[10px] text-white/80 mt-0.5">Configura variables de entorno en Vercel y ejecuta la migración de reservas.</p>
+                </div>
+                <div className="rounded-lg bg-white/10 p-3 backdrop-blur">
+                  <p className="text-xs font-semibold">Verificar reservas</p>
+                  <p className="text-[10px] text-white/80 mt-0.5">Agrega una reserva y confirma que aparece en el calendario instantáneamente.</p>
+                </div>
+                <div className="rounded-lg bg-white/10 p-3 backdrop-blur">
+                  <p className="text-xs font-semibold">Mantén el control</p>
+                  <p className="text-[10px] text-white/80 mt-0.5">Rastrea gastos e inventario con estados de UI unificados.</p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -176,28 +183,28 @@ type IconType = ComponentType<SVGProps<SVGSVGElement>>
 
 function Metric({ label, value, trend, detail }: { label: string; value: string; trend: 'up' | 'down'; detail: string }) {
   return (
-    <div className="rounded-2xl border border-slate-100 bg-white/80 px-4 py-3 shadow-sm">
-      <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
+    <div className="rounded-md border border-[#E2E8F0] bg-white px-2.5 py-2 shadow-sm">
+      <div className="flex items-center justify-between text-[10px] font-medium text-[#64748B]">
         <span>{label}</span>
-        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] ${trend === 'up' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
-          {trend === 'up' ? '↑' : '↓'} {trend === 'up' ? 'up' : 'down'}
+        <span className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] ${trend === 'up' ? 'bg-[#22C55E]/10 text-[#22C55E]' : 'bg-[#F59E0B]/10 text-[#F59E0B]'}`}>
+          {trend === 'up' ? '↑' : '↓'} {trend === 'up' ? 'arriba' : 'abajo'}
         </span>
       </div>
-      <p className="mt-2 text-xl font-bold text-slate-900">{value}</p>
-      <p className="text-xs text-slate-500">{detail}</p>
+      <p className="mt-1.5 text-base font-bold text-[#0F172A]">{value}</p>
+      <p className="text-[9px] text-[#64748B]">{detail}</p>
     </div>
   )
 }
 
 function MiniFeature({ icon: Icon, title, description }: { icon: IconType; title: string; description: string }) {
   return (
-    <div className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-white/70 p-4 shadow-sm">
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700 shadow-inner">
-        <Icon className="h-5 w-5" />
+    <div className="flex items-start gap-2 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] p-2.5 shadow-sm">
+      <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#2563EB]/10 text-[#2563EB]">
+        <Icon className="h-4 w-4 stroke-[1.5]" />
       </div>
       <div>
-        <p className="text-sm font-semibold text-slate-900">{title}</p>
-        <p className="text-sm text-slate-500">{description}</p>
+        <p className="text-xs font-semibold text-[#0F172A]">{title}</p>
+        <p className="text-[10px] text-[#64748B] mt-0.5">{description}</p>
       </div>
     </div>
   )

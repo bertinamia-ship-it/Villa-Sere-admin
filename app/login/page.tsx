@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { t } from '@/lib/i18n/es'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -42,7 +43,7 @@ export default function LoginPage() {
 
     // Basic validation
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long')
+      setError('La contraseña debe tener al menos 6 caracteres')
       setLoading(false)
       return
     }
@@ -65,7 +66,7 @@ export default function LoginPage() {
       // Check if email confirmation is required
       if (data.user.identities && data.user.identities.length === 0) {
         // User already exists
-        setError('An account with this email already exists. Please sign in instead.')
+        setError('Ya existe una cuenta con este email. Por favor inicia sesión.')
         setLoading(false)
       } else if (data.user.confirmed_at) {
         // User is confirmed - redirect to dashboard
@@ -74,7 +75,7 @@ export default function LoginPage() {
       } else {
         // Email confirmation required
         setError(null)
-        setSuccess('Account created! Please check your email to confirm your account. After confirming, you can sign in here.')
+        setSuccess('¡Cuenta creada! Por favor revisa tu email para confirmar tu cuenta. Después de confirmar, puedes iniciar sesión aquí.')
         setLoading(false)
         // Keep user on the same page with message
         setEmail('')
@@ -82,50 +83,50 @@ export default function LoginPage() {
         setFullName('')
       }
     } else {
-      setError('An unexpected error occurred. Please try again.')
+      setError('Ocurrió un error inesperado. Por favor intenta de nuevo.')
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
+    <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] px-4">
+      <div className="max-w-md w-full bg-white rounded-lg border border-[#E2E8F0] shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">CasaPilot</h1>
-          <p className="text-gray-600">Property Management System</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A] mb-1.5">CasaPilot</h1>
+          <p className="text-sm text-[#64748B]">Sistema de Gestión de Propiedades</p>
         </div>
 
         {success && (
-          <div className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          <div className="mb-6 rounded-md border border-[#22C55E]/30 bg-[#22C55E]/10 px-4 py-3 text-xs text-[#22C55E]">
             {success}
           </div>
         )}
 
-        <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-6">
+        <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444] px-4 py-3 rounded-md text-xs">
               {error}
             </div>
           )}
 
           {isSignUp && (
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name (Optional)
+              <label htmlFor="fullName" className="block text-xs font-medium text-[#0F172A] mb-1.5">
+                Nombre Completo {t('common.optional')}
               </label>
               <input
                 id="fullName"
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-gray-900 placeholder-gray-400"
-                placeholder="John Doe"
+                className="w-full px-3 py-2 border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all duration-150 text-[#0F172A] placeholder-[#64748B]"
+                placeholder="Juan Pérez"
               />
             </div>
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="email" className="block text-xs font-medium text-[#0F172A] mb-1.5">
               Email
             </label>
             <input
@@ -134,14 +135,14 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-gray-900 placeholder-gray-400"
-              placeholder="your@email.com"
+              className="w-full px-3 py-2 border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all duration-150 text-[#0F172A] placeholder-[#64748B]"
+              placeholder="tu@email.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Password {isSignUp && <span className="text-gray-500 font-normal">(min. 6 characters)</span>}
+            <label htmlFor="password" className="block text-xs font-medium text-[#0F172A] mb-1.5">
+              Contraseña {isSignUp && <span className="text-[#64748B] font-normal">(mín. 6 caracteres)</span>}
             </label>
             <input
               id="password"
@@ -149,7 +150,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-gray-900 placeholder-gray-400"
+              className="w-full px-3 py-2 border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all duration-150 text-[#0F172A] placeholder-[#64748B]"
               placeholder="••••••••"
             />
           </div>
@@ -157,9 +158,9 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className="w-full bg-[#0F172A] text-white py-2.5 rounded-md text-sm font-medium hover:bg-[#1E293B] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 ease-out"
           >
-            {loading ? (isSignUp ? 'Creating account...' : 'Signing in...') : (isSignUp ? 'Create Account' : 'Sign In')}
+            {loading ? (isSignUp ? 'Creando cuenta...' : 'Iniciando sesión...') : (isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión')}
           </button>
         </form>
 
@@ -171,9 +172,9 @@ export default function LoginPage() {
               setError(null)
               setFullName('')
             }}
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium transition"
+            className="text-xs text-[#2563EB] hover:text-[#1D4ED8] font-medium transition-colors duration-150"
           >
-            {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+            {isSignUp ? '¿Ya tienes una cuenta? Inicia sesión' : '¿No tienes una cuenta? Regístrate'}
           </button>
         </div>
       </div>
