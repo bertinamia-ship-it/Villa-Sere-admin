@@ -4,12 +4,10 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { MaintenancePlan, Vendor } from '@/lib/types/database'
 import { PRIORITIES, PRIORITY_LABELS } from '@/lib/constants'
-import { X } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Select } from '@/components/ui/Select'
 import { useToast } from '@/components/ui/Toast'
 import { t } from '@/lib/i18n/es'
 
@@ -22,14 +20,13 @@ interface MaintenancePlanFormProps {
 export default function MaintenancePlanForm({ plan, vendors, onClose }: MaintenancePlanFormProps) {
   const [formData, setFormData] = useState({
     title: plan?.title || '',
-    description: plan?.description || '',
+    next_run_date: plan?.next_run_date || new Date().toISOString().split('T')[0],
+    is_recurrent: plan ? (plan.frequency_unit && plan.frequency_interval > 0) : false,
     frequency_unit: plan?.frequency_unit || ('month' as 'day' | 'week' | 'month' | 'year'),
     frequency_interval: plan?.frequency_interval?.toString() || '1',
-    start_date: plan?.start_date || new Date().toISOString().split('T')[0],
     vendor_id: plan?.vendor_id || '',
-    estimated_cost: plan?.estimated_cost?.toString() || '',
     priority: plan?.priority || ('medium' as 'low' | 'medium' | 'high' | 'urgent'),
-    is_active: plan?.is_active ?? true,
+    notes: plan?.description || '',
   })
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
@@ -53,8 +50,14 @@ export default function MaintenancePlanForm({ plan, vendors, onClose }: Maintena
       return
     }
 
-    const interval = parseInt(formData.frequency_interval)
-    if (isNaN(interval) || interval <= 0) {
+    if (!formData.next_run_date) {
+      showToast('La próxima fecha es requerida', 'error')
+      setLoading(false)
+      return
+    }
+
+    const interval = formData.is_recurrent ? parseInt(formData.frequency_interval) : 0
+    if (formData.is_recurrent && (isNaN(interval) || interval <= 0)) {
       showToast('El intervalo debe ser mayor que 0', 'error')
       setLoading(false)
       return
@@ -81,35 +84,22 @@ export default function MaintenancePlanForm({ plan, vendors, onClose }: Maintena
         return
       }
 
-      // Calculate next_run_date using SQL function
-      const { data: nextRunDate, error: nextDateError } = await supabase
-        .rpc('calculate_next_run_date', {
-          p_start_date: formData.start_date,
-          p_frequency_unit: formData.frequency_unit,
-          p_frequency_interval: interval,
-          p_last_completed_date: null
-        })
-
-      if (nextDateError) {
-        console.error('Error calculating next_run_date:', nextDateError)
-        showToast('Error al calcular próxima fecha', 'error')
-        setLoading(false)
-        return
-      }
+      // Use next_run_date as start_date for calculation purposes
+      const startDate = formData.next_run_date
 
       const dataToSave = {
         tenant_id: profile.tenant_id,
         property_id: propertyId,
         title: formData.title.trim(),
-        description: formData.description.trim() || null,
-        frequency_unit: formData.frequency_unit,
-        frequency_interval: interval,
-        start_date: formData.start_date,
-        next_run_date: nextRunDate || formData.start_date,
+        description: formData.notes.trim() || null,
+        frequency_unit: formData.is_recurrent ? formData.frequency_unit : null,
+        frequency_interval: formData.is_recurrent ? interval : null,
+        start_date: startDate,
+        next_run_date: formData.next_run_date,
         vendor_id: formData.vendor_id || null,
-        estimated_cost: formData.estimated_cost ? parseFloat(formData.estimated_cost) : null,
+        estimated_cost: null,
         priority: formData.priority,
-        is_active: formData.is_active,
+        is_active: true,
       }
 
       if (plan) {
@@ -165,57 +155,59 @@ export default function MaintenancePlanForm({ plan, vendors, onClose }: Maintena
           required
         />
 
-        <div>
-          <label className="block text-xs font-medium text-[#0F172A] mb-1.5">
-            {t('maintenancePlans.planDescription')}
-          </label>
-          <textarea
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-3 py-2 text-sm text-[#0F172A] placeholder-[#64748B] bg-white border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
-            rows={3}
-            placeholder="Descripción opcional del plan de mantenimiento"
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-medium text-[#0F172A] mb-1.5">
-              {t('maintenancePlans.frequencyInterval')}
-            </label>
-            <input
-              type="number"
-              min="1"
-              value={formData.frequency_interval}
-              onChange={(e) => setFormData({ ...formData, frequency_interval: e.target.value })}
-              className="w-full px-3 py-2 text-sm text-[#0F172A] bg-white border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-[#0F172A] mb-1.5">
-              {t('maintenancePlans.frequencyUnit')}
-            </label>
-            <select
-              value={formData.frequency_unit}
-              onChange={(e) => setFormData({ ...formData, frequency_unit: e.target.value as 'day' | 'week' | 'month' | 'year' })}
-              className="w-full px-3 py-2 text-sm text-[#0F172A] bg-white border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
-            >
-              <option value="day">{t('maintenancePlans.frequencyUnitOptions.day')}</option>
-              <option value="week">{t('maintenancePlans.frequencyUnitOptions.week')}</option>
-              <option value="month">{t('maintenancePlans.frequencyUnitOptions.month')}</option>
-              <option value="year">{t('maintenancePlans.frequencyUnitOptions.year')}</option>
-            </select>
-          </div>
-        </div>
-
         <Input
-          label={t('maintenancePlans.startDate')}
+          label={t('maintenancePlans.nextRunDate')}
           type="date"
-          value={formData.start_date}
-          onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+          value={formData.next_run_date}
+          onChange={(e) => setFormData({ ...formData, next_run_date: e.target.value })}
           required
         />
+
+        <div className="flex items-center gap-2 pt-2">
+          <input
+            type="checkbox"
+            id="is_recurrent"
+            checked={formData.is_recurrent}
+            onChange={(e) => setFormData({ ...formData, is_recurrent: e.target.checked })}
+            className="h-4 w-4 text-[#2563EB] border-[#E2E8F0] rounded focus:ring-[#2563EB]/30"
+          />
+          <label htmlFor="is_recurrent" className="text-sm font-medium text-[#0F172A]">
+            {t('maintenancePlans.repeat')}
+          </label>
+        </div>
+
+        {formData.is_recurrent && (
+          <div className="grid grid-cols-2 gap-4 pl-6">
+            <div>
+              <label className="block text-xs font-medium text-[#0F172A] mb-1.5">
+                {t('maintenancePlans.frequencyInterval')}
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={formData.frequency_interval}
+                onChange={(e) => setFormData({ ...formData, frequency_interval: e.target.value })}
+                className="w-full px-3 py-2 text-sm text-[#0F172A] bg-white border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-[#0F172A] mb-1.5">
+                {t('maintenancePlans.frequencyUnit')}
+              </label>
+              <select
+                value={formData.frequency_unit}
+                onChange={(e) => setFormData({ ...formData, frequency_unit: e.target.value as 'day' | 'week' | 'month' | 'year' })}
+                className="w-full px-3 py-2 text-sm text-[#0F172A] bg-white border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+              >
+                <option value="day">{t('maintenancePlans.frequencyUnitOptions.day')}</option>
+                <option value="week">{t('maintenancePlans.frequencyUnitOptions.week')}</option>
+                <option value="month">{t('maintenancePlans.frequencyUnitOptions.month')}</option>
+                <option value="year">{t('maintenancePlans.frequencyUnitOptions.year')}</option>
+              </select>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -234,18 +226,6 @@ export default function MaintenancePlanForm({ plan, vendors, onClose }: Maintena
             </select>
           </div>
 
-          <Input
-            label={t('maintenancePlans.estimatedCost')}
-            type="number"
-            min="0"
-            step="0.01"
-            value={formData.estimated_cost}
-            onChange={(e) => setFormData({ ...formData, estimated_cost: e.target.value })}
-            placeholder="0.00"
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-medium text-[#0F172A] mb-1.5">
               {t('maintenancePlans.priority')}
@@ -260,19 +240,19 @@ export default function MaintenancePlanForm({ plan, vendors, onClose }: Maintena
               ))}
             </select>
           </div>
+        </div>
 
-          <div className="flex items-center gap-2 pt-6">
-            <input
-              type="checkbox"
-              id="is_active"
-              checked={formData.is_active}
-              onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-              className="h-4 w-4 text-[#2563EB] border-[#E2E8F0] rounded focus:ring-[#2563EB]/30"
-            />
-            <label htmlFor="is_active" className="text-sm font-medium text-[#0F172A]">
-              {t('maintenancePlans.isActive')}
-            </label>
-          </div>
+        <div>
+          <label className="block text-xs font-medium text-[#0F172A] mb-1.5">
+            {t('maintenancePlans.notes')}
+          </label>
+          <textarea
+            value={formData.notes}
+            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+            className="w-full px-3 py-2 text-sm text-[#0F172A] placeholder-[#64748B] bg-white border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+            rows={3}
+            placeholder="Notas opcionales"
+          />
         </div>
 
         <div className="flex gap-2 pt-4">
@@ -298,4 +278,3 @@ export default function MaintenancePlanForm({ plan, vendors, onClose }: Maintena
     </Modal>
   )
 }
-

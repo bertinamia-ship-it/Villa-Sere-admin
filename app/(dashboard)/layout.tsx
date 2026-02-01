@@ -30,7 +30,7 @@ const navigation = [
   { name: 'Inventario', href: '/inventory', icon: Package },
   { name: 'Compras', href: '/to-buy', icon: ShoppingCart },
   { name: 'Mantenimiento', href: '/maintenance', icon: Wrench },
-  { name: 'Programación', href: '/maintenance-plans', icon: CalendarCheck },
+  { name: 'Mantenimientos', href: '/maintenance-plans', icon: CalendarCheck },
   { name: 'Tareas', href: '/tasks', icon: CheckSquare },
   { name: 'Gastos', href: '/expenses', icon: DollarSign },
   { name: 'Proveedores', href: '/vendors', icon: Users },

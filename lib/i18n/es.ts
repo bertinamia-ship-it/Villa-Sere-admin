@@ -308,8 +308,8 @@ export const es = {
 
   // Maintenance Plans
   maintenancePlans: {
-    title: 'Programación de Mantenimiento',
-    subtitle: 'Planes recurrentes por propiedad',
+    title: 'Mantenimientos Recurrentes',
+    subtitle: 'La app te recuerda lo que toca hacer',
     createPlan: 'Crear Plan',
     editPlan: 'Editar Plan',
     planTitle: 'Título',
@@ -359,6 +359,17 @@ export const es = {
     nextRun: 'Próxima ejecución',
     lastRun: 'Última ejecución',
     never: 'Nunca',
+    repeat: 'Repetir',
+    notes: 'Notas',
+    createTicket: 'Crear ticket',
+    tabs: {
+      pending: 'Pendientes',
+      all: 'Todos',
+    },
+    noPendingPlans: 'No hay mantenimientos pendientes',
+    noPendingPlansDescription: 'Todos los mantenimientos están al día o no hay mantenimientos programados',
+    deletePlanTitle: 'Eliminar Mantenimiento',
+    deletePlanMessage: '¿Estás seguro de que quieres eliminar este mantenimiento? Esta acción no se puede deshacer.',
   },
 
   // Tasks

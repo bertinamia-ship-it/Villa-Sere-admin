@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { MaintenancePlan, Vendor } from '@/lib/types/database'
 import { PRIORITIES, PRIORITY_LABELS } from '@/lib/constants'
-import { Plus, Calendar, CheckCircle2, Edit, Trash2, Power, PowerOff, AlertCircle } from 'lucide-react'
+import { Plus, Calendar, CheckCircle2, Edit, Trash2, Power, PowerOff, AlertCircle, Wrench, ExternalLink } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -14,18 +14,24 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { useToast } from '@/components/ui/Toast'
 import MaintenancePlanForm from './MaintenancePlanForm'
 import { t } from '@/lib/i18n/es'
+import { useRouter } from 'next/navigation'
+
+type TabType = 'pending' | 'all'
 
 export default function MaintenancePlanList() {
   const [plans, setPlans] = useState<MaintenancePlan[]>([])
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [loading, setLoading] = useState(true)
   const [hasProperty, setHasProperty] = useState(true)
+  const [activeTab, setActiveTab] = useState<TabType>('pending')
   const [showForm, setShowForm] = useState(false)
   const [editingPlan, setEditingPlan] = useState<MaintenancePlan | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; planId: string | null }>({ isOpen: false, planId: null })
   const [completingPlanId, setCompletingPlanId] = useState<string | null>(null)
+  const [creatingTicketPlanId, setCreatingTicketPlanId] = useState<string | null>(null)
   const supabase = createClient()
   const { showToast } = useToast()
+  const router = useRouter()
 
   const fetchData = async () => {
     setLoading(true)
@@ -81,6 +87,37 @@ export default function MaintenancePlanList() {
     return () => window.removeEventListener('propertyChanged', handlePropertyChange)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Filter plans based on active tab
+  const getFilteredPlans = (): MaintenancePlan[] => {
+    if (activeTab === 'all') {
+      return plans
+    }
+    
+    // Pending: active plans with next_run_date <= today + 60 days
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const futureDate = new Date(today)
+    futureDate.setDate(futureDate.getDate() + 60)
+    
+    return plans.filter(plan => {
+      if (!plan.is_active) return false
+      const nextRun = new Date(plan.next_run_date + 'T00:00:00')
+      nextRun.setHours(0, 0, 0, 0)
+      return nextRun <= futureDate
+    })
+  }
+
+  const getDateStatus = (nextRunDate: string): 'overdue' | 'upcoming' | 'future' => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const nextRun = new Date(nextRunDate + 'T00:00:00')
+    nextRun.setHours(0, 0, 0, 0)
+    
+    if (nextRun < today) return 'overdue'
+    if (nextRun <= new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)) return 'upcoming'
+    return 'future'
+  }
+
   const handleMarkCompleted = async (planId: string) => {
     setCompletingPlanId(planId)
     const propertyId = await getActivePropertyId()
@@ -115,23 +152,35 @@ export default function MaintenancePlanList() {
 
       const today = new Date().toISOString().split('T')[0]
 
-      // Calculate next_run_date using SQL function
-      const { data: nextDateResult, error: nextDateError } = await supabase
-        .rpc('calculate_next_run_date', {
-          p_start_date: plan.start_date,
-          p_frequency_unit: plan.frequency_unit,
-          p_frequency_interval: plan.frequency_interval,
-          p_last_completed_date: today
-        })
+      // Check if plan is recurrent (has frequency)
+      const isRecurrent = plan.frequency_unit && plan.frequency_interval > 0
 
-      if (nextDateError) {
-        console.error('Error calculating next_run_date:', nextDateError)
-        showToast('Error al calcular próxima fecha', 'error')
-        setCompletingPlanId(null)
-        return
+      let nextRunDate: string
+      let shouldDeactivate = false
+
+      if (isRecurrent) {
+        // Calculate next_run_date using SQL function
+        const { data: nextDateResult, error: nextDateError } = await supabase
+          .rpc('calculate_next_run_date', {
+            p_start_date: plan.start_date,
+            p_frequency_unit: plan.frequency_unit,
+            p_frequency_interval: plan.frequency_interval,
+            p_last_completed_date: today
+          })
+
+        if (nextDateError) {
+          console.error('Error calculating next_run_date:', nextDateError)
+          showToast('Error al calcular próxima fecha', 'error')
+          setCompletingPlanId(null)
+          return
+        }
+
+        nextRunDate = nextDateResult || today
+      } else {
+        // Not recurrent: deactivate
+        nextRunDate = plan.next_run_date
+        shouldDeactivate = true
       }
-
-      const nextRunDate = nextDateResult || today
 
       // Create run record
       const { error: runError } = await supabase
@@ -158,6 +207,7 @@ export default function MaintenancePlanList() {
         .update({
           last_completed_date: today,
           next_run_date: nextRunDate,
+          is_active: shouldDeactivate ? false : plan.is_active,
         })
         .eq('id', planId)
         .eq('property_id', propertyId)
@@ -169,13 +219,75 @@ export default function MaintenancePlanList() {
         return
       }
 
-      showToast(t('maintenancePlans.planCompleted'), 'success')
+      if (shouldDeactivate) {
+        showToast('Listo. Se archivó porque no es recurrente.', 'success')
+      } else {
+        showToast(t('maintenancePlans.planCompleted'), 'success')
+      }
       fetchData()
     } catch (error) {
       console.error('Error completing plan:', error)
       showToast(t('maintenancePlans.completeError'), 'error')
     } finally {
       setCompletingPlanId(null)
+    }
+  }
+
+  const handleCreateTicket = async (plan: MaintenancePlan) => {
+    setCreatingTicketPlanId(plan.id)
+    const propertyId = await getActivePropertyId()
+    if (!propertyId) {
+      showToast('Por favor selecciona una propiedad primero', 'error')
+      setCreatingTicketPlanId(null)
+      return
+    }
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      if (!profile?.tenant_id) {
+        showToast('Error: No se encontró tenant_id', 'error')
+        setCreatingTicketPlanId(null)
+        return
+      }
+
+      // Create maintenance ticket from plan
+      const { data: ticket, error } = await supabase
+        .from('maintenance_tickets')
+        .insert({
+          tenant_id: profile.tenant_id,
+          property_id: propertyId,
+          title: plan.title,
+          vendor_id: plan.vendor_id,
+          priority: plan.priority,
+          status: 'open',
+          date: new Date().toISOString().split('T')[0],
+          notes: plan.description || null,
+          created_by: user.id,
+        })
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error creating ticket:', error)
+        showToast('Error al crear ticket', 'error')
+      } else {
+        showToast('Ticket creado exitosamente', 'success')
+        // Navigate to maintenance page
+        router.push('/maintenance')
+      }
+    } catch (error) {
+      console.error('Error creating ticket:', error)
+      showToast('Error al crear ticket', 'error')
+    } finally {
+      setCreatingTicketPlanId(null)
     }
   }
 
@@ -242,7 +354,17 @@ export default function MaintenancePlanList() {
     }
   }
 
-  const getFrequencyLabel = (plan: MaintenancePlan): string => {
+  const getDateStatusColor = (status: 'overdue' | 'upcoming' | 'future') => {
+    switch (status) {
+      case 'overdue': return 'text-[#EF4444] bg-[#EF4444]/10'
+      case 'upcoming': return 'text-[#F59E0B] bg-[#F59E0B]/10'
+      case 'future': return 'text-[#64748B] bg-slate-50'
+      default: return 'text-slate-600 bg-slate-50'
+    }
+  }
+
+  const getFrequencyLabel = (plan: MaintenancePlan): string | null => {
+    if (!plan.frequency_unit || !plan.frequency_interval) return null
     const units: Record<string, { singular: string; plural: string }> = {
       day: { singular: t('maintenancePlans.frequencyUnits.day'), plural: t('maintenancePlans.frequencyUnits.days') },
       week: { singular: t('maintenancePlans.frequencyUnits.week'), plural: t('maintenancePlans.frequencyUnits.weeks') },
@@ -251,6 +373,7 @@ export default function MaintenancePlanList() {
     }
     
     const unit = units[plan.frequency_unit]
+    if (!unit) return null
     const label = plan.frequency_interval === 1 ? unit.singular : unit.plural
     return `Cada ${plan.frequency_interval} ${label}`
   }
@@ -293,6 +416,8 @@ export default function MaintenancePlanList() {
     )
   }
 
+  const filteredPlans = getFilteredPlans()
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -310,99 +435,139 @@ export default function MaintenancePlanList() {
         </Button>
       </div>
 
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-slate-200">
+        <button
+          onClick={() => setActiveTab('pending')}
+          className={`px-4 py-2 text-sm font-medium transition-colors duration-200 border-b-2 ${
+            activeTab === 'pending'
+              ? 'border-[#0F172A] text-[#0F172A]'
+              : 'border-transparent text-slate-500 hover:text-[#0F172A]'
+          }`}
+        >
+          {t('maintenancePlans.tabs.pending')}
+        </button>
+        <button
+          onClick={() => setActiveTab('all')}
+          className={`px-4 py-2 text-sm font-medium transition-colors duration-200 border-b-2 ${
+            activeTab === 'all'
+              ? 'border-[#0F172A] text-[#0F172A]'
+              : 'border-transparent text-slate-500 hover:text-[#0F172A]'
+          }`}
+        >
+          {t('maintenancePlans.tabs.all')}
+        </button>
+      </div>
+
       {/* Plans List */}
-      {plans.length === 0 ? (
+      {filteredPlans.length === 0 ? (
         <EmptyState
           icon={<Calendar className="h-12 w-12" />}
-          title={t('maintenancePlans.noPlans')}
-          description={t('maintenancePlans.noPlansDescription')}
+          title={activeTab === 'pending' ? t('maintenancePlans.noPendingPlans') : t('maintenancePlans.noPlans')}
+          description={activeTab === 'pending' ? t('maintenancePlans.noPendingPlansDescription') : t('maintenancePlans.noPlansDescription')}
         />
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {plans.map(plan => (
-            <Card key={plan.id} padding="md" className="hover:shadow-md transition-all duration-200">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <h3 className="text-base font-semibold text-[#0F172A] mb-1">{plan.title}</h3>
-                  {plan.description && (
-                    <p className="text-sm text-slate-500 mb-2">{plan.description}</p>
+        <div className="space-y-3">
+          {filteredPlans.map(plan => {
+            const dateStatus = getDateStatus(plan.next_run_date)
+            const frequencyLabel = getFrequencyLabel(plan)
+            
+            return (
+              <Card key={plan.id} padding="md" className="hover:shadow-md transition-all duration-200">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <h3 className="text-base font-semibold text-[#0F172A] mb-1">{plan.title}</h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(plan.priority)}`}>
+                      {PRIORITY_LABELS[plan.priority]}
+                    </span>
+                    {activeTab === 'all' && (
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${plan.is_active ? 'text-[#10B981] bg-[#10B981]/10' : 'text-slate-500 bg-slate-50'}`}>
+                        {plan.is_active ? 'Activo' : 'Inactivo'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2 text-sm text-slate-600">
+                    <Calendar className="h-4 w-4" />
+                    <span className="font-medium">Próximo:</span>
+                    <span>{formatDate(plan.next_run_date)}</span>
+                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ml-2 ${getDateStatusColor(dateStatus)}`}>
+                      {dateStatus === 'overdue' ? 'Vencido' : dateStatus === 'upcoming' ? 'Próximo' : 'En el futuro'}
+                    </span>
+                  </div>
+                  {frequencyLabel && (
+                    <div className="text-sm text-slate-600">
+                      {frequencyLabel}
+                    </div>
+                  )}
+                  {getVendorName(plan.vendor_id) && (
+                    <div className="text-sm text-slate-600">
+                      <span className="font-medium">{t('maintenancePlans.vendor')}:</span>{' '}
+                      {getVendorName(plan.vendor_id)}
+                    </div>
                   )}
                 </div>
-                <span className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(plan.priority)}`}>
-                  {PRIORITY_LABELS[plan.priority]}
-                </span>
-              </div>
 
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Calendar className="h-4 w-4" />
-                  <span>{getFrequencyLabel(plan)}</span>
-                </div>
-                <div className="text-sm text-slate-600">
-                  <span className="font-medium">{t('maintenancePlans.nextRun')}:</span>{' '}
-                  {formatDate(plan.next_run_date)}
-                </div>
-                {plan.last_completed_date && (
-                  <div className="text-sm text-slate-500">
-                    <span className="font-medium">{t('maintenancePlans.lastRun')}:</span>{' '}
-                    {formatDate(plan.last_completed_date)}
-                  </div>
-                )}
-                {getVendorName(plan.vendor_id) && (
-                  <div className="text-sm text-slate-600">
-                    <span className="font-medium">{t('maintenancePlans.vendor')}:</span>{' '}
-                    {getVendorName(plan.vendor_id)}
-                  </div>
-                )}
-                {plan.estimated_cost && (
-                  <div className="text-sm text-slate-600">
-                    <span className="font-medium">{t('maintenancePlans.estimatedCost')}:</span>{' '}
-                    ${plan.estimated_cost.toFixed(0)}
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2 pt-3 border-t border-slate-200">
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => handleMarkCompleted(plan.id)}
-                  disabled={completingPlanId === plan.id || !plan.is_active}
-                  loading={completingPlanId === plan.id}
-                  className="flex-1"
-                >
-                  <CheckCircle2 className="h-4 w-4" />
-                  {t('maintenancePlans.markCompleted')}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => handleEdit(plan)}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => handleToggleActive(plan)}
-                  title={plan.is_active ? t('maintenancePlans.deactivate') : t('maintenancePlans.activate')}
-                >
-                  {plan.is_active ? (
-                    <PowerOff className="h-4 w-4 text-slate-500" />
-                  ) : (
-                    <Power className="h-4 w-4 text-slate-500" />
+                <div className="flex items-center gap-2 pt-3 border-t border-slate-200">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => handleMarkCompleted(plan.id)}
+                    disabled={completingPlanId === plan.id || !plan.is_active}
+                    loading={completingPlanId === plan.id}
+                    className="flex-1"
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    {t('maintenancePlans.markCompleted')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleCreateTicket(plan)}
+                    disabled={creatingTicketPlanId === plan.id}
+                    loading={creatingTicketPlanId === plan.id}
+                    title={t('maintenancePlans.createTicket')}
+                  >
+                    <Wrench className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleEdit(plan)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  {activeTab === 'all' && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleToggleActive(plan)}
+                        title={plan.is_active ? t('maintenancePlans.deactivate') : t('maintenancePlans.activate')}
+                      >
+                        {plan.is_active ? (
+                          <PowerOff className="h-4 w-4 text-slate-500" />
+                        ) : (
+                          <Power className="h-4 w-4 text-slate-500" />
+                        )}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setDeleteConfirm({ isOpen: true, planId: plan.id })}
+                      >
+                        <Trash2 className="h-4 w-4 text-[#EF4444]" />
+                      </Button>
+                    </>
                   )}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setDeleteConfirm({ isOpen: true, planId: plan.id })}
-                >
-                  <Trash2 className="h-4 w-4 text-[#EF4444]" />
-                </Button>
-              </div>
-            </Card>
-          ))}
+                </div>
+              </Card>
+            )
+          })}
         </div>
       )}
 
@@ -420,12 +585,10 @@ export default function MaintenancePlanList() {
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, planId: null })}
         onConfirm={handleDelete}
-        title={t('maintenancePlans.delete')}
-        message="¿Estás seguro de que quieres eliminar este plan de mantenimiento? Esta acción no se puede deshacer."
+        title={t('maintenancePlans.deletePlanTitle')}
+        message={t('maintenancePlans.deletePlanMessage')}
         confirmText={t('maintenancePlans.delete')}
-        variant="danger"
       />
     </div>
   )
 }
-
