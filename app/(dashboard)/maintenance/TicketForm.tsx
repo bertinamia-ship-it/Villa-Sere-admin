@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { MaintenanceTicket, Vendor } from '@/lib/types/database'
-import { ROOMS, PRIORITIES, TICKET_STATUSES } from '@/lib/constants'
+import { ROOMS, PRIORITIES, TICKET_STATUSES, PRIORITY_LABELS, STATUS_LABELS } from '@/lib/constants'
 import { X, Upload } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
+import { t } from '@/lib/i18n/es'
 
 interface TicketFormProps {
   ticket?: MaintenanceTicket | null
@@ -35,7 +36,7 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
 
     const propertyId = await getActivePropertyId()
     if (!propertyId) {
-      alert('Please select a property first')
+      alert('Por favor selecciona una propiedad primero')
       setLoading(false)
       return
     }
@@ -101,7 +102,7 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900">
-            {ticket ? 'Edit Ticket' : 'New Maintenance Ticket'}
+            {ticket ? t('maintenance.editTicket') : t('maintenance.addTicket')}
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="h-6 w-6" />
@@ -111,7 +112,7 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Title *
+              {t('maintenance.titleLabel')} *
             </label>
             <input
               type="text"
@@ -119,14 +120,14 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400"
-              placeholder="e.g., Fix leaking faucet"
+              placeholder="ej. Arreglar grifo que gotea"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Room *
+                {t('maintenance.room')} *
               </label>
               <select
                 value={formData.room}
@@ -141,7 +142,7 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date *
+                {t('maintenance.date')} *
               </label>
               <input
                 type="date"
@@ -156,7 +157,7 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Priority *
+                {t('maintenance.priority')} *
               </label>
               <select
                 value={formData.priority}
@@ -165,7 +166,7 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
               >
                 {PRIORITIES.map(p => (
                   <option key={p} value={p}>
-                    {p.charAt(0).toUpperCase() + p.slice(1)}
+                    {PRIORITY_LABELS[p]}
                   </option>
                 ))}
               </select>
@@ -173,7 +174,7 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Status *
+                {t('maintenance.status')} *
               </label>
               <select
                 value={formData.status}
@@ -182,7 +183,7 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
               >
                 {TICKET_STATUSES.map(s => (
                   <option key={s} value={s}>
-                    {s.replace('_', ' ').charAt(0).toUpperCase() + s.slice(1).replace('_', ' ')}
+                    {STATUS_LABELS[s]}
                   </option>
                 ))}
               </select>
@@ -192,14 +193,14 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Vendor
+                Proveedor
               </label>
               <select
                 value={formData.vendor_id}
                 onChange={(e) => setFormData({ ...formData, vendor_id: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
               >
-                <option value="">None</option>
+                <option value="">Ninguno</option>
                 {vendors.map(vendor => (
                   <option key={vendor.id} value={vendor.id}>
                     {vendor.company_name}
@@ -210,7 +211,7 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Cost
+                Costo
               </label>
               <input
                 type="number"
@@ -226,20 +227,20 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
+              {t('maintenance.notes')}
             </label>
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400"
-              placeholder="Additional details..."
+              placeholder="Detalles adicionales..."
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Photo / Receipt
+              {t('maintenance.photo')} / Recibo
             </label>
             {photoUrl ? (
               <div className="space-y-2">
@@ -249,7 +250,7 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
                   onClick={() => setPhotoUrl('')}
                   className="text-sm text-red-600 hover:text-red-700"
                 >
-                  Remove Photo
+                  Eliminar Foto
                 </button>
               </div>
             ) : (
@@ -257,7 +258,7 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <Upload className="h-8 w-8 text-gray-400 mb-2" />
                   <p className="text-sm text-gray-600">
-                    {uploading ? 'Uploading...' : 'Click to upload'}
+                    {uploading ? 'Subiendo...' : 'Haz clic para subir'}
                   </p>
                 </div>
                 <input
@@ -277,14 +278,14 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
               disabled={loading || uploading}
               className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition"
             >
-              {loading ? 'Saving...' : ticket ? 'Update Ticket' : 'Create Ticket'}
+              {loading ? 'Guardando...' : ticket ? 'Actualizar Ticket' : 'Crear Ticket'}
             </button>
             <button
               type="button"
               onClick={onClose}
               className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition"
             >
-              Cancel
+              Cancelar
             </button>
           </div>
         </form>

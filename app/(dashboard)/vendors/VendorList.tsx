@@ -6,6 +6,7 @@ import { Vendor } from '@/lib/types/database'
 import { Plus, Search, Pencil, Trash2, Phone, Mail, MessageCircle } from 'lucide-react'
 import VendorForm from './VendorForm'
 import { getCurrentTenantId } from '@/lib/utils/tenant'
+import { t } from '@/lib/i18n/es'
 
 export default function VendorList() {
   const [vendors, setVendors] = useState<Vendor[]>([])
@@ -132,7 +133,7 @@ export default function VendorList() {
   }
 
   if (loading) {
-    return <div className="flex justify-center p-8">Loading...</div>
+    return <div className="flex justify-center p-8">{t('common.loading')}</div>
   }
 
   return (
@@ -140,15 +141,15 @@ export default function VendorList() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Vendors</h1>
-          <p className="text-gray-600 mt-1">{vendors.length} total vendors</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('vendors.title')}</h1>
+          <p className="text-gray-600 mt-1">{vendors.length} proveedores en total</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
           className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
         >
           <Plus className="h-5 w-5" />
-          Add Vendor
+          {t('vendors.addVendor')}
         </button>
       </div>
 
@@ -158,7 +159,7 @@ export default function VendorList() {
           <Search className="h-5 w-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Search vendors..."
+            placeholder={t('vendors.search')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1 border-0 focus:ring-0 text-sm text-gray-900 placeholder-gray-400"
@@ -169,7 +170,7 @@ export default function VendorList() {
       {/* Vendors List */}
       {filteredVendors.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-600">No vendors found</p>
+          <p className="text-gray-600">No se encontraron proveedores</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

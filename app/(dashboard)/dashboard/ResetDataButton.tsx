@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { useToast } from '@/components/ui/Toast'
 import { Trash2, AlertTriangle, Loader2 } from 'lucide-react'
+import { t } from '@/lib/i18n/es'
 
 export default function ResetDataButton() {
   const [showConfirm, setShowConfirm] = useState(false)
@@ -72,7 +73,7 @@ export default function ResetDataButton() {
 
   async function handleReset() {
     if (confirmation !== 'RESET') {
-      showToast('Confirmation must be "RESET" (all caps)', 'error')
+      showToast(t('resetData.confirmationRequired'), 'error')
       return
     }
 
@@ -92,7 +93,7 @@ export default function ResetDataButton() {
         throw new Error(data.error || 'Failed to reset data')
       }
 
-      showToast('Data reset successfully! Refreshing...', 'success')
+      showToast(t('resetData.resetSuccess'), 'success')
       
       // Refresh the page after a short delay
       setTimeout(() => {
@@ -101,7 +102,7 @@ export default function ResetDataButton() {
     } catch (error) {
       console.error('Reset error:', error)
       showToast(
-        error instanceof Error ? error.message : 'Failed to reset data',
+        error instanceof Error ? error.message : t('resetData.resetError'),
         'error'
       )
     } finally {
@@ -131,12 +132,12 @@ export default function ResetDataButton() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-red-700">
             <AlertTriangle className="h-5 w-5" />
-            Admin Tools
+            {t('resetData.adminTools')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-gray-700 mb-4">
-            Reset all business data (expenses, bookings, inventory, etc.)
+            {t('resetData.description')}
           </p>
           <Button
             variant="danger"
@@ -144,7 +145,7 @@ export default function ResetDataButton() {
             onClick={() => setShowConfirm(true)}
           >
             <Trash2 className="h-4 w-4" />
-            Reset All Data
+            {t('resetData.resetAllData')}
           </Button>
         </CardContent>
       </Card>
@@ -156,31 +157,30 @@ export default function ResetDataButton() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-red-800">
           <AlertTriangle className="h-5 w-5" />
-          Confirm Data Reset
+          {t('resetData.confirmTitle')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="bg-red-100 border border-red-300 rounded-lg p-3">
           <p className="text-sm font-semibold text-red-900 mb-2">
-            ⚠️ This will DELETE ALL DATA:
+            ⚠️ {t('resetData.warning')}
           </p>
           <ul className="text-xs text-red-800 space-y-1 list-disc list-inside">
-            <li>expenses</li>
-            <li>maintenance_tickets</li>
-            <li>bookings</li>
-            <li>purchase_items</li>
-            <li>inventory_items</li>
-            <li>vendors</li>
-            <li>All files in storage</li>
+            <li>{t('resetData.expenses')}</li>
+            <li>{t('resetData.maintenanceTickets')}</li>
+            <li>{t('resetData.bookings')}</li>
+            <li>{t('resetData.purchaseItems')}</li>
+            <li>{t('resetData.inventoryItems')}</li>
+            <li>{t('resetData.vendors')}</li>
+            <li>{t('resetData.allFilesInStorage')}</li>
           </ul>
           <p className="text-xs text-red-700 mt-2 font-medium">
-            This action CANNOT be undone!
+            {t('resetData.cannotUndone')}
           </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Type <span className="font-mono font-bold">RESET</span> to confirm:
+          <label className="block text-sm font-medium text-gray-700 mb-2" dangerouslySetInnerHTML={{ __html: t('resetData.typeReset') }}>
           </label>
           <input
             type="text"
@@ -202,12 +202,12 @@ export default function ResetDataButton() {
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Resetting...
+                {t('resetData.resetting')}
               </>
             ) : (
               <>
                 <Trash2 className="h-4 w-4" />
-                Confirm Reset
+                {t('resetData.confirmReset')}
               </>
             )}
           </Button>
@@ -219,7 +219,7 @@ export default function ResetDataButton() {
             }}
             disabled={loading}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
         </div>
       </CardContent>

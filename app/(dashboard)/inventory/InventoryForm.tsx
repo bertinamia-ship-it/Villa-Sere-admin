@@ -6,6 +6,7 @@ import { InventoryItem } from '@/lib/types/database'
 import { CATEGORIES, ROOMS } from '@/lib/constants'
 import { X, Upload } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
+import { t } from '@/lib/i18n/es'
 
 interface InventoryFormProps {
   item?: InventoryItem | null
@@ -32,7 +33,7 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
 
     const propertyId = await getActivePropertyId()
     if (!propertyId) {
-      alert('Please select a property first')
+      alert('Por favor selecciona una propiedad primero')
       setLoading(false)
       return
     }
@@ -100,7 +101,7 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900">
-            {item ? 'Edit Item' : 'Add New Item'}
+            {item ? t('inventory.editItem') : t('inventory.addItem')}
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="h-6 w-6" />
@@ -110,7 +111,7 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Item Name *
+              {t('inventory.name')} *
             </label>
             <input
               type="text"
@@ -118,14 +119,14 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400"
-              placeholder="e.g., Dish Soap"
+              placeholder="ej. Detergente"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Category *
+                {t('inventory.category')} *
               </label>
               <select
                 value={formData.category}
@@ -140,7 +141,7 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Location/Room *
+                {t('inventory.location')} *
               </label>
               <select
                 value={formData.location}
@@ -157,7 +158,7 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Quantity *
+                {t('inventory.quantity')} *
               </label>
               <input
                 type="number"
@@ -171,7 +172,7 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Min Threshold
+                {t('inventory.minThreshold')}
               </label>
               <input
                 type="number"
@@ -185,20 +186,20 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
+              Notas
             </label>
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400"
-              placeholder="Additional notes..."
+              placeholder="Notas adicionales..."
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Photo
+              {t('inventory.photo')}
             </label>
             {photoUrl ? (
               <div className="space-y-2">
@@ -208,7 +209,7 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
                   onClick={() => setPhotoUrl('')}
                   className="text-sm text-red-600 hover:text-red-700"
                 >
-                  Remove Photo
+                  Eliminar Foto
                 </button>
               </div>
             ) : (
@@ -216,7 +217,7 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <Upload className="h-8 w-8 text-gray-400 mb-2" />
                   <p className="text-sm text-gray-600">
-                    {uploading ? 'Uploading...' : 'Click to upload photo'}
+                    {uploading ? 'Subiendo...' : 'Haz clic para subir foto'}
                   </p>
                 </div>
                 <input
@@ -236,14 +237,14 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
               disabled={loading || uploading}
               className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition"
             >
-              {loading ? 'Saving...' : item ? 'Update Item' : 'Add Item'}
+              {loading ? 'Guardando...' : item ? 'Actualizar Artículo' : 'Agregar Artículo'}
             </button>
             <button
               type="button"
               onClick={onClose}
               className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition"
             >
-              Cancel
+              Cancelar
             </button>
           </div>
         </form>

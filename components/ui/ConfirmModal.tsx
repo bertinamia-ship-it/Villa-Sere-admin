@@ -22,8 +22,8 @@ export function ConfirmModal({
   onConfirm,
   title,
   message,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
+  confirmText = 'Confirmar',
+  cancelText = 'Cancelar',
   variant = 'danger',
   loading = false
 }: ConfirmModalProps) {
@@ -50,7 +50,7 @@ export function ConfirmModal({
         
         <div className={`border rounded-lg p-3 ${variantStyles[variant]}`}>
           <p className="text-sm font-medium text-gray-900">
-            This action cannot be undone.
+            Esta acción no se puede deshacer.
           </p>
         </div>
 

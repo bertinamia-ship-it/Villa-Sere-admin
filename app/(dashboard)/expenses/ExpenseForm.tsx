@@ -6,6 +6,7 @@ import { Expense, Vendor, MaintenanceTicket } from '@/lib/types/database'
 import { EXPENSE_CATEGORIES } from '@/lib/constants'
 import { X, Upload } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
+import { t } from '@/lib/i18n/es'
 
 interface ExpenseFormProps {
   expense?: Expense | null
@@ -34,26 +35,26 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
 
     const propertyId = await getActivePropertyId()
     if (!propertyId) {
-      alert('Please select a property first')
+      alert('Por favor selecciona una propiedad primero')
       setLoading(false)
       return
     }
 
     // Validation
     if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      alert('Amount must be greater than 0')
+      alert('El monto debe ser mayor que 0')
       setLoading(false)
       return
     }
 
     if (!formData.date) {
-      alert('Date is required')
+      alert('La fecha es requerida')
       setLoading(false)
       return
     }
 
     if (!formData.category) {
-      alert('Category is required')
+      alert('La categoría es requerida')
       setLoading(false)
       return
     }
@@ -124,7 +125,7 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900">
-            {expense ? 'Edit Expense' : 'Add New Expense'}
+            {expense ? t('expenses.editExpense') : t('expenses.addExpense')}
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="h-6 w-6" />
@@ -134,21 +135,21 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date *
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                Fecha *
               </label>
               <input
                 type="date"
                 required
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
+                className="w-full border border-[#E5E7EB] rounded-lg px-3.5 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Amount *
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                Monto *
               </label>
               <input
                 type="number"
@@ -157,20 +158,20 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
                 required
                 value={formData.amount}
                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400"
+                className="w-full border border-[#E5E7EB] rounded-lg px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
                 placeholder="0.00"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Category *
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                Categoría *
             </label>
             <select
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
+              className="w-full border border-[#E5E7EB] rounded-lg px-3.5 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
             >
               {EXPENSE_CATEGORIES.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
@@ -179,15 +180,15 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Vendor (optional)
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                {t('expenses.vendor')} ({t('common.optional')})
             </label>
             <select
               value={formData.vendor_id}
               onChange={(e) => setFormData({ ...formData, vendor_id: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
+              className="w-full border border-[#E5E7EB] rounded-lg px-3.5 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
             >
-              <option value="">None</option>
+              <option value="">{t('expenses.noVendor')}</option>
               {vendors.map(vendor => (
                 <option key={vendor.id} value={vendor.id}>
                   {vendor.company_name}
@@ -197,15 +198,15 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Linked Ticket (optional)
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              {t('expenses.linkedTicket')} ({t('common.optional')})
             </label>
             <select
               value={formData.ticket_id}
               onChange={(e) => setFormData({ ...formData, ticket_id: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
+              className="w-full border border-[#E5E7EB] rounded-lg px-3.5 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
             >
-              <option value="">None</option>
+              <option value="">{t('expenses.noTicket')}</option>
               {tickets.map(ticket => (
                 <option key={ticket.id} value={ticket.id}>
                   {ticket.title} - {ticket.room}
@@ -215,21 +216,21 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              Notas
             </label>
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400"
-              placeholder="Additional details..."
+              className="w-full border border-[#E5E7EB] rounded-lg px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all resize-none"
+              placeholder="Detalles adicionales..."
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Receipt Photo
+              Foto del Recibo
             </label>
             {receiptUrl ? (
               <div className="space-y-2">
@@ -239,7 +240,7 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
                   onClick={() => setReceiptUrl('')}
                   className="text-sm text-red-600 hover:text-red-700"
                 >
-                  Remove Photo
+                  Eliminar Foto
                 </button>
               </div>
             ) : (
@@ -247,7 +248,7 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <Upload className="h-8 w-8 text-gray-400 mb-2" />
                   <p className="text-sm text-gray-600">
-                    {uploading ? 'Uploading...' : 'Click to upload receipt'}
+                    {uploading ? 'Subiendo...' : 'Haz clic para subir recibo'}
                   </p>
                 </div>
                 <input
@@ -267,14 +268,14 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
               disabled={loading || uploading}
               className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition"
             >
-              {loading ? 'Saving...' : expense ? 'Update Expense' : 'Add Expense'}
+              {loading ? 'Guardando...' : expense ? 'Actualizar Gasto' : 'Agregar Gasto'}
             </button>
             <button
               type="button"
               onClick={onClose}
               className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition"
             >
-              Cancel
+                {t('common.cancel')}
             </button>
           </div>
         </form>

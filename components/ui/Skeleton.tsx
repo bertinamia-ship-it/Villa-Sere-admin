@@ -15,7 +15,7 @@ export function Skeleton({
   height,
   children 
 }: SkeletonProps) {
-  const baseClasses = 'animate-pulse bg-gray-200 rounded'
+  const baseClasses = 'animate-skeleton bg-slate-200 rounded'
   
   const variantClasses = {
     text: 'h-4',
@@ -51,7 +51,7 @@ export function SkeletonList({ count = 3 }: { count?: number }) {
   return (
     <div className="space-y-3">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="flex items-center gap-4 p-4 bg-white rounded-lg border border-gray-200">
+        <div key={i} className="flex items-center gap-4 p-4 bg-white rounded-lg border border-slate-200/60 shadow-sm">
           <Skeleton variant="circular" width={40} height={40} />
           <div className="flex-1 space-y-2">
             <Skeleton variant="text" width="70%" height={20} />

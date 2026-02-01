@@ -12,6 +12,8 @@ import { exportToCSV } from '@/lib/utils/export'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { t } from '@/lib/i18n/es'
 
 export default function InventoryList() {
   const [items, setItems] = useState<InventoryItem[]>([])
@@ -144,7 +146,19 @@ export default function InventoryList() {
     }
   }
 
-  const handleExportCSV = () => {
+  const handleExportCSV = async () => {
+    // Get active property name
+    const propertyId = await getActivePropertyId()
+    let propertyName: string | null = null
+    if (propertyId) {
+      const { data: property } = await supabase
+        .from('properties')
+        .select('name')
+        .eq('id', propertyId)
+        .maybeSingle()
+      propertyName = property?.name || null
+    }
+
     const exportData = items.map(item => ({
       Name: item.name,
       Category: item.category,
@@ -154,24 +168,40 @@ export default function InventoryList() {
       Notes: item.notes || '',
       'Created At': new Date(item.created_at).toLocaleDateString()
     }))
-    exportToCSV(exportData, 'inventory')
+    exportToCSV(exportData, 'Inventario', undefined, { propertyName })
   }
 
   if (loading) {
-    return <div className="flex justify-center p-8">Loading...</div>
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Inventario</h1>
+          <p className="text-gray-600 mt-1">Gestiona el inventario de tu propiedad</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-lg shadow-sm border border-slate-200/60 p-4 space-y-3">
+              <Skeleton variant="rectangular" height={200} />
+              <Skeleton variant="text" width="70%" height={20} />
+              <Skeleton variant="text" width="50%" height={16} />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   if (!hasProperty) {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Inventory</h1>
-          <p className="text-gray-600 mt-1">Manage your property inventory</p>
+          <h1 className="text-3xl font-bold text-gray-900">Inventario</h1>
+          <p className="text-gray-600 mt-1">Gestiona el inventario de tu propiedad</p>
         </div>
         <EmptyState
           icon={<Package className="h-12 w-12" />}
-          title="No Property Selected"
-          description="Please select or create a property to manage inventory items."
+          title={t('inventory.noPropertySelected')}
+          description={t('inventory.noPropertyDescription')}
         />
       </div>
     )
@@ -182,8 +212,8 @@ export default function InventoryList() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Inventory</h1>
-          <p className="text-gray-600 mt-1">{items.length} total items</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('inventory.title')}</h1>
+          <p className="text-gray-600 mt-1">{items.length} artículos en total</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -191,21 +221,21 @@ export default function InventoryList() {
             className="flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
           >
             <Upload className="h-5 w-5" />
-            Import CSV
+            {t('inventory.importCSV')}
           </button>
           <button
             onClick={handleExportCSV}
             className="flex items-center justify-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
           >
             <Download className="h-5 w-5" />
-            Export CSV
+            {t('inventory.exportCSV')}
           </button>
           <button
             onClick={() => setShowForm(true)}
             className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
           >
             <Plus className="h-5 w-5" />
-            Add Item
+            {t('inventory.addItem')}
           </button>
         </div>
       </div>
@@ -216,7 +246,7 @@ export default function InventoryList() {
           <Search className="h-5 w-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Search items..."
+            placeholder={t('inventory.search')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1 border-0 focus:ring-0 text-sm text-gray-900 placeholder-gray-400"
@@ -225,13 +255,13 @@ export default function InventoryList() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('inventory.category')}</label>
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900"
             >
-              <option value="all">All Categories</option>
+              <option value="all">{t('inventory.allCategories')}</option>
               {CATEGORIES.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
@@ -239,13 +269,13 @@ export default function InventoryList() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Room</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('inventory.room')}</label>
             <select
               value={roomFilter}
               onChange={(e) => setRoomFilter(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900"
             >
-              <option value="all">All Rooms</option>
+              <option value="all">{t('inventory.allRooms')}</option>
               {ROOMS.map(room => (
                 <option key={room} value={room}>{room}</option>
               ))}
@@ -258,7 +288,7 @@ export default function InventoryList() {
       {filteredItems.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-8 text-center">
           <Package className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-600">No items found</p>
+          <p className="text-gray-600">{t('inventory.itemNotFound')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -271,23 +301,25 @@ export default function InventoryList() {
                   className="w-full h-48 object-cover rounded-t-lg"
                 />
               )}
-              <div className="p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                    <p className="text-sm text-gray-600">{item.category}</p>
-                    <p className="text-sm text-gray-500">{item.location}</p>
+              <div className="p-5">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-slate-900 text-base mb-1">{item.name}</h3>
+                    <p className="text-sm text-slate-600 mb-0.5">{item.category}</p>
+                    <p className="text-xs text-slate-500">{item.location}</p>
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1 ml-2">
                     <button
                       onClick={() => handleEdit(item)}
-                      className="p-1 text-gray-600 hover:text-blue-600 transition"
+                      className="p-1.5 text-slate-500 hover:text-[#2563EB] hover:bg-[#2563EB]/10 rounded transition-all duration-150"
+                      aria-label="Editar"
                     >
                       <Pencil className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteClick(item.id)}
-                      className="p-1 text-gray-600 hover:text-red-600 transition"
+                      className="p-1.5 text-slate-500 hover:text-[#EF4444] hover:bg-[#EF4444]/10 rounded transition-all duration-150"
+                      aria-label="Eliminar"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -295,9 +327,9 @@ export default function InventoryList() {
                 </div>
 
                 {item.quantity <= item.min_threshold && (
-                  <div className="flex items-center gap-1 text-red-600 text-sm mb-2">
-                    <AlertCircle className="h-4 w-4" />
-                    <span>Low stock!</span>
+                  <div className="flex items-center gap-1.5 text-[#EF4444] text-xs font-medium mb-2 px-2 py-1 bg-[#EF4444]/10 rounded">
+                    <AlertCircle className="h-3.5 w-3.5" />
+                    <span>{t('inventory.lowStock')}</span>
                   </div>
                 )}
 
@@ -307,7 +339,7 @@ export default function InventoryList() {
                 />
 
                 {item.notes && (
-                  <p className="text-sm text-gray-600 mt-2">{item.notes}</p>
+                  <p className="text-sm text-slate-600 mt-3 pt-3 border-t border-[#E5E7EB]">{item.notes}</p>
                 )}
               </div>
             </div>
@@ -328,7 +360,7 @@ export default function InventoryList() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Import Inventory</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t('inventory.importCSV')}</h2>
               <button
                 onClick={() => {
                   setShowImport(false)
@@ -348,9 +380,9 @@ export default function InventoryList() {
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, itemId: null })}
         onConfirm={handleDelete}
-        title="Delete Inventory Item"
-        message="Are you sure you want to delete this item? This action cannot be undone."
-        confirmText="Delete"
+        title={t('inventory.editItem')}
+        message="¿Estás seguro de que quieres eliminar este artículo? Esta acción no se puede deshacer."
+        confirmText={t('common.delete')}
         loading={deleting}
       />
     </div>

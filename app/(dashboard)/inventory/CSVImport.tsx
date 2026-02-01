@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
+import { t } from '@/lib/i18n/es'
 
 interface ImportResult {
   success: number
@@ -24,7 +25,7 @@ export default function CSVImport() {
     if (!file) return
 
     if (!file.name.endsWith('.csv')) {
-      showToast('Please upload a CSV file', 'error')
+      showToast('Por favor sube un archivo CSV', 'error')
       return
     }
 
@@ -36,7 +37,7 @@ export default function CSVImport() {
       const lines = text.split('\n').filter(line => line.trim())
       
       if (lines.length < 2) {
-        throw new Error('CSV file is empty or invalid')
+        throw new Error('El archivo CSV está vacío o es inválido')
       }
 
       const headers = lines[0].split(',').map(h => h.trim().toLowerCase())
@@ -48,14 +49,14 @@ export default function CSVImport() {
       const missingColumns = requiredColumns.filter(col => !headers.includes(col))
       
       if (missingColumns.length > 0) {
-        throw new Error(`Missing required columns: ${missingColumns.join(', ')}`)
+        throw new Error(`Faltan columnas requeridas: ${missingColumns.join(', ')}`)
       }
 
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i].split(',').map(v => v.trim())
         
         if (values.length !== headers.length) {
-          errors.push(`Line ${i + 1}: Column count mismatch`)
+          errors.push(`Línea ${i + 1}: Número de columnas no coincide`)
           continue
         }
 
@@ -66,7 +67,7 @@ export default function CSVImport() {
 
         // Validate and prepare data
         if (!row.name || !row.category || !row.location) {
-          errors.push(`Line ${i + 1}: Missing required fields`)
+          errors.push(`Línea ${i + 1}: Faltan campos requeridos`)
           continue
         }
 
@@ -76,7 +77,7 @@ export default function CSVImport() {
         try {
           const propertyId = await getActivePropertyId()
           if (!propertyId) {
-            errors.push(`Line ${i + 1}: No active property selected`)
+            errors.push(`Línea ${i + 1}: No hay propiedad activa seleccionada`)
             continue
           }
 
@@ -106,13 +107,13 @@ export default function CSVImport() {
       setResult({ success, errors })
       
       if (success > 0) {
-        showToast(`Successfully imported ${success} items`, 'success')
+        showToast(`Se importaron exitosamente ${success} artículos`, 'success')
       }
       if (errors.length > 0) {
-        showToast(`${errors.length} items failed to import`, 'warning')
+        showToast(`${errors.length} artículos fallaron al importar`, 'warning')
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to import CSV'
+      const message = error instanceof Error ? error.message : 'Error al importar CSV'
       showToast(message, 'error')
     } finally {
       setImporting(false)
@@ -125,18 +126,18 @@ export default function CSVImport() {
       <CardHeader>
         <div className="flex items-center gap-2">
           <Upload className="h-5 w-5 text-blue-600" />
-          <CardTitle>Import Inventory from CSV</CardTitle>
+          <CardTitle>Importar Inventario desde CSV</CardTitle>
         </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="text-sm font-semibold text-blue-900 mb-2">CSV Format Requirements</h4>
+            <h4 className="text-sm font-semibold text-blue-900 mb-2">Requisitos del Formato CSV</h4>
             <ul className="text-sm text-blue-800 space-y-1">
-              <li>• Required columns: <code className="bg-blue-100 px-1 rounded">name</code>, <code className="bg-blue-100 px-1 rounded">category</code>, <code className="bg-blue-100 px-1 rounded">location</code>, <code className="bg-blue-100 px-1 rounded">quantity</code></li>
-              <li>• Optional columns: <code className="bg-blue-100 px-1 rounded">min_threshold</code>, <code className="bg-blue-100 px-1 rounded">notes</code></li>
-              <li>• First row must be column headers</li>
-              <li>• Values separated by commas</li>
+              <li>• Columnas requeridas: <code className="bg-blue-100 px-1 rounded">name</code>, <code className="bg-blue-100 px-1 rounded">category</code>, <code className="bg-blue-100 px-1 rounded">location</code>, <code className="bg-blue-100 px-1 rounded">quantity</code></li>
+              <li>• Columnas opcionales: <code className="bg-blue-100 px-1 rounded">min_threshold</code>, <code className="bg-blue-100 px-1 rounded">notes</code></li>
+              <li>• La primera fila debe contener los encabezados de columna</li>
+              <li>• Valores separados por comas</li>
             </ul>
           </div>
 
@@ -158,11 +159,11 @@ export default function CSVImport() {
                 disabled={importing}
               >
                 <Upload className="h-4 w-4" />
-                Choose CSV File
+                Elegir Archivo CSV
               </Button>
             </label>
             <p className="text-sm text-gray-500 mt-2">
-              Click to select a CSV file to import
+              Haz clic para seleccionar un archivo CSV para importar
             </p>
           </div>
 
@@ -173,7 +174,7 @@ export default function CSVImport() {
                   <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-green-900">
-                      Successfully imported {result.success} items
+                      Se importaron exitosamente {result.success} artículos
                     </p>
                   </div>
                 </div>
@@ -184,7 +185,7 @@ export default function CSVImport() {
                   <div className="flex items-start gap-3 mb-3">
                     <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
                     <p className="text-sm font-medium text-red-900">
-                      {result.errors.length} errors occurred:
+                      Ocurrieron {result.errors.length} errores:
                     </p>
                   </div>
                   <div className="ml-8 space-y-1 max-h-48 overflow-y-auto">
@@ -195,7 +196,7 @@ export default function CSVImport() {
                     ))}
                     {result.errors.length > 10 && (
                       <p className="text-sm text-red-700 italic">
-                        ... and {result.errors.length - 10} more errors
+                        ... y {result.errors.length - 10} errores más
                       </p>
                     )}
                   </div>

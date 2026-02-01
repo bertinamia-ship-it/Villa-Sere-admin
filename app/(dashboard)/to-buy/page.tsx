@@ -11,6 +11,7 @@ import { useToast } from '@/components/ui/Toast'
 import { Plus, ShoppingCart, Edit, Trash2, ExternalLink, Search } from 'lucide-react'
 import PurchaseItemForm from './PurchaseItemForm'
 import { getActivePropertyId } from '@/lib/utils/property-client'
+import { t } from '@/lib/i18n/es'
 
 export default function ToBuyPage() {
   const supabase = createClient()
@@ -47,7 +48,7 @@ export default function ToBuyPage() {
       setItems(data || [])
     } catch (error) {
       console.error('Error loading items:', error)
-      showToast('Failed to load items', 'error')
+      showToast('Error al cargar items', 'error')
     } finally {
       setLoading(false)
     }
@@ -105,14 +106,14 @@ export default function ToBuyPage() {
           .eq('id', editingItem.id)
           .eq('property_id', propertyId)
         if (error) throw error
-        showToast('Item updated successfully', 'success')
+        showToast(t('toBuy.itemSaved'), 'success')
       } else {
         // Insert: include property_id
         const { error } = await supabase
           .from('purchase_items')
           .insert([{ ...item, property_id: propertyId }])
         if (error) throw error
-        showToast('Item added successfully', 'success')
+        showToast(t('toBuy.itemSaved'), 'success')
       }
       
       setShowForm(false)
@@ -120,17 +121,17 @@ export default function ToBuyPage() {
       loadItems()
     } catch (error) {
       console.error('Error saving item:', error)
-      showToast('Failed to save item', 'error')
+      showToast(t('toBuy.saveError'), 'error')
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Are you sure you want to delete this item?')) return
+    if (!confirm('¿Estás seguro de que quieres eliminar este artículo?')) return
 
     try {
       const propertyId = await getActivePropertyId()
       if (!propertyId) {
-        showToast('No active property selected', 'error')
+        showToast(t('toBuy.noPropertySelected'), 'error')
         return
       }
 
@@ -141,11 +142,11 @@ export default function ToBuyPage() {
         .eq('property_id', propertyId) // Security: ensure property matches
       
       if (error) throw error
-      showToast('Item deleted successfully', 'success')
+      showToast(t('toBuy.itemDeleted'), 'success')
       loadItems()
     } catch (error) {
       console.error('Error deleting item:', error)
-      showToast('Failed to delete item', 'error')
+      showToast(t('toBuy.deleteError'), 'error')
     }
   }
 
@@ -165,16 +166,16 @@ export default function ToBuyPage() {
     .filter(i => i.est_cost)
     .reduce((sum, i) => sum + (i.est_cost || 0) * i.quantity, 0)
 
-  const statusColors = {
-    to_buy: 'bg-blue-100 text-blue-700 border-blue-200',
-    ordered: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-    received: 'bg-green-100 text-green-700 border-green-200',
+  const statusColors: Record<string, string> = {
+    to_buy: 'bg-[#2563EB]/10 text-[#2563EB] border-[#2563EB]/20',
+    ordered: 'bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20',
+    received: 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20',
   }
 
   const statusLabels = {
-    to_buy: 'To Buy',
-    ordered: 'Ordered',
-    received: 'Received',
+    to_buy: t('status.toBuy'),
+    ordered: 'Ordenado',
+    received: 'Recibido',
   }
 
   if (loading) {
@@ -189,13 +190,13 @@ export default function ToBuyPage() {
     return (
       <div className="max-w-7xl mx-auto space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Shopping List</h1>
-          <p className="mt-1 text-sm text-gray-500">Items to purchase for your property</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('toBuy.title')}</h1>
+          <p className="mt-1 text-sm text-gray-500">Artículos para comprar para tu propiedad</p>
         </div>
         <EmptyState
           icon={<ShoppingCart className="h-12 w-12" />}
-          title="No Property Selected"
-          description="Please select or create a property to manage your shopping list."
+          title={t('toBuy.noPropertySelected')}
+          description={t('toBuy.noPropertyDescription')}
         />
       </div>
     )
@@ -205,8 +206,8 @@ export default function ToBuyPage() {
     <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Shopping List</h1>
-          <p className="mt-1 text-sm text-gray-700">Items to purchase for the villa</p>
+          <h1 className="text-2xl font-semibold text-gray-900">{t('toBuy.title')}</h1>
+          <p className="mt-1 text-sm text-gray-700">Artículos para comprar para la villa</p>
         </div>
         <Button 
           onClick={() => {
@@ -216,7 +217,7 @@ export default function ToBuyPage() {
           className="w-full sm:w-auto"
         >
           <Plus className="h-4 w-4" />
-          Add Item
+          {t('toBuy.addItem')}
         </Button>
       </div>
 
@@ -228,7 +229,7 @@ export default function ToBuyPage() {
               <ShoppingCart className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">To Buy</p>
+              <p className="text-sm text-gray-600">{t('status.toBuy')}</p>
               <p className="text-xl font-bold text-gray-900">{statusCounts.to_buy}</p>
             </div>
           </div>
@@ -240,7 +241,7 @@ export default function ToBuyPage() {
               <ShoppingCart className="h-5 w-5 text-yellow-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Ordered</p>
+              <p className="text-sm text-gray-600">Ordenado</p>
               <p className="text-xl font-bold text-gray-900">{statusCounts.ordered}</p>
             </div>
           </div>
@@ -252,7 +253,7 @@ export default function ToBuyPage() {
               <ShoppingCart className="h-5 w-5 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Received</p>
+              <p className="text-sm text-gray-600">Recibido</p>
               <p className="text-xl font-bold text-gray-900">{statusCounts.received}</p>
             </div>
           </div>
@@ -264,7 +265,7 @@ export default function ToBuyPage() {
               <ShoppingCart className="h-5 w-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Est. Cost</p>
+              <p className="text-sm text-gray-600">Costo Est.</p>
               <p className="text-xl font-bold text-gray-900">${totalCost.toFixed(2)}</p>
             </div>
           </div>
@@ -278,7 +279,7 @@ export default function ToBuyPage() {
             <Search className="h-5 w-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search items..."
+              placeholder={t('toBuy.search')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1 border-0 focus:ring-0 text-sm text-gray-900 placeholder-gray-400"
@@ -287,27 +288,27 @@ export default function ToBuyPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('toBuy.status')}</label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3.5 py-2.5 text-sm text-gray-900"
               >
-                <option value="all">All Status</option>
-                <option value="to_buy">To Buy</option>
-                <option value="ordered">Ordered</option>
-                <option value="received">Received</option>
+                <option value="all">{t('toBuy.allStatuses')}</option>
+                <option value="to_buy">{t('status.toBuy')}</option>
+                <option value="ordered">Ordenado</option>
+                <option value="received">Recibido</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Area</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('toBuy.area')}</label>
               <select
                 value={areaFilter}
                 onChange={(e) => setAreaFilter(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3.5 py-2.5 text-sm text-gray-900"
               >
-                <option value="all">All Areas</option>
+                <option value="all">{t('toBuy.allAreas')}</option>
                 {areas.map(area => (
                   <option key={area} value={area}>{area}</option>
                 ))}
@@ -322,12 +323,12 @@ export default function ToBuyPage() {
         <Card>
           <EmptyState
             icon={<ShoppingCart className="h-12 w-12" />}
-            title="No items found"
-            description="Add items to your shopping list"
+            title={t('toBuy.noItems')}
+            description={t('toBuy.noItemsDescription')}
             action={
               <Button onClick={() => setShowForm(true)}>
                 <Plus className="h-4 w-4" />
-                Add Item
+                {t('toBuy.addItem')}
               </Button>
             }
           />
@@ -352,25 +353,25 @@ export default function ToBuyPage() {
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                     <div>
-                      <p className="text-gray-500">Quantity</p>
+                      <p className="text-gray-500">{t('toBuy.quantity')}</p>
                       <p className="font-medium text-gray-900">{item.quantity}</p>
                     </div>
                     {item.est_cost && (
                       <div>
-                        <p className="text-gray-500">Est. Cost</p>
+                        <p className="text-gray-500">Costo Est.</p>
                         <p className="font-medium text-gray-900">${(item.est_cost * item.quantity).toFixed(2)}</p>
                       </div>
                     )}
                     {item.link && (
                       <div className="col-span-2">
-                        <p className="text-gray-500">Link</p>
+                        <p className="text-gray-500">{t('toBuy.link')}</p>
                         <a
                           href={item.link}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
                         >
-                          View <ExternalLink className="h-3 w-3" />
+                          {t('common.view')} <ExternalLink className="h-3 w-3" />
                         </a>
                       </div>
                     )}

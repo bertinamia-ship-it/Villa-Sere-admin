@@ -5,6 +5,7 @@ import { Booking } from '@/lib/types/database'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { ChevronLeft, ChevronRight, Info } from 'lucide-react'
+import { t } from '@/lib/i18n/es'
 
 interface BookingCalendarProps {
   bookings: Booking[]
@@ -96,10 +97,10 @@ export default function BookingCalendar({ bookings, onEdit }: BookingCalendarPro
       : 'rounded-lg'
 
     const bookingGradient = booking
-      ? 'bg-gradient-to-br from-indigo-600 to-indigo-500 text-white border-indigo-400 shadow-lg shadow-indigo-100 hover:from-indigo-500 hover:to-indigo-400'
-      : 'bg-white text-gray-800 border-gray-200 hover:border-gray-300 hover:shadow-sm'
+      ? 'bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] text-white border-[#2563EB]/30 shadow-sm hover:from-[#1D4ED8] hover:to-[#1E40AF]'
+      : 'bg-white text-[#0F172A] border-[#E2E8F0] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]'
 
-    const todayRing = today ? 'ring-2 ring-offset-2 ring-amber-400' : ''
+    const todayRing = today ? 'ring-1 ring-[#F59E0B] ring-offset-1' : ''
 
     days.push(
       <button
@@ -130,7 +131,7 @@ export default function BookingCalendar({ bookings, onEdit }: BookingCalendarPro
         }}
         onBlur={() => setTooltip(prev => ({ ...prev, visible: false }))}
         className={`
-          relative overflow-hidden aspect-square p-1 text-sm border transition-all duration-200
+          relative overflow-hidden aspect-square p-1 text-xs border transition-all duration-150 ease-out
           ${bookingGradient}
           ${rangeClasses}
           ${todayRing}
@@ -138,12 +139,12 @@ export default function BookingCalendar({ bookings, onEdit }: BookingCalendarPro
         aria-label={booking ? `Booked: ${booking.guest_name || booking.platform} from ${new Date(booking.check_in).toDateString()} to ${new Date(booking.check_out).toDateString()}` : `Available on ${date.toDateString()}`}
       >
         <div className="flex flex-col h-full">
-          <span className={`text-xs font-semibold ${booking ? 'text-white' : 'text-gray-800'}`}>
+          <span className={`text-[11px] font-semibold ${booking ? 'text-white' : 'text-[#0F172A]'}`}>
             {day}
           </span>
           {booking && (
-            <span className="text-[11px] mt-auto truncate font-medium text-white/90">
-              {isCheckInDay ? 'Check-in · ' : isCheckOutDay ? 'Checkout · ' : ''}
+            <span className="text-[9px] mt-auto truncate font-medium text-white/90">
+              {isCheckInDay ? t('rentals.checkIn') + ' · ' : isCheckOutDay ? t('rentals.checkOut') + ' · ' : ''}
               {booking.guest_name || booking.platform}
             </span>
           )}
@@ -157,10 +158,10 @@ export default function BookingCalendar({ bookings, onEdit }: BookingCalendarPro
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <h2 className="text-lg font-semibold text-gray-900">
-            {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            <h2 className="text-base font-semibold text-[#0F172A]">
+            {currentDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
             </h2>
-            <p className="text-sm text-gray-500">Hover or click a booked day to view details.</p>
+            <p className="text-xs text-[#64748B]">{t('rentals.hoverForDetails')}</p>
           </div>
           <div className="flex gap-2">
             <Button size="sm" variant="ghost" onClick={previousMonth}>
@@ -173,7 +174,7 @@ export default function BookingCalendar({ bookings, onEdit }: BookingCalendarPro
         </div>
 
         <div className="grid grid-cols-7 gap-2">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+          {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(day => (
             <div key={day} className="text-center text-xs font-semibold text-gray-500 py-2 tracking-wide">
               {day}
             </div>
@@ -181,43 +182,43 @@ export default function BookingCalendar({ bookings, onEdit }: BookingCalendarPro
           {days}
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-200 text-sm">
+        <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-[#E2E8F0] text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-gradient-to-br from-indigo-600 to-indigo-500 border border-indigo-400" />
-            <span className="text-gray-700">Booked</span>
+            <div className="w-3 h-3 rounded bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] border border-[#2563EB]/30" />
+            <span className="text-[#64748B] font-medium">{t('rentals.booked')}</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-white border border-gray-200" />
-            <span className="text-gray-700">Available</span>
+            <div className="w-3 h-3 rounded bg-white border border-[#E2E8F0]" />
+            <span className="text-[#64748B] font-medium">{t('rentals.available')}</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded border border-amber-400 ring-2 ring-amber-300/60" />
-            <span className="text-gray-700">Today</span>
+            <div className="w-3 h-3 rounded border border-[#F59E0B] ring-1 ring-[#F59E0B]/30" />
+            <span className="text-[#64748B] font-medium">{t('rentals.today')}</span>
           </div>
-          <div className="flex items-center gap-2 text-gray-500">
-            <Info className="h-4 w-4" />
-            <span>Hover or click a booked date for guest + total.</span>
+          <div className="flex items-center gap-1.5 text-[#64748B]">
+            <Info className="h-3.5 w-3.5 stroke-[1.5]" />
+            <span className="text-[10px]">{t('rentals.hoverForGuestTotal')}</span>
           </div>
         </div>
       </div>
 
       {tooltip.visible && tooltip.booking && (
         <div
-          className="absolute z-50 w-64 -translate-x-1/2 -translate-y-full rounded-xl border border-gray-200 bg-white p-3 shadow-xl shadow-indigo-100/70"
+          className="absolute z-50 w-56 -translate-x-1/2 -translate-y-full rounded-lg border border-[#E2E8F0] bg-white p-3 shadow-lg"
           style={{ left: tooltip.x, top: tooltip.y }}
         >
           <div className="flex items-start justify-between gap-2">
             <div>
-              <p className="text-sm font-semibold text-gray-900">{tooltip.booking.guest_name || tooltip.booking.platform || 'Guest'}</p>
-              <p className="text-xs text-gray-500">{tooltip.booking.platform}</p>
+              <p className="text-xs font-semibold text-[#0F172A]">{tooltip.booking.guest_name || tooltip.booking.platform || t('rentals.guest')}</p>
+              <p className="text-[10px] text-[#64748B] mt-0.5">{tooltip.booking.platform}</p>
             </div>
-            <span className={`px-2 py-0.5 text-[11px] rounded-full font-semibold ${tooltip.booking.status === 'cancelled' ? 'bg-red-100 text-red-700' : tooltip.booking.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-              {tooltip.booking.status}
+            <span className={`px-1.5 py-0.5 text-[9px] rounded-full font-semibold ${tooltip.booking.status === 'cancelled' ? 'bg-[#EF4444]/10 text-[#EF4444]' : tooltip.booking.status === 'completed' ? 'bg-[#22C55E]/10 text-[#22C55E]' : 'bg-[#F59E0B]/10 text-[#F59E0B]'}`}>
+              {tooltip.booking.status === 'confirmed' ? t('rentals.confirmed') : tooltip.booking.status === 'completed' ? t('rentals.completed') : tooltip.booking.status === 'cancelled' ? t('rentals.cancelled') : tooltip.booking.status}
             </span>
           </div>
-          <div className="mt-2 space-y-1 text-sm text-gray-700">
-            <p>{new Date(tooltip.booking.check_in).toLocaleDateString()} → {new Date(tooltip.booking.check_out).toLocaleDateString()}</p>
-            <p className="font-semibold text-gray-900">${Number(tooltip.booking.total_amount || 0).toFixed(0)} total</p>
+          <div className="mt-2 space-y-1 text-xs text-[#64748B]">
+            <p>{new Date(tooltip.booking.check_in).toLocaleDateString('es-ES')} → {new Date(tooltip.booking.check_out).toLocaleDateString('es-ES')}</p>
+            <p className="font-semibold text-[#0F172A]">${Number(tooltip.booking.total_amount || 0).toFixed(0)} {t('rentals.total')}</p>
           </div>
         </div>
       )}

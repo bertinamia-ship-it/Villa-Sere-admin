@@ -16,6 +16,7 @@ import BookingList from './BookingList'
 import BookingCalendar from './BookingCalendar'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { t } from '@/lib/i18n/es'
 
 interface MonthlyStats {
   income: number
@@ -59,7 +60,7 @@ export default function RentalsPage() {
       await Promise.all([loadBookings(), loadMonthlyStats()])
     } catch (error) {
       console.error('Error loading data:', error)
-      showToast('Failed to load data', 'error')
+      showToast('Error al cargar datos', 'error')
     } finally {
       setLoading(false)
     }
@@ -211,7 +212,7 @@ export default function RentalsPage() {
           throw error
         }
         console.log('✅ Booking updated:', data)
-        showToast('Booking updated successfully', 'success')
+        showToast(t('rentals.bookingUpdated'), 'success')
       } else {
         console.log('➕ Creating new booking')
         const { data, error } = await supabase
@@ -224,7 +225,7 @@ export default function RentalsPage() {
           throw error
         }
         console.log('✅ Booking created:', data)
-        showToast('Booking created successfully', 'success')
+        showToast(t('rentals.bookingCreated'), 'success')
       }
       
       setShowForm(false)
@@ -233,7 +234,7 @@ export default function RentalsPage() {
     } catch (error) {
       console.error('❌ Error saving booking:', error)
       const errorMsg = error instanceof Error ? error.message : String(error)
-      showToast(`Failed to save booking: ${errorMsg}`, 'error')
+      showToast(`${t('rentals.saveError')}: ${errorMsg}`, 'error')
     }
   }
 
@@ -248,7 +249,7 @@ export default function RentalsPage() {
     try {
       const propertyId = await getActivePropertyId()
       if (!propertyId) {
-        showToast('No active property selected', 'error')
+        showToast(t('rentals.noActiveProperty'), 'error')
         setDeleting(false)
         setDeleteConfirm({ isOpen: false, bookingId: null })
         return
@@ -261,11 +262,11 @@ export default function RentalsPage() {
         .eq('property_id', propertyId) // Security: ensure property matches
       
       if (error) throw error
-      showToast('Booking deleted successfully', 'success')
+      showToast(t('rentals.bookingDeleted'), 'success')
       loadData()
     } catch (error) {
       console.error('Error deleting booking:', error)
-      showToast('Failed to delete booking', 'error')
+      showToast(t('rentals.deleteError'), 'error')
     } finally {
       setDeleting(false)
       setDeleteConfirm({ isOpen: false, bookingId: null })
@@ -289,13 +290,13 @@ export default function RentalsPage() {
     return (
       <div className="max-w-7xl mx-auto space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Rental Management</h1>
-          <p className="mt-1 text-sm text-gray-500">Track bookings, income, and occupancy</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('rentals.title')}</h1>
+          <p className="mt-1 text-sm text-gray-500">{t('rentals.subtitle')}</p>
         </div>
         <EmptyState
           icon={<CalendarIcon className="h-12 w-12" />}
-          title="No Property Selected"
-          description="Please select or create a property to manage bookings."
+          title={t('rentals.noPropertySelected')}
+          description={t('rentals.noPropertyDescription')}
         />
       </div>
     )
@@ -306,8 +307,8 @@ export default function RentalsPage() {
       <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Rental Management</h1>
-          <p className="mt-1 text-sm text-gray-500">Track bookings, income, and occupancy</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('rentals.title')}</h1>
+          <p className="mt-1 text-sm text-gray-500">{t('rentals.subtitle')}</p>
         </div>
         <Button 
           onClick={() => {
@@ -317,7 +318,7 @@ export default function RentalsPage() {
           className="w-full sm:w-auto"
         >
           <Plus className="h-4 w-4" />
-          Add Booking
+          {t('rentals.addBooking')}
         </Button>
       </div>
 
@@ -330,7 +331,7 @@ export default function RentalsPage() {
                 <DollarSign className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-700">Income</p>
+                <p className="text-sm text-gray-700">{t('rentals.income')}</p>
                 <p className="text-xl font-bold text-gray-900">${monthlyStats.income.toFixed(0)}</p>
               </div>
             </div>
@@ -342,7 +343,7 @@ export default function RentalsPage() {
                 <DollarSign className="h-5 w-5 text-red-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-700">Expenses</p>
+                <p className="text-sm text-gray-700">{t('rentals.expenses')}</p>
                 <p className="text-xl font-bold text-gray-900">${monthlyStats.expenses.toFixed(0)}</p>
               </div>
             </div>
@@ -354,7 +355,7 @@ export default function RentalsPage() {
                 <TrendingUp className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-700">Profit</p>
+                <p className="text-sm text-gray-700">{t('rentals.profit')}</p>
                 <p className={`text-xl font-bold ${monthlyStats.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   ${monthlyStats.profit.toFixed(0)}
                 </p>
@@ -368,7 +369,7 @@ export default function RentalsPage() {
                 <CalendarIcon className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Bookings</p>
+                <p className="text-sm text-gray-600">{t('rentals.bookings')}</p>
                 <p className="text-xl font-bold text-gray-900">{monthlyStats.bookingCount}</p>
               </div>
             </div>
@@ -380,7 +381,7 @@ export default function RentalsPage() {
                 <Percent className="h-5 w-5 text-amber-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-700">Occupancy</p>
+                <p className="text-sm text-gray-700">{t('rentals.occupancyRate')}</p>
                 <p className="text-xl font-bold text-gray-900">{monthlyStats.occupancyRate.toFixed(0)}%</p>
               </div>
             </div>
@@ -397,14 +398,14 @@ export default function RentalsPage() {
             onClick={() => setView('calendar')}
           >
             <CalendarIcon className="h-4 w-4" />
-            Calendar
+            {t('rentals.calendar')}
           </Button>
           <Button
             size="sm"
             variant={view === 'list' ? 'primary' : 'ghost'}
             onClick={() => setView('list')}
           >
-            List
+            {t('rentals.list')}
           </Button>
         </div>
       </Card>
@@ -437,11 +438,12 @@ export default function RentalsPage() {
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, bookingId: null })}
         onConfirm={handleDelete}
-        title="Delete Booking"
-        message="Are you sure you want to delete this booking? This action cannot be undone."
-        confirmText="Delete"
+        title={t('rentals.deleteBookingTitle')}
+        message={t('rentals.deleteBookingMessage')}
+        confirmText={t('common.delete')}
         loading={deleting}
       />
     </>
   )
 }
+

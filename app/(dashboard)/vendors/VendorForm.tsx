@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Vendor } from '@/lib/types/database'
 import { X } from 'lucide-react'
 import { getCurrentTenantId } from '@/lib/utils/tenant'
+import { t } from '@/lib/i18n/es'
 
 interface VendorFormProps {
   vendor?: Vendor | null
@@ -99,7 +100,7 @@ export default function VendorForm({ vendor, onClose }: VendorFormProps) {
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900">
-            {vendor ? 'Edit Vendor' : 'Add New Vendor'}
+            {vendor ? t('vendors.editVendor') : t('vendors.addVendor')}
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="h-6 w-6" />
@@ -109,7 +110,7 @@ export default function VendorForm({ vendor, onClose }: VendorFormProps) {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Company/Name *
+              Empresa/Nombre *
             </label>
             <input
               type="text"
@@ -117,27 +118,27 @@ export default function VendorForm({ vendor, onClose }: VendorFormProps) {
               value={formData.company_name}
               onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400"
-              placeholder="e.g., ABC Plumbing"
+              placeholder="ej. Fontanería ABC"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Specialty
+              Especialidad
             </label>
             <input
               type="text"
               value={formData.specialty}
               onChange={(e) => setFormData({ ...formData, specialty: e.target.value })}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400"
-              placeholder="e.g., Plumbing, Electrical, Pool Service"
+              placeholder="ej. Fontanería, Electricidad, Servicio de Piscina"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone
+                Teléfono
               </label>
               <input
                 type="tel"
@@ -177,14 +178,14 @@ export default function VendorForm({ vendor, onClose }: VendorFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
+              Notas
             </label>
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400"
-              placeholder="Additional notes about this vendor..."
+              placeholder="Notas adicionales sobre este proveedor..."
             />
           </div>
 
@@ -194,14 +195,14 @@ export default function VendorForm({ vendor, onClose }: VendorFormProps) {
               disabled={loading}
               className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition"
             >
-              {loading ? 'Saving...' : vendor ? 'Update Vendor' : 'Add Vendor'}
+              {loading ? 'Guardando...' : vendor ? 'Actualizar Proveedor' : 'Agregar Proveedor'}
             </button>
             <button
               type="button"
               onClick={onClose}
               className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition"
             >
-              Cancel
+              Cancelar
             </button>
           </div>
         </form>

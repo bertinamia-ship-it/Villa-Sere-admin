@@ -1,6 +1,26 @@
-export function exportToCSV(data: any[], filename: string, headers?: string[]) {
+import { buildExportFilename } from './download'
+
+/**
+ * Exports data to CSV file
+ * 
+ * @param data - Array of objects to export
+ * @param reportType - Type of report (e.g., "Inventario", "Reporte-Gastos")
+ * @param headers - Optional array of header keys (defaults to Object.keys(data[0]))
+ * @param options - Optional configuration
+ * @param options.propertyName - Name of the active property (will be included in filename)
+ * @param options.dateRange - Optional date range (e.g., "2026-01" for month)
+ */
+export function exportToCSV(
+  data: any[],
+  reportType: string,
+  headers?: string[],
+  options?: {
+    propertyName?: string | null
+    dateRange?: string | null
+  }
+) {
   if (data.length === 0) {
-    alert('No data to export')
+    alert('No hay datos para exportar')
     return
   }
 
@@ -26,7 +46,16 @@ export function exportToCSV(data: any[], filename: string, headers?: string[]) {
   const url = window.URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = `${filename}-${new Date().toISOString().split('T')[0]}.csv`
+  
+  // Build filename with property name if provided
+  const dateRange = options?.dateRange || new Date().toISOString().split('T')[0]
+  link.download = buildExportFilename({
+    propertyName: options?.propertyName,
+    reportType,
+    dateRange,
+    ext: 'csv'
+  })
+  
   link.click()
   window.URL.revokeObjectURL(url)
 }

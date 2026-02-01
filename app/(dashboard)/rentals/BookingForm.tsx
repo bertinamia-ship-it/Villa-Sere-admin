@@ -7,6 +7,7 @@ import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { Button } from '@/components/ui/Button'
 import { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
+import { t } from '@/lib/i18n/es'
 
 interface BookingFormProps {
   booking?: Booking | null
@@ -50,20 +51,20 @@ export default function BookingForm({ booking, onSave, onCancel }: BookingFormPr
   return (
     <form onSubmit={handleSubmit} className="p-6">
       <CardHeader>
-        <CardTitle>{booking ? 'Edit Booking' : 'Add New Booking'}</CardTitle>
+        <CardTitle>{booking ? t('rentals.editBooking') : t('rentals.newBooking')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label="Guest Name"
-              placeholder="Optional"
+              label={t('rentals.guestName')}
+              placeholder={t('common.optional')}
               value={formData.guest_name}
               onChange={(e) => setFormData({ ...formData, guest_name: e.target.value })}
             />
             
             <Select
-              label="Platform"
+              label={t('rentals.platform')}
               value={formData.platform}
               onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
               options={[
@@ -80,7 +81,7 @@ export default function BookingForm({ booking, onSave, onCancel }: BookingFormPr
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               type="date"
-              label="Check-In"
+              label={t('rentals.checkIn')}
               value={formData.check_in}
               onChange={(e) => setFormData({ ...formData, check_in: e.target.value })}
               required
@@ -88,7 +89,7 @@ export default function BookingForm({ booking, onSave, onCancel }: BookingFormPr
             
             <Input
               type="date"
-              label="Check-Out"
+              label={t('rentals.checkOut')}
               value={formData.check_out}
               onChange={(e) => setFormData({ ...formData, check_out: e.target.value })}
               required
@@ -99,8 +100,8 @@ export default function BookingForm({ booking, onSave, onCancel }: BookingFormPr
             <Input
               type="number"
               step="0.01"
-              label="Nightly Rate"
-              placeholder="Optional"
+              label={t('rentals.nightlyRate')}
+              placeholder={t('common.optional')}
               value={formData.nightly_rate}
               onChange={(e) => setFormData({ ...formData, nightly_rate: e.target.value })}
             />
@@ -108,7 +109,7 @@ export default function BookingForm({ booking, onSave, onCancel }: BookingFormPr
             <Input
               type="number"
               step="0.01"
-              label="Total Amount"
+              label={t('rentals.total')}
               value={formData.total_amount}
               onChange={(e) => setFormData({ ...formData, total_amount: e.target.value })}
               required
@@ -117,38 +118,38 @@ export default function BookingForm({ booking, onSave, onCancel }: BookingFormPr
             <Input
               type="number"
               step="0.01"
-              label="Cleaning Fee"
+              label={t('rentals.cleaningFee')}
               value={formData.cleaning_fee}
               onChange={(e) => setFormData({ ...formData, cleaning_fee: e.target.value })}
             />
           </div>
 
           <Select
-            label="Status"
+            label={t('rentals.status')}
             value={formData.status}
             onChange={(e) => setFormData({ ...formData, status: e.target.value as 'confirmed' | 'cancelled' | 'completed' })}
             options={[
-              { value: 'confirmed', label: 'Confirmed' },
-              { value: 'completed', label: 'Completed' },
-              { value: 'cancelled', label: 'Cancelled' },
+              { value: 'confirmed', label: t('rentals.confirmed') },
+              { value: 'completed', label: t('rentals.completed') },
+              { value: 'cancelled', label: t('rentals.cancelled') },
             ]}
             required
           />
 
           <Textarea
-            label="Notes"
+            label={t('rentals.notes')}
             rows={3}
-            placeholder="Any additional information..."
+            placeholder="Información adicional..."
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
           />
 
           <div className="flex gap-3 justify-end pt-4">
             <Button type="button" variant="secondary" onClick={onCancel}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit">
-              {booking ? 'Update' : 'Create'} Booking
+              {booking ? t('rentals.updateBooking') : t('rentals.createBooking')}
             </Button>
           </div>
         </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { getActivePropertyId } from '@/lib/utils/property-client'
+import { buildExportFilename } from '@/lib/utils/download'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Select } from '@/components/ui/Select'
@@ -10,6 +11,7 @@ import { LoadingSpinner } from '@/components/ui/Loading'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/Toast'
 import { Download, BarChart3, TrendingUp, TrendingDown, DollarSign, Wrench, Package } from 'lucide-react'
+import { t } from '@/lib/i18n/es'
 
 interface MonthlyExpenseSummary {
   total: number
@@ -75,7 +77,7 @@ export default function ReportsPage() {
       ])
     } catch (error) {
       console.error('Error loading reports:', error)
-      showToast('Failed to load reports', 'error')
+      showToast('Error al cargar reportes', 'error')
     } finally {
       setLoading(false)
     }
@@ -205,23 +207,34 @@ export default function ReportsPage() {
   }
 
   async function exportToCSV() {
+    // Get active property name
+    const propertyId = await getActivePropertyId()
+    let propertyName: string | null = null
+    if (propertyId) {
+      const { data: property } = await supabase
+        .from('properties')
+        .select('name')
+        .eq('id', propertyId)
+        .maybeSingle()
+      propertyName = property?.name || null
+    }
     if (!expenseSummary) return
 
     const rows = [
-      [`${propertyName} - Monthly Expense Report`],
-      [`Month: ${selectedMonth}`],
+      [t('reports.monthlyExpenseReport', { propertyName: propertyName || 'CasaPilot' })],
+      [`${t('reports.month')}: ${selectedMonth}`],
       [''],
-      ['Summary'],
-      ['Total Expenses', expenseSummary.total.toFixed(2)],
-      ['Maintenance', expenseSummary.maintenance.toFixed(2)],
-      ['Other', expenseSummary.other.toFixed(2)],
+      [t('reports.summary')],
+      [t('reports.totalExpenses'), expenseSummary.total.toFixed(2)],
+      [t('reports.maintenance'), expenseSummary.maintenance.toFixed(2)],
+      [t('reports.other'), expenseSummary.other.toFixed(2)],
       [''],
-      ['By Category'],
-      ['Category', 'Amount'],
+      [t('reports.byCategory')],
+      [t('reports.category'), t('reports.amount')],
       ...expenseSummary.byCategory.map(c => [c.category, c.total.toFixed(2)]),
       [''],
-      ['By Vendor'],
-      ['Vendor', 'Amount'],
+      [t('reports.byVendor')],
+      [t('reports.vendor'), t('reports.amount')],
       ...expenseSummary.byVendor.map(v => [v.vendor_name, v.total.toFixed(2)]),
     ]
 
@@ -230,10 +243,18 @@ export default function ReportsPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `expense-report-${selectedMonth}.csv`
+    
+    // Build filename with property name
+    a.download = buildExportFilename({
+      propertyName,
+      reportType: 'Reporte-Gastos',
+      dateRange: selectedMonth,
+      ext: 'csv'
+    })
+    
     a.click()
     URL.revokeObjectURL(url)
-    showToast('Report exported successfully', 'success')
+    showToast(t('reports.reportExported'), 'success')
   }
 
   // Generate month options for the last 12 months
@@ -241,7 +262,7 @@ export default function ReportsPage() {
     const d = new Date()
     d.setMonth(d.getMonth() - i)
     const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-    const label = d.toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
+    const label = d.toLocaleDateString('es-ES', { year: 'numeric', month: 'long' })
     return { value, label }
   })
 
@@ -257,8 +278,8 @@ export default function ReportsPage() {
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Reports & Analytics</h1>
-          <p className="mt-1 text-sm text-gray-700">Financial insights and operational metrics</p>
+          <h1 className="text-2xl font-semibold text-gray-900">{t('reports.title')}</h1>
+          <p className="mt-1 text-sm text-gray-700">{t('reports.subtitle')}</p>
         </div>
       </div>
 
@@ -267,7 +288,7 @@ export default function ReportsPage() {
         <div className="flex items-center justify-between">
           <div className="flex-1 max-w-xs">
             <Select
-              label="Select Month"
+              label={t('reports.selectMonth')}
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
               options={monthOptions}
@@ -275,7 +296,7 @@ export default function ReportsPage() {
           </div>
           <Button onClick={exportToCSV} variant="secondary" className="ml-4">
             <Download className="h-4 w-4" />
-            Export CSV
+            {t('reports.exportCSV')}
           </Button>
         </div>
       </Card>
@@ -285,7 +306,7 @@ export default function ReportsPage() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-blue-600" />
-            <CardTitle>Monthly Expense Summary</CardTitle>
+            <CardTitle>{t('reports.monthlyExpenseSummary')}</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
@@ -293,15 +314,15 @@ export default function ReportsPage() {
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                  <p className="text-sm font-medium text-blue-600">Total Expenses</p>
+                  <p className="text-sm font-medium text-blue-600">{t('reports.totalExpenses')}</p>
                   <p className="text-2xl font-bold text-blue-900 mt-1">${expenseSummary.total.toFixed(2)}</p>
                 </div>
                 <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-                  <p className="text-sm font-medium text-red-600">Maintenance</p>
+                  <p className="text-sm font-medium text-red-600">{t('reports.maintenance')}</p>
                   <p className="text-2xl font-bold text-red-900 mt-1">${expenseSummary.maintenance.toFixed(2)}</p>
                 </div>
                 <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                  <p className="text-sm font-medium text-green-600">Other</p>
+                  <p className="text-sm font-medium text-green-600">{t('reports.other')}</p>
                   <p className="text-2xl font-bold text-green-900 mt-1">${expenseSummary.other.toFixed(2)}</p>
                 </div>
               </div>
@@ -320,7 +341,7 @@ export default function ReportsPage() {
                 </div>
 
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">By Vendor</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">{t('reports.byVendor')}</h4>
                   <div className="space-y-2">
                     {expenseSummary.byVendor.length > 0 ? (
                       expenseSummary.byVendor.map((item) => (
@@ -330,7 +351,7 @@ export default function ReportsPage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-gray-500">No vendor expenses recorded</p>
+                      <p className="text-sm text-gray-500">{t('reports.noVendorExpenses')}</p>
                     )}
                   </div>
                 </div>
@@ -339,8 +360,8 @@ export default function ReportsPage() {
           ) : (
             <EmptyState
               icon={<BarChart3 className="h-12 w-12" />}
-              title="No expenses for this month"
-              description="Add expenses to see analytics"
+              title={t('reports.noExpensesThisMonth')}
+              description={t('reports.noExpensesDescription')}
             />
           )}
         </CardContent>
@@ -351,19 +372,19 @@ export default function ReportsPage() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Wrench className="h-5 w-5 text-orange-600" />
-            <CardTitle>Maintenance Cost Summary</CardTitle>
+            <CardTitle>{t('reports.maintenanceCostSummary')}</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
           {maintenanceSummary && (maintenanceSummary.byMonth.length > 0 || maintenanceSummary.byRoom.length > 0) ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">Last 6 Months</h4>
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">{t('reports.last6Months')}</h4>
                 <div className="space-y-2">
                   {maintenanceSummary.byMonth.map((item) => (
                     <div key={item.month} className="flex items-center justify-between py-2 border-b border-gray-100">
                       <span className="text-sm text-gray-700">
-                        {new Date(item.month + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}
+                        {new Date(item.month + '-01').toLocaleDateString('es-ES', { year: 'numeric', month: 'short' })}
                       </span>
                       <span className="text-sm font-semibold text-gray-900">${item.total.toFixed(2)}</span>
                     </div>
@@ -372,7 +393,7 @@ export default function ReportsPage() {
               </div>
 
               <div>
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">By Room/Area</h4>
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">{t('reports.byRoom')}</h4>
                 <div className="space-y-2">
                   {maintenanceSummary.byRoom.map((item) => (
                     <div key={item.room} className="flex items-center justify-between py-2 border-b border-gray-100">
@@ -386,8 +407,8 @@ export default function ReportsPage() {
           ) : (
             <EmptyState
               icon={<Wrench className="h-12 w-12" />}
-              title="No maintenance costs recorded"
-              description="Add costs to maintenance tickets to see analytics"
+              title={t('reports.noMaintenanceCosts')}
+              description={t('reports.noMaintenanceCostsDescription')}
             />
           )}
         </CardContent>
@@ -398,14 +419,14 @@ export default function ReportsPage() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Package className="h-5 w-5 text-purple-600" />
-            <CardTitle>Inventory Insights</CardTitle>
+            <CardTitle>{t('reports.inventoryInsights')}</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
           {inventoryInsights ? (
             <div className="space-y-6">
               <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
-                <p className="text-sm font-medium text-amber-700">Low Stock Items</p>
+                <p className="text-sm font-medium text-amber-700">{t('reports.lowStockItems')}</p>
                 <p className="text-2xl font-bold text-amber-900 mt-1">{inventoryInsights.lowStockCount}</p>
                 {inventoryInsights.lowStockItems.length > 0 && (
                   <div className="mt-3 space-y-1">
@@ -420,24 +441,24 @@ export default function ReportsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">By Category</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">{t('reports.byCategory')}</h4>
                   <div className="space-y-2">
                     {inventoryInsights.byCategory.map((item) => (
                       <div key={item.category} className="flex items-center justify-between py-2 border-b border-gray-100">
                         <span className="text-sm text-gray-700">{item.category}</span>
-                        <span className="text-sm font-semibold text-gray-900">{item.count} items</span>
+                        <span className="text-sm font-semibold text-gray-900">{item.count} {t('reports.items')}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">By Location</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">{t('reports.byLocation')}</h4>
                   <div className="space-y-2">
                     {inventoryInsights.byLocation.map((item) => (
                       <div key={item.location} className="flex items-center justify-between py-2 border-b border-gray-100">
                         <span className="text-sm text-gray-700">{item.location}</span>
-                        <span className="text-sm font-semibold text-gray-900">{item.count} items</span>
+                        <span className="text-sm font-semibold text-gray-900">{item.count} {t('reports.items')}</span>
                       </div>
                     ))}
                   </div>
@@ -447,8 +468,8 @@ export default function ReportsPage() {
           ) : (
             <EmptyState
               icon={<Package className="h-12 w-12" />}
-              title="No inventory data"
-              description="Add inventory items to see insights"
+              title={t('reports.noInventoryData')}
+              description={t('reports.noInventoryDataDescription')}
             />
           )}
         </CardContent>

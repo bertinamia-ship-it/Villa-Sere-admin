@@ -57,7 +57,11 @@ body {
 }
 
 .toast-enter {
-  animation: slideInRight 0.3s ease-out;
+  animation: slideInRight 200ms ease-out;
+}
+
+.toast-exit {
+  animation: fadeOutToRight 150ms ease-out;
 }
 
 /* Fix Chrome autofill text visibility */

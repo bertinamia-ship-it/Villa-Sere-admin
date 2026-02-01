@@ -37,22 +37,22 @@ export default function MonthlySummary({ expenses, vendors, selectedMonth }: Mon
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-xl font-bold text-gray-900 mb-4">
-        Monthly Summary: {new Date(selectedMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+        Resumen Mensual: {new Date(selectedMonth + '-01').toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
       </h2>
 
       {/* Total */}
       <div className="bg-blue-50 rounded-lg p-4 mb-6">
-        <p className="text-sm text-gray-600 mb-1">Total Expenses</p>
+        <p className="text-sm text-gray-600 mb-1">Total de Gastos</p>
         <p className="text-3xl font-bold text-blue-600">${monthlyData.total.toFixed(2)}</p>
-        <p className="text-sm text-gray-600 mt-1">{monthlyData.count} transactions</p>
+        <p className="text-sm text-gray-600 mt-1">{monthlyData.count} transacciones</p>
       </div>
 
       {/* By Category */}
       <div className="mb-6">
-        <h3 className="font-semibold text-gray-900 mb-3">By Category</h3>
+        <h3 className="font-semibold text-gray-900 mb-3">Por Categoría</h3>
         <div className="space-y-2">
           {Object.entries(monthlyData.byCategory).length === 0 ? (
-            <p className="text-sm text-gray-500">No expenses this month</p>
+            <p className="text-sm text-gray-500">No hay gastos este mes</p>
           ) : (
             Object.entries(monthlyData.byCategory)
               .sort(([, a], [, b]) => b - a)
@@ -69,7 +69,7 @@ export default function MonthlySummary({ expenses, vendors, selectedMonth }: Mon
       {/* By Vendor */}
       {Object.keys(monthlyData.byVendor).length > 0 && (
         <div>
-          <h3 className="font-semibold text-gray-900 mb-3">By Vendor</h3>
+          <h3 className="font-semibold text-gray-900 mb-3">Por Proveedor</h3>
           <div className="space-y-2">
             {Object.entries(monthlyData.byVendor)
               .sort(([, a], [, b]) => b - a)
@@ -77,7 +77,7 @@ export default function MonthlySummary({ expenses, vendors, selectedMonth }: Mon
                 const vendor = vendors.find(v => v.id === vendorId)
                 return (
                   <div key={vendorId} className="flex items-center justify-between py-2 border-b border-gray-100">
-                    <span className="text-sm text-gray-700">{vendor?.company_name || 'Unknown'}</span>
+                    <span className="text-sm text-gray-700">{vendor?.company_name || 'Desconocido'}</span>
                     <span className="text-sm font-semibold text-gray-900">${amount.toFixed(2)}</span>
                   </div>
                 )

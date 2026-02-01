@@ -102,7 +102,7 @@ export function Modal({
     <Portal>
       <div
         ref={overlayRef}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity duration-200"
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity duration-200 ease-out"
         onClick={handleOverlayClick}
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}
@@ -111,18 +111,19 @@ export function Modal({
         <div
           ref={modalRef}
           className={`
-            bg-white rounded-lg shadow-xl
+            bg-white rounded-lg shadow-2xl border border-[#E5E7EB]
             w-full ${sizes[size]}
             max-h-[90vh] overflow-y-auto
             transform transition-all duration-200 ease-out
+            animate-modal-enter
             ${className}
           `}
           onClick={(e) => e.stopPropagation()}
         >
           {(title || showCloseButton) && (
-            <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
+            <div className="flex items-center justify-between p-6 border-b border-[#E5E7EB]">
               {title && (
-                <h2 id="modal-title" className="text-xl font-semibold text-gray-900">
+                <h2 id="modal-title" className="text-xl font-semibold text-slate-900">
                   {typeof title === 'string' ? title : title}
                 </h2>
               )}

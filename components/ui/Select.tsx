@@ -12,22 +12,23 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label className="block text-xs font-medium text-[#0F172A] mb-1.5">
             {label}
-            {props.required && <span className="text-red-500 ml-1">*</span>}
+            {props.required && <span className="text-[#EF4444] ml-1">*</span>}
           </label>
         )}
         <select
           ref={ref}
           className={`
-            w-full px-3.5 py-2.5 
-            text-slate-900 placeholder-slate-400
-            bg-white border border-gray-300 rounded-lg
-            transition-all duration-200
-            focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
-            disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
-            autofill:!text-slate-900 autofill:!bg-white
-            ${error ? 'border-red-300 focus:ring-red-500' : ''}
+            w-full px-3 py-2 
+            text-[#0F172A] placeholder-[#64748B]
+            bg-white border border-[#E2E8F0] rounded-md
+            transition-all duration-150 ease-out
+            focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] focus:shadow-sm
+            hover:border-[#CBD5E1]
+            disabled:bg-[#F8FAFC] disabled:text-[#64748B] disabled:cursor-not-allowed
+            autofill:!text-[#0F172A] autofill:!bg-white
+            ${error ? 'border-[#EF4444] focus:ring-[#EF4444]/30' : ''}
             ${className}
           `}
           {...props}
@@ -39,10 +40,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           ))}
         </select>
         {error && (
-          <p className="mt-1.5 text-sm text-red-600">{error}</p>
+          <p className="mt-1 text-xs text-[#EF4444]">{error}</p>
         )}
         {helperText && !error && (
-          <p className="mt-1.5 text-sm text-gray-500">{helperText}</p>
+          <p className="mt-1 text-xs text-[#64748B]">{helperText}</p>
         )}
       </div>
     )
