@@ -102,12 +102,8 @@ export default function DashboardLayout({
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex grow flex-col gap-y-4 overflow-y-auto bg-white border-r border-[#E2E8F0] px-4 py-4">
           {/* Branding */}
-          <div className="shrink-0 pb-3">
-            <h1 className="text-sm font-semibold text-[#0F172A] tracking-tight">CasaPilot</h1>
-          </div>
-
-          {/* Property Switcher */}
-          <div className="shrink-0">
+          <div className="shrink-0 pb-4 border-b border-[#E2E8F0]">
+            <h1 className="text-base font-semibold text-[#0F172A] tracking-tight mb-3">CasaPilot</h1>
             <PropertySelector />
           </div>
 

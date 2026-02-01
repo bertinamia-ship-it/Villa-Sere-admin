@@ -426,6 +426,26 @@ export const es = {
     upgradeRequired: 'Actualización Requerida',
     upgradeMessage: 'Tu plan actual tiene límites. Actualiza para obtener más funcionalidades.',
   },
+
+  // Property Selector
+  propertySelector: {
+    loading: 'Cargando propiedades...',
+    createProperty: 'Crear Propiedad',
+    addNewProperty: 'Agregar nueva propiedad',
+    manageProperties: 'Gestionar Propiedades',
+    selectProperty: 'Seleccionar propiedad',
+    propertyLabel: 'Propiedad',
+    noProperties: 'No hay propiedades',
+    createFirstProperty: 'Crea tu Primera Propiedad',
+    propertyName: 'Nombre de la propiedad',
+    propertyLocation: 'Ubicación',
+    propertyNamePlaceholder: 'ej. Villa Serena',
+    propertyLocationPlaceholder: 'ej. Tulum, México',
+    freeTrialLimit: 'Los planes gratuitos/prueba están limitados a 1 propiedad. Por favor actualiza para agregar más propiedades.',
+    errorCreatingProperty: 'Error al crear propiedad',
+    errorCreatingPropertyRetry: 'Error al crear propiedad. Por favor intenta de nuevo.',
+    propertyCreatedFailedRetrieve: 'Error: Propiedad creada pero falló al recuperar datos.',
+  },
 }
 
 // Helper function para acceder a traducciones con interpolación
