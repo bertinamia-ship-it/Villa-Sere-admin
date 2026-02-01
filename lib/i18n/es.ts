@@ -332,7 +332,7 @@ export const es = {
     noPlans: 'No hay planes de mantenimiento',
     noPlansDescription: 'Crea planes recurrentes para automatizar el mantenimiento',
     noPropertySelected: 'No hay propiedad seleccionada',
-    noPropertyDescription: 'Selecciona o crea una propiedad para gestionar planes',
+    selectOrCreatePropertyPlans: 'Por favor selecciona o crea una propiedad para gestionar planes de mantenimiento.',
     planSaved: 'Plan guardado exitosamente',
     planDeleted: 'Plan eliminado exitosamente',
     planCompleted: 'Mantenimiento completado exitosamente',

@@ -256,7 +256,9 @@ export default function MaintenancePlanList() {
   }
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
+    // Use local date to avoid timezone issues
+    const localDate = new Date(date + 'T00:00:00')
+    return localDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
   }
 
   if (loading) {
@@ -285,7 +287,7 @@ export default function MaintenancePlanList() {
         <EmptyState
           icon={<AlertCircle className="h-12 w-12" />}
           title={t('maintenancePlans.noPropertySelected')}
-          description={t('maintenancePlans.noPropertyDescription')}
+          description={t('maintenancePlans.selectOrCreatePropertyPlans')}
         />
       </div>
     )
@@ -299,7 +301,10 @@ export default function MaintenancePlanList() {
           <h1 className="text-2xl font-semibold text-[#0F172A]">{t('maintenancePlans.title')}</h1>
           <p className="text-sm text-slate-500 mt-1">{t('maintenancePlans.subtitle')}</p>
         </div>
-        <Button onClick={() => setShowForm(true)}>
+        <Button 
+          onClick={() => setShowForm(true)}
+          disabled={!hasProperty}
+        >
           <Plus className="h-4 w-4" />
           {t('maintenancePlans.createPlan')}
         </Button>

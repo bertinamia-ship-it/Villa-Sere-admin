@@ -271,7 +271,9 @@ export default function TaskList() {
   }
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
+    // Use local date to avoid timezone issues
+    const localDate = new Date(date + 'T00:00:00')
+    return localDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
   }
 
   const isOverdue = (dueDate: string) => {
@@ -310,7 +312,7 @@ export default function TaskList() {
         <EmptyState
           icon={<AlertCircle className="h-12 w-12" />}
           title={t('tasks.noPropertySelected')}
-          description={t('tasks.noPropertyDescription')}
+          description={t('tasks.selectOrCreatePropertyTasks')}
         />
       </div>
     )
@@ -324,7 +326,10 @@ export default function TaskList() {
           <h1 className="text-2xl font-semibold text-[#0F172A]">{t('tasks.title')}</h1>
           <p className="text-sm text-slate-500 mt-1">{t('tasks.subtitle')}</p>
         </div>
-        <Button onClick={() => setShowForm(true)}>
+        <Button 
+          onClick={() => setShowForm(true)}
+          disabled={!hasProperty}
+        >
           <Plus className="h-4 w-4" />
           {t('tasks.createTask')}
         </Button>

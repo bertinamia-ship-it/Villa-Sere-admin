@@ -109,10 +109,12 @@ export function UpcomingMaintenancePlans({ plans }: UpcomingMaintenancePlansProp
         showToast(t('maintenancePlans.completeError'), 'error')
       } else {
         showToast(t('maintenancePlans.planCompleted'), 'success')
-        // Refresh page after a short delay
+        // Dispatch propertyChanged event to trigger refresh in parent
+        window.dispatchEvent(new CustomEvent('propertyChanged'))
+        // Refresh page after a short delay to show updated data
         setTimeout(() => {
           window.location.reload()
-        }, 500)
+        }, 800)
       }
     } catch (error) {
       console.error('Error completing plan:', error)
@@ -249,7 +251,12 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
           showToast(t('tasks.completeError'), 'error')
         } else {
           showToast(t('tasks.taskCompleted'), 'success')
-          onUpdate()
+          // Dispatch propertyChanged event to trigger refresh in parent
+          window.dispatchEvent(new CustomEvent('propertyChanged'))
+          // Refresh page after a short delay to show updated data
+          setTimeout(() => {
+            window.location.reload()
+          }, 800)
         }
       } else {
         // Recurrent: calculate next_due_date
@@ -284,7 +291,12 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
           showToast(t('tasks.completeError'), 'error')
         } else {
           showToast(t('tasks.taskCompleted'), 'success')
-          onUpdate()
+          // Dispatch propertyChanged event to trigger refresh in parent
+          window.dispatchEvent(new CustomEvent('propertyChanged'))
+          // Refresh page after a short delay to show updated data
+          setTimeout(() => {
+            window.location.reload()
+          }, 800)
         }
       }
     } catch (error) {

@@ -5,7 +5,6 @@ import { getActiveProperty, getActivePropertyId } from '@/lib/utils/property'
 import { 
   Package, 
   Wrench, 
-  DollarSign, 
   AlertTriangle, 
   Calendar, 
   Plus, 
@@ -18,7 +17,6 @@ import {
 } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Skeleton } from '@/components/ui/Skeleton'
 import ResetDataButton from './ResetDataButton'
 import { UpcomingMaintenancePlans, UpcomingTasks } from '@/components/dashboard/UpcomingAutomation'
 import { t } from '@/lib/i18n/es'
