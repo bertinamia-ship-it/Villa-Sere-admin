@@ -192,7 +192,12 @@ export default function BillingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p className="text-sm text-gray-600">{t('billing.plan')}</p>
-              <p className="text-lg font-semibold text-gray-900 capitalize">{tenant.subscription_plan === 'free' ? t('billing.free') : tenant.subscription_plan === 'paid' ? t('billing.paid') : tenant.subscription_plan}</p>
+              <p className="text-lg font-semibold text-gray-900 capitalize">
+                {tenant.subscription_plan === 'free' ? t('billing.free') : 
+                 tenant.subscription_plan === 'basic' ? t('billing.basic') :
+                 tenant.subscription_plan === 'premium' ? t('billing.premium') : 
+                 String(tenant.subscription_plan)}
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600">{t('billing.status')}</p>
