@@ -65,7 +65,7 @@ export default function DashboardLayout({
 
           {/* Navigation */}
           <nav className="flex flex-1 flex-col">
-            <ul role="list" className="flex flex-1 flex-col gap-y-1">
+            <ul role="list" className="flex flex-1 flex-col gap-y-0.5">
               {navigation.map((item) => {
                 const isActive = pathname === item.href
                 return (
@@ -74,12 +74,16 @@ export default function DashboardLayout({
                       href={item.href}
                       className={`group relative flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-out ${
                         isActive
-                          ? 'bg-[#0F172A] text-white shadow-sm'
-                          : 'text-[#64748B] hover:text-[#0F172A] hover:bg-gray-50'
+                          ? 'bg-gray-50 text-[#0F172A]'
+                          : 'text-[#64748B] hover:text-[#0F172A] hover:bg-gray-50/50'
                       }`}
                     >
+                      {/* Active indicator lateral izquierdo (estilo Mac) */}
+                      {isActive && (
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-[#0F172A] rounded-r-full transition-all duration-200" />
+                      )}
                       <item.icon className={`h-4 w-4 shrink-0 stroke-[1.5] transition-colors duration-200 ${
-                        isActive ? 'text-white' : 'text-[#64748B] group-hover:text-[#0F172A]'
+                        isActive ? 'text-[#0F172A]' : 'text-[#64748B] group-hover:text-[#0F172A]'
                       }`} aria-hidden="true" />
                       <span className="flex-1">{item.name}</span>
                     </Link>
@@ -114,13 +118,17 @@ export default function DashboardLayout({
                     key={item.name}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-out ${
+                    className={`group relative flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-out ${
                       isActive
-                        ? 'bg-[#0F172A] text-white shadow-sm'
-                        : 'text-[#64748B] hover:text-[#0F172A] hover:bg-gray-50'
+                        ? 'bg-gray-50 text-[#0F172A]'
+                        : 'text-[#64748B] hover:text-[#0F172A] hover:bg-gray-50/50'
                     }`}
                   >
-                    <item.icon className={`h-4 w-4 stroke-[1.5] ${isActive ? 'text-white' : 'text-[#64748B]'}`} />
+                    {/* Active indicator lateral izquierdo (estilo Mac) */}
+                    {isActive && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-[#0F172A] rounded-r-full transition-all duration-200" />
+                    )}
+                    <item.icon className={`h-4 w-4 stroke-[1.5] ${isActive ? 'text-[#0F172A]' : 'text-[#64748B]'}`} />
                     {item.name}
                   </Link>
                 )

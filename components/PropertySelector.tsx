@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Building2, Plus, Loader2, ChevronDown } from 'lucide-react'
+import { Building2, Plus, Loader2, ChevronDown, Home, Building } from 'lucide-react'
 import { Button } from './ui/Button'
 import { Input } from './ui/Input'
 import { Modal } from './ui/Modal'
 import TenantError from './TenantError'
+import { useToast } from './ui/Toast'
 import { t } from '@/lib/i18n/es'
 
 interface Property {
@@ -17,6 +18,7 @@ interface Property {
 
 export default function PropertySelector() {
   const supabase = createClient()
+  const { showToast } = useToast()
   const [properties, setProperties] = useState<Property[]>([])
   const [activePropertyId, setActivePropertyId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -26,6 +28,7 @@ export default function PropertySelector() {
   const [newPropertyName, setNewPropertyName] = useState('')
   const [newPropertyLocation, setNewPropertyLocation] = useState('')
   const [tenantError, setTenantError] = useState<string | null>(null)
+  const [isChanging, setIsChanging] = useState(false)
 
   // Load properties and active property
   useEffect(() => {
@@ -101,6 +104,14 @@ export default function PropertySelector() {
   }
 
   async function handlePropertyChange(propertyId: string) {
+    if (propertyId === activePropertyId) return
+    
+    setIsChanging(true)
+    const newProperty = properties.find(p => p.id === propertyId)
+    
+    // Micro transición suave
+    await new Promise(resolve => setTimeout(resolve, 150))
+    
     setActivePropertyId(propertyId)
     localStorage.setItem('activePropertyId', propertyId)
 
@@ -126,6 +137,13 @@ export default function PropertySelector() {
 
     // Trigger refresh to update all queries
     window.dispatchEvent(new CustomEvent('propertyChanged', { detail: { propertyId } }))
+    
+    // Toast feedback
+    if (newProperty) {
+      showToast(`Propiedad cambiada a: ${newProperty.name}`, 'success')
+    }
+    
+    setIsChanging(false)
   }
 
   async function handleCreateProperty() {
@@ -346,26 +364,42 @@ export default function PropertySelector() {
 
   const activeProperty = properties.find(p => p.id === activePropertyId) || properties[0]
 
-  // Get property icon based on name or location
+  // Get property icon component based on name (heuristic)
   const getPropertyIcon = (name: string) => {
     const lowerName = name.toLowerCase()
-    if (lowerName.includes('beach') || lowerName.includes('playa') || lowerName.includes('mar')) return '🏖️'
-    if (lowerName.includes('mountain') || lowerName.includes('montaña')) return '⛰️'
-    if (lowerName.includes('city') || lowerName.includes('ciudad')) return '🏙️'
-    return '🏠'
+    
+    // Departamento / Apartamento
+    if (lowerName.includes('departamento') || lowerName.includes('apartamento') || 
+        lowerName.includes('depto') || lowerName.includes('apto') ||
+        lowerName.includes('apartment') || lowerName.includes('flat')) {
+      return <Building className="h-4 w-4 text-[#64748B]" />
+    }
+    
+    // Villa
+    if (lowerName.includes('villa') || lowerName.includes('casa grande')) {
+      return <Home className="h-4 w-4 text-[#64748B]" />
+    }
+    
+    // Default: Casa / Home
+    return <Home className="h-4 w-4 text-[#64748B]" />
   }
 
   return (
-    <div className="flex items-center gap-2">
-      {/* Dropdown para cambiar propiedad */}
+    <div className="flex items-center gap-1.5 sm:gap-2">
+      {/* Dropdown principal para cambiar propiedad */}
       <div className="relative">
         <button
           onClick={() => setShowDropdown(!showDropdown)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-gray-50 transition-all duration-150 ease-out text-sm font-medium text-[#0F172A]"
+          disabled={isChanging}
+          className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-md border border-gray-200/60 bg-white hover:bg-gray-50 hover:border-gray-300/60 transition-all duration-200 ease-out text-xs sm:text-sm font-medium text-[#0F172A] ${
+            isChanging ? 'opacity-60 cursor-wait' : ''
+          }`}
         >
-          <span className="text-base shrink-0">{activeProperty ? getPropertyIcon(activeProperty.name) : '🏠'}</span>
-          <span className="truncate max-w-[120px]">{activeProperty?.name || t('propertySelector.selectProperty')}</span>
-          <ChevronDown className={`h-3.5 w-3.5 text-[#64748B] shrink-0 transition-transform duration-150 ease-out ${showDropdown ? 'rotate-180' : ''}`} />
+          <span className="shrink-0">
+            {activeProperty ? getPropertyIcon(activeProperty.name) : <Home className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#64748B]" />}
+          </span>
+          <span className="truncate max-w-[100px] sm:max-w-[140px] md:max-w-[180px]">{activeProperty?.name || t('propertySelector.selectProperty')}</span>
+          <ChevronDown className={`h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#64748B] shrink-0 transition-transform duration-200 ease-out ${showDropdown ? 'rotate-180' : ''}`} />
         </button>
         
         {showDropdown && (
@@ -374,7 +408,7 @@ export default function PropertySelector() {
               className="fixed inset-0 z-[94]"
               onClick={() => setShowDropdown(false)}
             />
-            <div className="absolute right-0 mt-1.5 w-56 rounded-lg bg-white border border-gray-200/60 shadow-lg py-1.5 z-[95] animate-dropdown-enter">
+            <div className="absolute right-0 mt-1.5 w-56 rounded-lg bg-white border border-gray-200/60 shadow-lg py-1 z-[95]">
               <div className="max-h-64 overflow-y-auto">
                 {properties.length === 0 ? (
                   <div className="px-3 py-2.5 text-xs text-[#64748B] text-center">{t('propertySelector.noProperties')}</div>
@@ -386,17 +420,19 @@ export default function PropertySelector() {
                         handlePropertyChange(property.id)
                         setShowDropdown(false)
                       }}
-                      className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-all duration-150 ease-out flex items-center gap-2.5 ${
+                      className={`w-full text-left px-3 py-2.5 text-sm hover:bg-gray-50 transition-all duration-200 ease-out flex items-center gap-2.5 ${
                         property.id === activePropertyId
                           ? 'bg-[#0F172A] text-white font-medium'
                           : 'text-[#0F172A]'
                       }`}
                     >
-                      <span className="text-base shrink-0">{getPropertyIcon(property.name)}</span>
+                      <span className="shrink-0">
+                        {getPropertyIcon(property.name)}
+                      </span>
                       <div className="flex-1 min-w-0">
                         <div className="truncate">{property.name}</div>
                         {property.location && (
-                          <div className={`text-[10px] truncate ${property.id === activePropertyId ? 'text-white/70' : 'text-[#64748B]'}`}>
+                          <div className={`text-[10px] truncate mt-0.5 ${property.id === activePropertyId ? 'text-white/70' : 'text-[#64748B]'}`}>
                             {property.location}
                           </div>
                         )}
@@ -410,10 +446,11 @@ export default function PropertySelector() {
         )}
       </div>
 
-      {/* Botón separado para agregar propiedad */}
+      {/* Botón secundario (ghost) para agregar propiedad - más discreto */}
       <button
         onClick={() => setShowCreateModal(true)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-white border border-gray-200/60 hover:bg-gray-50 hover:border-gray-300/60 transition-all duration-150 ease-out text-xs font-medium text-[#0F172A]"
+        className="flex items-center justify-center gap-1 px-2 py-1.5 rounded-md border border-transparent hover:border-gray-200/60 hover:bg-gray-50/50 transition-all duration-200 ease-out text-xs font-medium text-[#64748B] hover:text-[#0F172A] min-w-[32px] sm:min-w-0"
+        title="Agregar nueva propiedad"
       >
         <Plus className="h-3.5 w-3.5 stroke-[1.5]" />
         <span className="hidden sm:inline">Agregar</span>
