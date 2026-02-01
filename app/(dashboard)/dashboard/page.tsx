@@ -11,10 +11,13 @@ import {
   Plus, 
   TrendingUp,
   ShoppingCart,
-  ArrowRight
+  ArrowRight,
+  ArrowUpRight,
+  ArrowDownRight
 } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { Skeleton } from '@/components/ui/Skeleton'
 import ResetDataButton from './ResetDataButton'
 import { t } from '@/lib/i18n/es'
 
@@ -170,23 +173,7 @@ export default async function DashboardPage() {
   ).slice(0, 5) || []
 
   return (
-    <div className="space-y-6">
-      {/* Quick Actions */}
-      <div className="flex flex-wrap gap-2">
-        <Link href="/rentals">
-          <Button size="sm">
-            <Plus className="h-4 w-4" />
-            {t('dashboard.newBooking')}
-          </Button>
-        </Link>
-        <Link href="/expenses">
-          <Button size="sm" variant="secondary">
-            <Plus className="h-4 w-4" />
-            {t('dashboard.addExpense')}
-          </Button>
-        </Link>
-      </div>
-
+    <div className="space-y-8">
       {/* Role Info Banner */}
       {profile?.role !== 'admin' && (
         <Card padding="md" className="bg-blue-50/50 border-blue-200/60">
@@ -202,256 +189,221 @@ export default async function DashboardPage() {
         </Card>
       )}
 
-      {/* Key Metrics Grid */}
+      {/* Hero Summary - 3 métricas principales */}
+      <Card padding="lg" className="bg-gradient-to-br from-white to-gray-50/50">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          {/* Ingresos */}
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-blue-50 rounded-lg">
+              <ArrowUpRight className="h-5 w-5 text-blue-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Ingresos</p>
+              <p className="text-3xl font-bold text-[#0F172A] mb-1">
+                {monthIncome > 0 ? `$${monthIncome.toFixed(0)}` : '—'}
+              </p>
+              <p className="text-xs text-slate-500">Este mes</p>
+            </div>
+          </div>
+
+          {/* Gastos */}
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-emerald-50 rounded-lg">
+              <ArrowDownRight className="h-5 w-5 text-emerald-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Gastos</p>
+              <p className="text-3xl font-bold text-[#0F172A] mb-1">
+                {monthTotal > 0 ? `$${monthTotal.toFixed(0)}` : '—'}
+              </p>
+              <p className="text-xs text-slate-500">Este mes</p>
+            </div>
+          </div>
+
+          {/* Balance */}
+          <div className="flex items-start gap-4">
+            <div className={`p-3 rounded-lg ${monthProfit >= 0 ? 'bg-emerald-50' : 'bg-red-50'}`}>
+              <TrendingUp className={`h-5 w-5 ${monthProfit >= 0 ? 'text-emerald-600' : 'text-red-600'}`} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Balance</p>
+              <p className={`text-3xl font-bold mb-1 ${monthProfit >= 0 ? 'text-emerald-600' : monthProfit < 0 ? 'text-red-600' : 'text-[#0F172A]'}`}>
+                {monthProfit !== 0 ? `$${Math.abs(monthProfit).toFixed(0)}` : '—'}
+              </p>
+              <p className="text-xs text-slate-500">Este mes</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Grid de 4 Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Link href="/inventory" className="block">
+        {/* Rentas */}
+        <Link href="/rentals" className="block">
           <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-blue-500 group" padding="md">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-[#64748B] uppercase tracking-wide">Inventario</p>
-                <p className="text-2xl font-bold text-[#0F172A] mt-2">{totalItems}</p>
-                {lowStockItems.length > 0 && (
-                  <p className="text-xs text-[#EF4444] mt-1.5 font-medium">
-                    {lowStockItems.length} necesitan reabastecimiento
-                  </p>
-                )}
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Rentas</p>
+                <p className="text-2xl font-bold text-[#0F172A] mb-1">{monthBookings.length}</p>
+                <p className="text-xs text-slate-500">Este mes</p>
               </div>
-              <div className="p-3 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors duration-200">
-                <Package className="h-6 w-6 text-blue-600 stroke-[1.5]" />
+              <div className="p-3 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors duration-200 shrink-0">
+                <Calendar className="h-5 w-5 text-blue-600 stroke-[1.5]" />
               </div>
             </div>
           </Card>
         </Link>
 
+        {/* Mantenimiento */}
         <Link href="/maintenance" className="block">
           <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-amber-500 group" padding="md">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-[#64748B] uppercase tracking-wide">Mantenimiento</p>
-                <p className="text-2xl font-bold text-[#0F172A] mt-2">{openTickets.length}</p>
-                {urgentTickets.length > 0 && (
-                  <p className="text-xs text-amber-600 mt-1.5 font-medium">
-                    {urgentTickets.length} urgentes
-                  </p>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Mantenimiento</p>
+                <p className="text-2xl font-bold text-[#0F172A] mb-1">{openTickets.length}</p>
+                {urgentTickets.length > 0 ? (
+                  <p className="text-xs text-amber-600 font-medium">{urgentTickets.length} urgentes</p>
+                ) : (
+                  <p className="text-xs text-slate-500">Pendientes</p>
                 )}
               </div>
-              <div className="p-3 bg-amber-50 rounded-lg group-hover:bg-amber-100 transition-colors duration-200">
-                <Wrench className="h-6 w-6 text-amber-600 stroke-[1.5]" />
+              <div className="p-3 bg-amber-50 rounded-lg group-hover:bg-amber-100 transition-colors duration-200 shrink-0">
+                <Wrench className="h-5 w-5 text-amber-600 stroke-[1.5]" />
               </div>
             </div>
           </Card>
         </Link>
 
-        <Link href="/expenses" className="block">
+        {/* Inventario */}
+        <Link href="/inventory" className="block">
           <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-emerald-500 group" padding="md">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-[#64748B] uppercase tracking-wide">Este Mes</p>
-                <p className="text-2xl font-bold text-[#0F172A] mt-2">
-                  ${monthTotal.toFixed(0)}
-                </p>
-                <p className="text-xs text-[#64748B] mt-1.5">Gastos</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Inventario</p>
+                <p className="text-2xl font-bold text-[#0F172A] mb-1">{totalItems}</p>
+                {lowStockItems.length > 0 ? (
+                  <p className="text-xs text-red-600 font-medium">{lowStockItems.length} bajo stock</p>
+                ) : (
+                  <p className="text-xs text-slate-500">Total items</p>
+                )}
               </div>
-              <div className="p-3 bg-emerald-50 rounded-lg group-hover:bg-emerald-100 transition-colors duration-200">
-                <DollarSign className="h-6 w-6 text-emerald-600 stroke-[1.5]" />
+              <div className="p-3 bg-emerald-50 rounded-lg group-hover:bg-emerald-100 transition-colors duration-200 shrink-0">
+                <Package className="h-5 w-5 text-emerald-600 stroke-[1.5]" />
               </div>
             </div>
           </Card>
         </Link>
 
-        <Link href="/rentals" className="block">
-          <Card className="hover:shadow-sm transition-all duration-150 border-l-2 border-l-[#2563EB] group" padding="sm">
+        {/* To-Buy */}
+        <Link href="/to-buy" className="block">
+          <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-purple-500 group" padding="md">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[10px] font-medium text-[#64748B] uppercase tracking-wide">Este Mes</p>
-                <p className="text-xl font-bold text-[#0F172A] mt-1">
-                  ${monthIncome.toFixed(0)}
-                </p>
-                <p className="text-[10px] text-[#64748B] mt-1">Ingresos</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Compras</p>
+                <p className="text-2xl font-bold text-[#0F172A] mb-1">{pendingPurchases.length}</p>
+                <p className="text-xs text-slate-500">Pendientes</p>
               </div>
-              <div className="p-2 bg-[#2563EB]/10 rounded-md group-hover:bg-[#2563EB]/15 transition-colors duration-150">
-                <TrendingUp className="h-5 w-5 text-[#2563EB] stroke-[1.5]" />
+              <div className="p-3 bg-purple-50 rounded-lg group-hover:bg-purple-100 transition-colors duration-200 shrink-0">
+                <ShoppingCart className="h-5 w-5 text-purple-600 stroke-[1.5]" />
               </div>
             </div>
           </Card>
         </Link>
       </div>
 
-      {/* Profit Card */}
-      {monthProfit !== 0 && (
-        <Card className={`border-l-2 ${monthProfit >= 0 ? 'border-l-[#22C55E] bg-[#22C55E]/5' : 'border-l-[#EF4444] bg-[#EF4444]/5'}`} padding="sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-medium text-[#64748B] uppercase tracking-wide">Ganancia Neta</p>
-              <p className={`text-2xl font-bold mt-1 ${monthProfit >= 0 ? 'text-[#22C55E]' : 'text-[#EF4444]'}`}>
-                ${Math.abs(monthProfit).toFixed(0)}
-              </p>
-              <p className="text-[10px] text-[#64748B] mt-1">Este Mes</p>
-            </div>
-            <div className={`p-2 rounded-md ${monthProfit >= 0 ? 'bg-[#22C55E]/10' : 'bg-[#EF4444]/10'}`}>
-              <TrendingUp className={`h-5 w-5 stroke-[1.5] ${monthProfit >= 0 ? 'text-[#22C55E]' : 'text-[#EF4444]'}`} />
-            </div>
-          </div>
-        </Card>
-      )}
+      {/* Próximos Eventos */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-[#0F172A]">Próximos Eventos</h2>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Upcoming Bookings */}
-        <Card className="lg:col-span-2" padding="md">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-blue-600 stroke-[1.5]" />
-                {t('dashboard.upcomingBookings')}
-              </CardTitle>
-              <Link href="/rentals">
-                <Button size="sm" variant="ghost">
-                  {t('dashboard.viewAll')}
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Button>
-              </Link>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {upcomingBookings.length > 0 ? (
-              <div className="space-y-3">
-                {upcomingBookings.map((booking) => {
-                  const checkIn = new Date(booking.check_in)
-                  const checkOut = new Date(booking.check_out)
-                  const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24))
-                  return (
-                    <Link
-                      key={booking.id}
-                      href="/rentals"
-                      className="block p-4 rounded-lg border border-gray-200/60 hover:border-blue-300/60 hover:bg-gray-50/50 transition-all duration-200"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <p className="font-medium text-sm text-[#0F172A]">{booking.guest_name || t('dashboard.guest')}</p>
-                          <p className="text-xs text-[#64748B] mt-1">
-                            {checkIn.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })} - {checkOut.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })} • {nights} {nights === 1 ? 'noche' : 'noches'}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-sm text-blue-600">${Number(booking.total_amount || 0).toFixed(0)}</p>
-                        </div>
-                      </div>
-                    </Link>
-                  )
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-[#64748B]">
-                <Calendar className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                <p className="text-sm">{t('dashboard.noUpcomingBookings')}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions & Alerts */}
-        <div className="space-y-4">
-          {/* Urgent Tickets */}
-          {urgentTickets.length > 0 && (
-            <Card className="border-l-4 border-l-red-500 bg-red-50/50" padding="md">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-red-600">
-                  <AlertTriangle className="h-4 w-4 stroke-[1.5]" />
-                  Tickets Urgentes
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Próximas Rentas */}
+          <Card padding="md">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-blue-600 stroke-[1.5]" />
+                  Próximas Rentas
                 </CardTitle>
-              </CardHeader>
-              <CardContent>
+                <Link href="/rentals">
+                  <Button size="sm" variant="ghost" className="text-xs">
+                    Ver todas
+                    <ArrowRight className="h-3 w-3" />
+                  </Button>
+                </Link>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {upcomingBookings.length > 0 ? (
                 <div className="space-y-2">
-                  {urgentTickets.slice(0, 3).map((ticket) => (
+                  {upcomingBookings.slice(0, 6).map((booking) => {
+                    const checkIn = new Date(booking.check_in)
+                    const checkOut = new Date(booking.check_out)
+                    const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24))
+                    return (
+                      <Link
+                        key={booking.id}
+                        href="/rentals"
+                        className="block p-3 rounded-lg border border-gray-200/60 hover:border-blue-300/60 hover:bg-gray-50/50 transition-all duration-200"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm text-[#0F172A] truncate">{booking.guest_name || t('dashboard.guest')}</p>
+                            <p className="text-xs text-slate-500 mt-0.5">
+                              {checkIn.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })} • {nights} {nights === 1 ? 'noche' : 'noches'}
+                            </p>
+                          </div>
+                          <p className="font-semibold text-sm text-blue-600 shrink-0">${Number(booking.total_amount || 0).toFixed(0)}</p>
+                        </div>
+                      </Link>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-6 text-slate-500">
+                  <Calendar className="h-10 w-10 mx-auto mb-2 text-gray-300" />
+                  <p className="text-xs">{t('dashboard.noUpcomingBookings')}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Tickets Urgentes */}
+          <Card padding="md" className={urgentTickets.length > 0 ? 'border-l-4 border-l-red-500 bg-red-50/30' : ''}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-red-600 stroke-[1.5]" />
+                Tickets Urgentes
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {urgentTickets.length > 0 ? (
+                <div className="space-y-2">
+                  {urgentTickets.slice(0, 6).map((ticket) => (
                     <Link
                       key={ticket.id}
                       href="/maintenance"
                       className="block p-3 rounded-lg bg-white border border-gray-200/60 hover:border-red-300/60 hover:bg-gray-50/50 transition-all duration-200"
                     >
                       <p className="font-medium text-sm text-[#0F172A]">{ticket.title}</p>
-                      <p className="text-xs text-[#64748B] mt-1">{ticket.room}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">{ticket.room}</p>
                     </Link>
                   ))}
-                  {urgentTickets.length > 3 && (
-                    <Link href="/maintenance" className="text-xs text-red-600 font-medium hover:underline">
-                      +{t('dashboard.moreUrgentTickets', { count: urgentTickets.length - 3 })}
-                    </Link>
-                  )}
                 </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Low Stock Items */}
-          {lowStockItems.length > 0 && (
-            <Card className="border-l-4 border-l-amber-500 bg-amber-50/50" padding="md">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-amber-600">
-                  <Package className="h-4 w-4 stroke-[1.5]" />
-                  {t('dashboard.lowStockAlert')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {lowStockItems.slice(0, 3).map((item) => (
-                    <Link
-                      key={item.id}
-                      href="/inventory"
-                      className="block p-3 rounded-lg bg-white border border-gray-200/60 hover:border-amber-300/60 hover:bg-gray-50/50 transition-all duration-200"
-                    >
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium text-sm text-[#0F172A]">{item.name}</p>
-                        <p className="text-xs font-bold text-amber-600">{item.quantity} {t('dashboard.left')}</p>
-                      </div>
-                    </Link>
-                  ))}
-                  {lowStockItems.length > 3 && (
-                    <Link href="/inventory" className="text-xs text-amber-600 font-medium hover:underline">
-                      +{t('dashboard.moreItems', { count: lowStockItems.length - 3 })}
-                    </Link>
-                  )}
+              ) : (
+                <div className="text-center py-6 text-slate-500">
+                  <AlertTriangle className="h-10 w-10 mx-auto mb-2 text-gray-300" />
+                  <p className="text-xs">No hay tickets urgentes</p>
                 </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* To Buy List */}
-          {pendingPurchases.length > 0 && (
-            <Card padding="md">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ShoppingCart className="h-4 w-4 text-blue-600 stroke-[1.5]" />
-                  Compras
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {pendingPurchases.slice(0, 3).map((item) => (
-                    <Link
-                      key={item.id}
-                      href="/to-buy"
-                      className="block p-3 rounded-lg border border-gray-200/60 hover:border-blue-300/60 hover:bg-gray-50/50 transition-all duration-200"
-                    >
-                      <p className="font-medium text-sm text-[#0F172A]">{item.item}</p>
-                    </Link>
-                  ))}
-                  {pendingPurchases.length > 3 && (
-                    <Link href="/to-buy" className="text-xs text-blue-600 font-medium hover:underline">
-                      +{pendingPurchases.length - 3} artículos más
-                    </Link>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
 
       {/* Quick Actions */}
       <Card className="bg-gray-50/50 border-gray-200/60" padding="md">
         <CardHeader>
-          <CardTitle>{t('dashboard.quickActions')}</CardTitle>
+          <CardTitle className="text-sm">{t('dashboard.quickActions')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
