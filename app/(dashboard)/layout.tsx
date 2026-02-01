@@ -16,7 +16,8 @@ import {
   Calendar,
   ShoppingCart,
   CreditCard,
-  User
+  User,
+  CalendarCheck
 } from 'lucide-react'
 import { useState } from 'react'
 import Header from '@/components/Header'
@@ -28,6 +29,7 @@ const navigation = [
   { name: 'Inventario', href: '/inventory', icon: Package },
   { name: 'Compras', href: '/to-buy', icon: ShoppingCart },
   { name: 'Mantenimiento', href: '/maintenance', icon: Wrench },
+  { name: 'Programación', href: '/maintenance-plans', icon: CalendarCheck },
   { name: 'Gastos', href: '/expenses', icon: DollarSign },
   { name: 'Proveedores', href: '/vendors', icon: Users },
   { name: 'Reportes', href: '/reports', icon: BarChart3 },
