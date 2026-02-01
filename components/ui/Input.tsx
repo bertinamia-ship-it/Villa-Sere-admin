@@ -21,10 +21,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           className={`
             w-full px-3 py-2 
             text-[#0F172A] placeholder-[#64748B]
-            bg-white border border-[#E2E8F0] rounded-md
-            transition-all duration-150 ease-out
+            bg-white border border-gray-200/60 rounded-md
+            transition-all duration-200 ease-out
             focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] focus:shadow-sm
-            hover:border-[#CBD5E1]
+            hover:border-gray-300/60
             disabled:bg-[#F8FAFC] disabled:text-[#64748B] disabled:cursor-not-allowed
             autofill:!text-[#0F172A] autofill:!bg-white
             ${error ? 'border-[#EF4444] focus:ring-[#EF4444]/30' : ''}

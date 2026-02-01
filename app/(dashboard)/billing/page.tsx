@@ -132,7 +132,8 @@ export default function BillingPage() {
     if (tenant.subscription_status === 'past_due') return t('billing.pastDue')
     if (tenant.subscription_status === 'cancelled') return t('billing.cancelled')
     if (tenant.subscription_status === 'expired') return t('billing.expired')
-    return tenant.subscription_status.charAt(0).toUpperCase() + tenant.subscription_status.slice(1)
+    const status = String(tenant.subscription_status)
+    return status.charAt(0).toUpperCase() + status.slice(1)
   }
 
   const getLimits = () => {

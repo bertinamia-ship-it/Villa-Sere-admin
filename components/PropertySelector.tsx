@@ -356,75 +356,68 @@ export default function PropertySelector() {
   }
 
   return (
-    <div className="relative w-full">
-      {/* Dropdown integrado con opción de agregar */}
-      <button
-        onClick={() => setShowDropdown(!showDropdown)}
-        className="flex items-center gap-2 w-full px-3 py-2.5 rounded-md hover:bg-[#F8FAFC] transition-all duration-150 ease-out text-sm font-medium text-[#0F172A] justify-between border border-[#E2E8F0] bg-white"
-      >
-        <div className="flex items-center gap-2 flex-1 min-w-0">
+    <div className="flex items-center gap-2">
+      {/* Dropdown para cambiar propiedad */}
+      <div className="relative">
+        <button
+          onClick={() => setShowDropdown(!showDropdown)}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-gray-50 transition-all duration-150 ease-out text-sm font-medium text-[#0F172A]"
+        >
           <span className="text-base shrink-0">{activeProperty ? getPropertyIcon(activeProperty.name) : '🏠'}</span>
-          <div className="flex-1 min-w-0 text-left">
-            <div className="truncate">{activeProperty?.name || t('propertySelector.selectProperty')}</div>
-            {activeProperty?.location && (
-              <div className="text-[10px] text-[#64748B] truncate">{activeProperty.location}</div>
-            )}
-          </div>
-        </div>
-        <ChevronDown className={`h-4 w-4 text-[#64748B] shrink-0 transition-transform duration-150 ease-out ${showDropdown ? 'rotate-180' : ''}`} />
-      </button>
-      
-      {showDropdown && (
-        <>
-          <div
-            className="fixed inset-0 z-[94]"
-            onClick={() => setShowDropdown(false)}
-          />
-          <div className="absolute top-full left-0 mt-1.5 w-full rounded-lg bg-white border border-[#E2E8F0] shadow-lg py-1.5 z-[95] animate-dropdown-enter">
-            <div className="max-h-64 overflow-y-auto">
-              {properties.length === 0 ? (
-                <div className="px-3 py-2.5 text-xs text-[#64748B] text-center">{t('propertySelector.noProperties')}</div>
-              ) : (
-                properties.map((property) => (
-                  <button
-                    key={property.id}
-                    onClick={() => {
-                      handlePropertyChange(property.id)
-                      setShowDropdown(false)
-                    }}
-                    className={`w-full text-left px-3 py-2.5 text-sm hover:bg-[#F8FAFC] transition-all duration-150 ease-out flex items-center gap-2.5 ${
-                      property.id === activePropertyId
-                        ? 'bg-[#0F172A] text-white font-medium'
-                        : 'text-[#0F172A]'
-                    }`}
-                  >
-                    <span className="text-base shrink-0">{getPropertyIcon(property.name)}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="truncate">{property.name}</div>
-                      {property.location && (
-                        <div className={`text-[10px] truncate ${property.id === activePropertyId ? 'text-white/70' : 'text-[#64748B]'}`}>
-                          {property.location}
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                ))
-              )}
+          <span className="truncate max-w-[120px]">{activeProperty?.name || t('propertySelector.selectProperty')}</span>
+          <ChevronDown className={`h-3.5 w-3.5 text-[#64748B] shrink-0 transition-transform duration-150 ease-out ${showDropdown ? 'rotate-180' : ''}`} />
+        </button>
+        
+        {showDropdown && (
+          <>
+            <div
+              className="fixed inset-0 z-[94]"
+              onClick={() => setShowDropdown(false)}
+            />
+            <div className="absolute right-0 mt-1.5 w-56 rounded-lg bg-white border border-gray-200/60 shadow-lg py-1.5 z-[95] animate-dropdown-enter">
+              <div className="max-h-64 overflow-y-auto">
+                {properties.length === 0 ? (
+                  <div className="px-3 py-2.5 text-xs text-[#64748B] text-center">{t('propertySelector.noProperties')}</div>
+                ) : (
+                  properties.map((property) => (
+                    <button
+                      key={property.id}
+                      onClick={() => {
+                        handlePropertyChange(property.id)
+                        setShowDropdown(false)
+                      }}
+                      className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-all duration-150 ease-out flex items-center gap-2.5 ${
+                        property.id === activePropertyId
+                          ? 'bg-[#0F172A] text-white font-medium'
+                          : 'text-[#0F172A]'
+                      }`}
+                    >
+                      <span className="text-base shrink-0">{getPropertyIcon(property.name)}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="truncate">{property.name}</div>
+                        {property.location && (
+                          <div className={`text-[10px] truncate ${property.id === activePropertyId ? 'text-white/70' : 'text-[#64748B]'}`}>
+                            {property.location}
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
             </div>
-            <div className="border-t border-[#E2E8F0] my-1" />
-            <button
-              onClick={() => {
-                setShowCreateModal(true)
-                setShowDropdown(false)
-              }}
-              className="w-full text-left px-3 py-2.5 text-sm text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all duration-150 ease-out flex items-center gap-2.5"
-            >
-              <Plus className="h-4 w-4 stroke-[1.5]" />
-              <span>{t('propertySelector.addNewProperty')}</span>
-            </button>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
+
+      {/* Botón separado para agregar propiedad */}
+      <button
+        onClick={() => setShowCreateModal(true)}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-white border border-gray-200/60 hover:bg-gray-50 hover:border-gray-300/60 transition-all duration-150 ease-out text-xs font-medium text-[#0F172A]"
+      >
+        <Plus className="h-3.5 w-3.5 stroke-[1.5]" />
+        <span className="hidden sm:inline">Agregar</span>
+      </button>
 
       {/* Modal para crear propiedad */}
       <Modal

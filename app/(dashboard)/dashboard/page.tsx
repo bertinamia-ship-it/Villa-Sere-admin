@@ -170,98 +170,90 @@ export default async function DashboardPage() {
   ).slice(0, 5) || []
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-      <div>
-          <h1 className="text-lg font-semibold text-[#0F172A]">{t('dashboard.title')}</h1>
-          <p className="text-xs text-[#64748B] mt-0.5">{t('dashboard.subtitle', { propertyName })}</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/rentals">
-            <Button size="sm" className="w-full sm:w-auto">
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('dashboard.newBooking')}</span>
-              <span className="sm:hidden">{t('rentals.title')}</span>
-            </Button>
-          </Link>
-          <Link href="/expenses">
-            <Button size="sm" variant="secondary" className="w-full sm:w-auto">
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('dashboard.addExpense')}</span>
-              <span className="sm:hidden">{t('dashboard.expenses')}</span>
-            </Button>
-          </Link>
-        </div>
+    <div className="space-y-6">
+      {/* Quick Actions */}
+      <div className="flex flex-wrap gap-2">
+        <Link href="/rentals">
+          <Button size="sm">
+            <Plus className="h-4 w-4" />
+            {t('dashboard.newBooking')}
+          </Button>
+        </Link>
+        <Link href="/expenses">
+          <Button size="sm" variant="secondary">
+            <Plus className="h-4 w-4" />
+            {t('dashboard.addExpense')}
+          </Button>
+        </Link>
       </div>
 
       {/* Role Info Banner */}
       {profile?.role !== 'admin' && (
-        <div className="bg-[#2563EB]/10 border border-[#2563EB]/20 rounded-md p-3">
-          <div className="flex items-start gap-2.5">
-            <AlertTriangle className="h-4 w-4 text-[#2563EB] mt-0.5 stroke-[1.5]" />
+        <Card padding="md" className="bg-blue-50/50 border-blue-200/60">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-4 w-4 text-blue-600 mt-0.5 stroke-[1.5]" />
             <div className="flex-1">
-              <h3 className="text-xs font-medium text-[#0F172A]">{t('dashboard.staffAccount')}</h3>
-              <p className="text-xs text-[#64748B] mt-0.5">
+              <h3 className="text-sm font-medium text-[#0F172A]">{t('dashboard.staffAccount')}</h3>
+              <p className="text-xs text-[#64748B] mt-1">
                 {t('dashboard.staffAccountMessage')}
               </p>
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Key Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Link href="/inventory" className="block">
-          <Card className="hover:shadow-sm transition-all duration-150 border-l-2 border-l-[#2563EB] group" padding="sm">
+          <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-blue-500 group" padding="md">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-medium text-[#64748B] uppercase tracking-wide">Inventario</p>
-                <p className="text-xl font-bold text-[#0F172A] mt-1">{totalItems}</p>
+                <p className="text-xs font-medium text-[#64748B] uppercase tracking-wide">Inventario</p>
+                <p className="text-2xl font-bold text-[#0F172A] mt-2">{totalItems}</p>
                 {lowStockItems.length > 0 && (
-                  <p className="text-[10px] text-[#EF4444] mt-1 font-medium">
+                  <p className="text-xs text-[#EF4444] mt-1.5 font-medium">
                     {lowStockItems.length} necesitan reabastecimiento
                   </p>
                 )}
               </div>
-              <div className="p-2 bg-[#2563EB]/10 rounded-md group-hover:bg-[#2563EB]/15 transition-colors duration-150">
-                <Package className="h-5 w-5 text-[#2563EB] stroke-[1.5]" />
+              <div className="p-3 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors duration-200">
+                <Package className="h-6 w-6 text-blue-600 stroke-[1.5]" />
               </div>
             </div>
           </Card>
         </Link>
 
         <Link href="/maintenance" className="block">
-          <Card className="hover:shadow-sm transition-all duration-150 border-l-2 border-l-[#F59E0B] group" padding="sm">
+          <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-amber-500 group" padding="md">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-medium text-[#64748B] uppercase tracking-wide">Mantenimiento</p>
-                <p className="text-xl font-bold text-[#0F172A] mt-1">{openTickets.length}</p>
+                <p className="text-xs font-medium text-[#64748B] uppercase tracking-wide">Mantenimiento</p>
+                <p className="text-2xl font-bold text-[#0F172A] mt-2">{openTickets.length}</p>
                 {urgentTickets.length > 0 && (
-                  <p className="text-[10px] text-[#F59E0B] mt-1 font-medium">
+                  <p className="text-xs text-amber-600 mt-1.5 font-medium">
                     {urgentTickets.length} urgentes
                   </p>
                 )}
               </div>
-              <div className="p-2 bg-[#F59E0B]/10 rounded-md group-hover:bg-[#F59E0B]/15 transition-colors duration-150">
-                <Wrench className="h-5 w-5 text-[#F59E0B] stroke-[1.5]" />
+              <div className="p-3 bg-amber-50 rounded-lg group-hover:bg-amber-100 transition-colors duration-200">
+                <Wrench className="h-6 w-6 text-amber-600 stroke-[1.5]" />
               </div>
             </div>
           </Card>
         </Link>
 
         <Link href="/expenses" className="block">
-          <Card className="hover:shadow-sm transition-all duration-150 border-l-2 border-l-[#22C55E] group" padding="sm">
+          <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-emerald-500 group" padding="md">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-medium text-[#64748B] uppercase tracking-wide">Este Mes</p>
-                <p className="text-xl font-bold text-[#0F172A] mt-1">
+                <p className="text-xs font-medium text-[#64748B] uppercase tracking-wide">Este Mes</p>
+                <p className="text-2xl font-bold text-[#0F172A] mt-2">
                   ${monthTotal.toFixed(0)}
                 </p>
-                <p className="text-[10px] text-[#64748B] mt-1">Gastos</p>
+                <p className="text-xs text-[#64748B] mt-1.5">Gastos</p>
               </div>
-              <div className="p-2 bg-[#22C55E]/10 rounded-md group-hover:bg-[#22C55E]/15 transition-colors duration-150">
-                <DollarSign className="h-5 w-5 text-[#22C55E] stroke-[1.5]" />
+              <div className="p-3 bg-emerald-50 rounded-lg group-hover:bg-emerald-100 transition-colors duration-200">
+                <DollarSign className="h-6 w-6 text-emerald-600 stroke-[1.5]" />
               </div>
             </div>
           </Card>
@@ -306,15 +298,15 @@ export default async function DashboardPage() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Upcoming Bookings */}
-        <Card className="lg:col-span-2" padding="sm">
+        <Card className="lg:col-span-2" padding="md">
           <CardHeader>
             <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-sm">
-                <Calendar className="h-4 w-4 text-[#2563EB] stroke-[1.5]" />
-                {t('dashboard.upcomingBookings')} ({t('dashboard.upcomingBookingsSubtitle')})
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-blue-600 stroke-[1.5]" />
+                {t('dashboard.upcomingBookings')}
               </CardTitle>
               <Link href="/rentals">
-                <Button size="sm" variant="ghost" className="text-xs">
+                <Button size="sm" variant="ghost">
                   {t('dashboard.viewAll')}
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
@@ -332,27 +324,27 @@ export default async function DashboardPage() {
                     <Link
                       key={booking.id}
                       href="/rentals"
-                      className="block p-3 rounded-md border border-[#E2E8F0] hover:border-[#2563EB] hover:bg-[#F8FAFC] transition-all duration-150"
+                      className="block p-4 rounded-lg border border-gray-200/60 hover:border-blue-300/60 hover:bg-gray-50/50 transition-all duration-200"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <p className="font-medium text-sm text-[#0F172A]">{booking.guest_name || t('dashboard.guest')}</p>
-                          <p className="text-xs text-[#64748B] mt-0.5">
+                          <p className="text-xs text-[#64748B] mt-1">
                             {checkIn.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })} - {checkOut.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })} • {nights} {nights === 1 ? 'noche' : 'noches'}
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold text-sm text-[#2563EB]">${Number(booking.total_amount || 0).toFixed(0)}</p>
-        </div>
-      </div>
+                          <p className="font-semibold text-sm text-blue-600">${Number(booking.total_amount || 0).toFixed(0)}</p>
+                        </div>
+                      </div>
                     </Link>
                   )
                 })}
               </div>
             ) : (
-              <div className="text-center py-6 text-[#64748B]">
-                <Calendar className="h-10 w-10 mx-auto mb-2 text-[#E2E8F0]" />
-                <p className="text-xs">{t('dashboard.noUpcomingBookings')}</p>
+              <div className="text-center py-8 text-[#64748B]">
+                <Calendar className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                <p className="text-sm">{t('dashboard.noUpcomingBookings')}</p>
               </div>
             )}
           </CardContent>
@@ -362,27 +354,27 @@ export default async function DashboardPage() {
         <div className="space-y-4">
           {/* Urgent Tickets */}
           {urgentTickets.length > 0 && (
-            <Card className="border-l-2 border-l-[#EF4444] bg-[#EF4444]/5" padding="sm">
+            <Card className="border-l-4 border-l-red-500 bg-red-50/50" padding="md">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm text-[#EF4444]">
+                <CardTitle className="flex items-center gap-2 text-red-600">
                   <AlertTriangle className="h-4 w-4 stroke-[1.5]" />
                   Tickets Urgentes
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {urgentTickets.slice(0, 3).map((ticket) => (
                     <Link
                       key={ticket.id}
                       href="/maintenance"
-                      className="block p-2 rounded-md bg-white border border-[#E2E8F0] hover:border-[#EF4444] transition-all duration-150"
+                      className="block p-3 rounded-lg bg-white border border-gray-200/60 hover:border-red-300/60 hover:bg-gray-50/50 transition-all duration-200"
                     >
-                      <p className="font-medium text-xs text-[#0F172A]">{ticket.title}</p>
-                      <p className="text-[10px] text-[#64748B] mt-0.5">{ticket.room}</p>
+                      <p className="font-medium text-sm text-[#0F172A]">{ticket.title}</p>
+                      <p className="text-xs text-[#64748B] mt-1">{ticket.room}</p>
                     </Link>
                   ))}
                   {urgentTickets.length > 3 && (
-                    <Link href="/maintenance" className="text-xs text-[#EF4444] font-medium hover:underline">
+                    <Link href="/maintenance" className="text-xs text-red-600 font-medium hover:underline">
                       +{t('dashboard.moreUrgentTickets', { count: urgentTickets.length - 3 })}
                     </Link>
                   )}
@@ -393,29 +385,29 @@ export default async function DashboardPage() {
 
           {/* Low Stock Items */}
           {lowStockItems.length > 0 && (
-            <Card className="border-l-2 border-l-[#F59E0B] bg-[#F59E0B]/5" padding="sm">
+            <Card className="border-l-4 border-l-amber-500 bg-amber-50/50" padding="md">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm text-[#F59E0B]">
+                <CardTitle className="flex items-center gap-2 text-amber-600">
                   <Package className="h-4 w-4 stroke-[1.5]" />
                   {t('dashboard.lowStockAlert')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {lowStockItems.slice(0, 3).map((item) => (
                     <Link
                       key={item.id}
                       href="/inventory"
-                      className="block p-2 rounded-md bg-white border border-[#E2E8F0] hover:border-[#F59E0B] transition-all duration-150"
+                      className="block p-3 rounded-lg bg-white border border-gray-200/60 hover:border-amber-300/60 hover:bg-gray-50/50 transition-all duration-200"
                     >
                       <div className="flex items-center justify-between">
-                        <p className="font-medium text-xs text-[#0F172A]">{item.name}</p>
-                        <p className="text-[10px] font-bold text-[#F59E0B]">{item.quantity} {t('dashboard.left')}</p>
+                        <p className="font-medium text-sm text-[#0F172A]">{item.name}</p>
+                        <p className="text-xs font-bold text-amber-600">{item.quantity} {t('dashboard.left')}</p>
                       </div>
                     </Link>
                   ))}
                   {lowStockItems.length > 3 && (
-                    <Link href="/inventory" className="text-xs text-[#F59E0B] font-medium hover:underline">
+                    <Link href="/inventory" className="text-xs text-amber-600 font-medium hover:underline">
                       +{t('dashboard.moreItems', { count: lowStockItems.length - 3 })}
                     </Link>
                   )}
@@ -426,26 +418,26 @@ export default async function DashboardPage() {
 
           {/* To Buy List */}
           {pendingPurchases.length > 0 && (
-            <Card padding="sm">
+            <Card padding="md">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm">
-                  <ShoppingCart className="h-4 w-4 text-[#2563EB] stroke-[1.5]" />
+                <CardTitle className="flex items-center gap-2">
+                  <ShoppingCart className="h-4 w-4 text-blue-600 stroke-[1.5]" />
                   Compras
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {pendingPurchases.slice(0, 3).map((item) => (
                     <Link
                       key={item.id}
                       href="/to-buy"
-                      className="block p-2 rounded-md border border-[#E2E8F0] hover:border-[#2563EB] hover:bg-[#F8FAFC] transition-all duration-150"
+                      className="block p-3 rounded-lg border border-gray-200/60 hover:border-blue-300/60 hover:bg-gray-50/50 transition-all duration-200"
                     >
-                      <p className="font-medium text-xs text-[#0F172A]">{item.item}</p>
+                      <p className="font-medium text-sm text-[#0F172A]">{item.item}</p>
                     </Link>
                   ))}
                   {pendingPurchases.length > 3 && (
-                    <Link href="/to-buy" className="text-xs text-[#2563EB] font-medium hover:underline">
+                    <Link href="/to-buy" className="text-xs text-blue-600 font-medium hover:underline">
                       +{pendingPurchases.length - 3} artículos más
                     </Link>
                   )}
@@ -457,33 +449,33 @@ export default async function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <Card className="bg-[#F8FAFC] border-[#E2E8F0]" padding="sm">
+      <Card className="bg-gray-50/50 border-gray-200/60" padding="md">
         <CardHeader>
-          <CardTitle className="text-sm">{t('dashboard.quickActions')}</CardTitle>
+          <CardTitle>{t('dashboard.quickActions')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Link href="/rentals">
-              <Button variant="secondary" size="sm" className="w-full justify-start text-xs">
-                <Plus className="h-3.5 w-3.5 stroke-[1.5]" />
+              <Button variant="secondary" size="sm" className="w-full justify-start">
+                <Plus className="h-4 w-4 stroke-[1.5]" />
                 {t('dashboard.newBooking')}
               </Button>
             </Link>
             <Link href="/expenses">
-              <Button variant="secondary" size="sm" className="w-full justify-start text-xs">
-                <Plus className="h-3.5 w-3.5 stroke-[1.5]" />
+              <Button variant="secondary" size="sm" className="w-full justify-start">
+                <Plus className="h-4 w-4 stroke-[1.5]" />
                 {t('dashboard.addExpense')}
               </Button>
             </Link>
             <Link href="/maintenance">
-              <Button variant="secondary" size="sm" className="w-full justify-start text-xs">
-                <Plus className="h-3.5 w-3.5 stroke-[1.5]" />
+              <Button variant="secondary" size="sm" className="w-full justify-start">
+                <Plus className="h-4 w-4 stroke-[1.5]" />
                 {t('dashboard.newTicket')}
               </Button>
             </Link>
             <Link href="/inventory">
-              <Button variant="secondary" size="sm" className="w-full justify-start text-xs">
-                <Plus className="h-3.5 w-3.5 stroke-[1.5]" />
+              <Button variant="secondary" size="sm" className="w-full justify-start">
+                <Plus className="h-4 w-4 stroke-[1.5]" />
                 {t('dashboard.addItem')}
               </Button>
             </Link>
