@@ -7,6 +7,7 @@ import { Button } from './ui/Button'
 import { Input } from './ui/Input'
 import { Modal } from './ui/Modal'
 import TenantError from './TenantError'
+import { t } from '@/lib/i18n/es'
 
 interface Property {
   id: string
@@ -205,7 +206,7 @@ export default function PropertySelector() {
             .eq('tenant_id', profile.tenant_id)
 
           if ((count || 0) >= 1) {
-            alert('Free/trial plans are limited to 1 property. Please upgrade to add more properties.')
+            alert(t('propertySelector.freeTrialLimit'))
             setShowCreateModal(false)
             return
           }
@@ -231,14 +232,14 @@ export default function PropertySelector() {
           code: createError.code,
           tenant_id: profile.tenant_id
         })
-        alert(`Error creating property: ${createError.message || 'Unknown error'}`)
+        alert(`${t('propertySelector.errorCreatingProperty')}: ${createError.message || 'Unknown error'}`)
         setCreating(false)
         return
       }
 
       if (!newProperty) {
         console.error('[PropertySelector] Property created but no data returned')
-        alert('Error: Property created but failed to retrieve data.')
+        alert(t('propertySelector.propertyCreatedFailedRetrieve'))
         setCreating(false)
         return
       }
@@ -255,7 +256,7 @@ export default function PropertySelector() {
       setShowCreateModal(false)
     } catch (error) {
       console.error('Error creating property:', error)
-      alert('Error creating property. Please try again.')
+      alert(t('propertySelector.errorCreatingPropertyRetry'))
     } finally {
       setCreating(false)
     }
@@ -277,7 +278,7 @@ export default function PropertySelector() {
     return (
       <div className="flex items-center gap-2 text-sm text-gray-600">
         <Loader2 className="h-4 w-4 animate-spin" />
-        <span>Loading...</span>
+        <span>{t('propertySelector.loading')}</span>
       </div>
     )
   }
@@ -291,7 +292,7 @@ export default function PropertySelector() {
           onClick={() => setShowCreateModal(true)}
         >
           <Plus className="h-4 w-4" />
-          <span>Create Property</span>
+          <span>Crear Propiedad</span>
         </Button>
         <Modal
           isOpen={showCreateModal}
@@ -300,22 +301,22 @@ export default function PropertySelector() {
             setNewPropertyName('')
             setNewPropertyLocation('')
           }}
-          title="Create Your First Property"
+          title={t('propertySelector.createFirstProperty')}
           size="md"
         >
           <div className="space-y-4">
             <Input
-              label="Property Name"
-              value={newPropertyName}
-              onChange={(e) => setNewPropertyName(e.target.value)}
-              placeholder="e.g., Villa Serena"
+            label={t('propertySelector.propertyName')}
+            value={newPropertyName}
+            onChange={(e) => setNewPropertyName(e.target.value)}
+            placeholder={t('propertySelector.propertyNamePlaceholder')}
               required
             />
             <Input
-              label="Location (optional)"
-              value={newPropertyLocation}
-              onChange={(e) => setNewPropertyLocation(e.target.value)}
-              placeholder="e.g., Tulum, Mexico"
+            label={t('propertySelector.propertyLocation')}
+            value={newPropertyLocation}
+            onChange={(e) => setNewPropertyLocation(e.target.value)}
+            placeholder={t('propertySelector.propertyLocationPlaceholder')}
             />
             <div className="flex gap-2 justify-end pt-2">
               <Button
@@ -327,14 +328,14 @@ export default function PropertySelector() {
                 }}
                 disabled={creating}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button
                 onClick={handleCreateProperty}
                 loading={creating}
                 disabled={!newPropertyName.trim()}
               >
-                Create
+                {t('common.create')}
               </Button>
             </div>
           </div>
@@ -345,60 +346,80 @@ export default function PropertySelector() {
 
   const activeProperty = properties.find(p => p.id === activePropertyId) || properties[0]
 
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setShowDropdown(!showDropdown)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium text-gray-900 min-w-[120px] justify-between"
-      >
-        <span className="truncate">{activeProperty?.name || 'Select property'}</span>
-        <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
-      </button>
-      
-      {showDropdown && (
-        <>
-          <div
-            className="fixed inset-0 z-[94]"
-            onClick={() => setShowDropdown(false)}
-          />
-          <div className="absolute top-full left-0 mt-1 w-56 rounded-lg bg-white border border-gray-200/60 shadow-lg py-1 z-[95]">
-            <div className="max-h-64 overflow-y-auto">
-              {properties.length === 0 ? (
-                <div className="px-3 py-2 text-sm text-gray-500">No properties</div>
-              ) : (
-                properties.map((property) => (
-                  <button
-                    key={property.id}
-                    onClick={() => {
-                      handlePropertyChange(property.id)
-                      setShowDropdown(false)
-                    }}
-                    className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                      property.id === activePropertyId
-                        ? 'bg-blue-50 text-blue-600 font-medium'
-                        : 'text-gray-900'
-                    }`}
-                  >
-                    {property.name}
-                  </button>
-                ))
-              )}
-            </div>
-            <div className="border-t border-gray-200/60 my-1" />
-            <button
-              onClick={() => {
-                setShowCreateModal(true)
-                setShowDropdown(false)
-              }}
-              className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Add property
-            </button>
-          </div>
-        </>
-      )}
+  // Get property icon based on name or location
+  const getPropertyIcon = (name: string) => {
+    const lowerName = name.toLowerCase()
+    if (lowerName.includes('beach') || lowerName.includes('playa') || lowerName.includes('mar')) return '🏖️'
+    if (lowerName.includes('mountain') || lowerName.includes('montaña')) return '⛰️'
+    if (lowerName.includes('city') || lowerName.includes('ciudad')) return '🏙️'
+    return '🏠'
+  }
 
+  return (
+    <div className="w-full space-y-2">
+      {/* Dropdown para cambiar propiedad */}
+      <div className="relative w-full">
+        <label className="block text-xs font-medium text-[#64748B] mb-1.5">
+          {t('propertySelector.propertyLabel')}
+        </label>
+        <button
+          onClick={() => setShowDropdown(!showDropdown)}
+          className="flex items-center gap-2 w-full px-2.5 py-2 rounded-md hover:bg-[#F8FAFC] transition-all duration-150 ease-out text-sm font-medium text-[#0F172A] justify-between border border-[#E2E8F0] bg-white"
+        >
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <span className="text-base shrink-0">{activeProperty ? getPropertyIcon(activeProperty.name) : '🏠'}</span>
+            <span className="truncate text-left">{activeProperty?.name || t('propertySelector.selectProperty')}</span>
+          </div>
+          <ChevronDown className={`h-3.5 w-3.5 text-[#64748B] shrink-0 transition-transform duration-150 ease-out ${showDropdown ? 'rotate-180' : ''}`} />
+        </button>
+        
+        {showDropdown && (
+          <>
+            <div
+              className="fixed inset-0 z-[94]"
+              onClick={() => setShowDropdown(false)}
+            />
+            <div className="absolute top-full left-0 mt-1 w-56 rounded-lg bg-white border border-[#E2E8F0] shadow-lg py-1 z-[95] animate-dropdown-enter">
+              <div className="max-h-64 overflow-y-auto">
+                {properties.length === 0 ? (
+                  <div className="px-3 py-2 text-sm text-[#64748B]">{t('propertySelector.noProperties')}</div>
+                ) : (
+                  properties.map((property) => (
+                    <button
+                      key={property.id}
+                      onClick={() => {
+                        handlePropertyChange(property.id)
+                        setShowDropdown(false)
+                      }}
+                      className={`w-full text-left px-3 py-2 text-sm hover:bg-[#F8FAFC] transition-all duration-150 ease-out flex items-center gap-2 ${
+                        property.id === activePropertyId
+                          ? 'bg-[#0F172A] text-white font-medium'
+                          : 'text-[#0F172A]'
+                      }`}
+                    >
+                      <span className="text-base">{getPropertyIcon(property.name)}</span>
+                      <span className="flex-1">{property.name}</span>
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Botón separado para agregar propiedad */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setShowCreateModal(true)}
+        className="w-full justify-start text-xs text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]"
+      >
+        <Plus className="h-3.5 w-3.5 stroke-[1.5]" />
+        {t('propertySelector.addNewProperty')}
+      </Button>
+
+      {/* Modal para crear propiedad */}
       <Modal
         isOpen={showCreateModal}
         onClose={() => {
@@ -406,24 +427,24 @@ export default function PropertySelector() {
           setNewPropertyName('')
           setNewPropertyLocation('')
         }}
-        title="Create New Property"
+        title={t('propertySelector.addNewProperty')}
         size="md"
       >
         <div className="space-y-4">
           <Input
-            label="Property Name"
+            label={t('propertySelector.propertyName')}
             value={newPropertyName}
             onChange={(e) => setNewPropertyName(e.target.value)}
-            placeholder="e.g., Beach House"
+            placeholder={t('propertySelector.propertyNamePlaceholder')}
             required
           />
           <Input
-            label="Location (optional)"
+            label={t('propertySelector.propertyLocation')}
             value={newPropertyLocation}
             onChange={(e) => setNewPropertyLocation(e.target.value)}
-            placeholder="e.g., Cancun, Mexico"
+            placeholder={t('propertySelector.propertyLocationPlaceholder')}
           />
-          <div className="flex gap-2 justify-end pt-2">
+          <div className="flex gap-2 justify-end pt-4">
             <Button
               variant="secondary"
               onClick={() => {
@@ -433,14 +454,14 @@ export default function PropertySelector() {
               }}
               disabled={creating}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               onClick={handleCreateProperty}
               loading={creating}
               disabled={!newPropertyName.trim()}
             >
-              Create
+              {t('propertySelector.createProperty')}
             </Button>
           </div>
         </div>
