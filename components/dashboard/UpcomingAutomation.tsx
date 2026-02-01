@@ -30,10 +30,9 @@ interface UpcomingMaintenancePlan {
 
 interface UpcomingMaintenancePlansProps {
   plans: UpcomingMaintenancePlan[]
-  onUpdate: () => void
 }
 
-export function UpcomingMaintenancePlans({ plans, onUpdate }: UpcomingMaintenancePlansProps) {
+export function UpcomingMaintenancePlans({ plans }: UpcomingMaintenancePlansProps) {
   const [completingPlanId, setCompletingPlanId] = useState<string | null>(null)
   const supabase = createClient()
   const { showToast } = useToast()
@@ -110,7 +109,10 @@ export function UpcomingMaintenancePlans({ plans, onUpdate }: UpcomingMaintenanc
         showToast(t('maintenancePlans.completeError'), 'error')
       } else {
         showToast(t('maintenancePlans.planCompleted'), 'success')
-        onUpdate()
+        // Refresh page after a short delay
+        setTimeout(() => {
+          window.location.reload()
+        }, 500)
       }
     } catch (error) {
       console.error('Error completing plan:', error)
@@ -197,10 +199,9 @@ interface UpcomingTask {
 
 interface UpcomingTasksProps {
   tasks: UpcomingTask[]
-  onUpdate: () => void
 }
 
-export function UpcomingTasks({ tasks, onUpdate }: UpcomingTasksProps) {
+export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
   const [completingTaskId, setCompletingTaskId] = useState<string | null>(null)
   const supabase = createClient()
   const { showToast } = useToast()

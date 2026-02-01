@@ -461,15 +461,7 @@ export default async function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <UpcomingMaintenancePlans 
-                plans={upcomingMaintenancePlans} 
-                onUpdate={() => {
-                  // Trigger page refresh via client-side navigation
-                  if (typeof window !== 'undefined') {
-                    window.location.reload()
-                  }
-                }}
-              />
+              <UpcomingMaintenancePlans plans={upcomingMaintenancePlans} />
             </CardContent>
           </Card>
 
@@ -482,15 +474,7 @@ export default async function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <UpcomingTasks 
-                tasks={upcomingTasks} 
-                onUpdate={() => {
-                  // Trigger page refresh via client-side navigation
-                  if (typeof window !== 'undefined') {
-                    window.location.reload()
-                  }
-                }}
-              />
+              <UpcomingTasks tasks={upcomingTasks} />
             </CardContent>
           </Card>
         </div>
