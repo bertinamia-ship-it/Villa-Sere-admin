@@ -13,12 +13,14 @@ import {
   ShoppingCart,
   ArrowRight,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  CheckSquare
 } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Skeleton } from '@/components/ui/Skeleton'
 import ResetDataButton from './ResetDataButton'
+import { UpcomingMaintenancePlans, UpcomingTasks } from '@/components/dashboard/UpcomingAutomation'
 import { t } from '@/lib/i18n/es'
 
 export default async function DashboardPage() {
@@ -101,13 +103,23 @@ export default async function DashboardPage() {
     )
   }
 
+  // Calculate date ranges for automation widgets
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const next30Days = new Date(today)
+  next30Days.setDate(next30Days.getDate() + 30)
+  const next7Days = new Date(today)
+  next7Days.setDate(next7Days.getDate() + 7)
+
   // Fetch all data in parallel (with property_id filter)
   const [
     inventoryResult,
     ticketsResult,
     expensesResult,
     bookingsResult,
-    purchaseItemsResult
+    purchaseItemsResult,
+    maintenancePlansResult,
+    tasksResult
   ] = await Promise.all([
     propertyId 
       ? supabase.from('inventory_items').select('id, name, quantity, min_threshold, category').eq('property_id', propertyId).order('name')
@@ -123,6 +135,24 @@ export default async function DashboardPage() {
       : { data: [], error: null },
     propertyId
       ? supabase.from('purchase_items').select('id, item, status').eq('property_id', propertyId).order('created_at', { ascending: false })
+      : { data: [], error: null },
+    propertyId
+      ? supabase
+          .from('maintenance_plans')
+          .select('id, title, next_run_date, priority, is_active, start_date, frequency_unit, frequency_interval')
+          .eq('property_id', propertyId)
+          .eq('is_active', true)
+          .lte('next_run_date', next30Days.toISOString().split('T')[0])
+          .order('next_run_date', { ascending: true })
+      : { data: [], error: null },
+    propertyId
+      ? supabase
+          .from('tasks')
+          .select('id, title, next_due_date, priority, status, cadence')
+          .eq('property_id', propertyId)
+          .neq('status', 'done')
+          .lte('next_due_date', next7Days.toISOString().split('T')[0])
+          .order('next_due_date', { ascending: true })
       : { data: [], error: null }
   ])
 
@@ -142,7 +172,6 @@ export default async function DashboardPage() {
   const totalTickets = ticketsResult.data?.length || 0
 
   // Process bookings
-  const now = new Date()
   const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
   const upcomingBookings = bookingsResult.data?.filter(
     booking => {
@@ -150,6 +179,28 @@ export default async function DashboardPage() {
       return checkIn >= now && checkIn <= nextWeek && booking.status === 'confirmed'
     }
   ).slice(0, 5) || []
+
+  // Process maintenance plans (next 30 days)
+  const upcomingMaintenancePlans = (maintenancePlansResult.data?.slice(0, 6) || []).map(plan => ({
+    id: plan.id,
+    title: plan.title,
+    next_run_date: plan.next_run_date,
+    priority: plan.priority,
+    is_active: plan.is_active,
+    start_date: plan.start_date,
+    frequency_unit: plan.frequency_unit,
+    frequency_interval: plan.frequency_interval,
+  }))
+
+  // Process tasks (next 7 days)
+  const upcomingTasks = (tasksResult.data?.slice(0, 6) || []).map(task => ({
+    id: task.id,
+    title: task.title,
+    next_due_date: task.next_due_date,
+    priority: task.priority,
+    status: task.status,
+    cadence: task.cadence,
+  }))
 
   // Calculate current month expenses and income
   const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -326,7 +377,7 @@ export default async function DashboardPage() {
                 </CardTitle>
                 <Link href="/rentals">
                   <Button size="sm" variant="ghost" className="text-xs">
-                    Ver todas
+                    {t('dashboard.viewAll')}
                     <ArrowRight className="h-3 w-3" />
                   </Button>
                 </Link>
@@ -395,6 +446,51 @@ export default async function DashboardPage() {
                   <p className="text-xs">No hay tickets urgentes</p>
                 </div>
               )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Automatización: Mantenimientos y Tareas */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Próximos Mantenimientos */}
+          <Card padding="md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wrench className="h-4 w-4 text-amber-600 stroke-[1.5]" />
+                Próximos Mantenimientos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <UpcomingMaintenancePlans 
+                plans={upcomingMaintenancePlans} 
+                onUpdate={() => {
+                  // Trigger page refresh via client-side navigation
+                  if (typeof window !== 'undefined') {
+                    window.location.reload()
+                  }
+                }}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Próximas Tareas */}
+          <Card padding="md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CheckSquare className="h-4 w-4 text-blue-600 stroke-[1.5]" />
+                Próximas Tareas
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <UpcomingTasks 
+                tasks={upcomingTasks} 
+                onUpdate={() => {
+                  // Trigger page refresh via client-side navigation
+                  if (typeof window !== 'undefined') {
+                    window.location.reload()
+                  }
+                }}
+              />
             </CardContent>
           </Card>
         </div>
