@@ -290,6 +290,150 @@ export interface Database {
           created_by?: string | null
         }
       }
+      maintenance_plans: {
+        Row: {
+          id: string
+          tenant_id: string
+          property_id: string
+          title: string
+          description: string | null
+          frequency_unit: 'day' | 'week' | 'month' | 'year'
+          frequency_interval: number
+          start_date: string
+          next_run_date: string
+          last_completed_date: string | null
+          vendor_id: string | null
+          estimated_cost: number | null
+          priority: 'low' | 'medium' | 'high' | 'urgent'
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          property_id: string
+          title: string
+          description?: string | null
+          frequency_unit: 'day' | 'week' | 'month' | 'year'
+          frequency_interval?: number
+          start_date?: string
+          next_run_date: string
+          last_completed_date?: string | null
+          vendor_id?: string | null
+          estimated_cost?: number | null
+          priority?: 'low' | 'medium' | 'high' | 'urgent'
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          property_id?: string
+          title?: string
+          description?: string | null
+          frequency_unit?: 'day' | 'week' | 'month' | 'year'
+          frequency_interval?: number
+          start_date?: string
+          next_run_date?: string
+          last_completed_date?: string | null
+          vendor_id?: string | null
+          estimated_cost?: number | null
+          priority?: 'low' | 'medium' | 'high' | 'urgent'
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      maintenance_plan_runs: {
+        Row: {
+          id: string
+          tenant_id: string
+          property_id: string
+          plan_id: string
+          scheduled_date: string
+          status: 'pending' | 'completed' | 'skipped'
+          completed_at: string | null
+          linked_ticket_id: string | null
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          property_id: string
+          plan_id: string
+          scheduled_date: string
+          status?: 'pending' | 'completed' | 'skipped'
+          completed_at?: string | null
+          linked_ticket_id?: string | null
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          property_id?: string
+          plan_id?: string
+          scheduled_date?: string
+          status?: 'pending' | 'completed' | 'skipped'
+          completed_at?: string | null
+          linked_ticket_id?: string | null
+          notes?: string | null
+          created_at?: string
+        }
+      }
+      tasks: {
+        Row: {
+          id: string
+          tenant_id: string
+          property_id: string
+          title: string
+          description: string | null
+          cadence: 'once' | 'daily' | 'weekly' | 'monthly' | 'yearly'
+          due_date: string | null
+          next_due_date: string
+          last_completed_date: string | null
+          assigned_to: string | null
+          priority: 'low' | 'medium' | 'high' | 'urgent'
+          status: 'pending' | 'in_progress' | 'done'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          property_id: string
+          title: string
+          description?: string | null
+          cadence: 'once' | 'daily' | 'weekly' | 'monthly' | 'yearly'
+          due_date?: string | null
+          next_due_date: string
+          last_completed_date?: string | null
+          assigned_to?: string | null
+          priority?: 'low' | 'medium' | 'high' | 'urgent'
+          status?: 'pending' | 'in_progress' | 'done'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          property_id?: string
+          title?: string
+          description?: string | null
+          cadence?: 'once' | 'daily' | 'weekly' | 'monthly' | 'yearly'
+          due_date?: string | null
+          next_due_date?: string
+          last_completed_date?: string | null
+          assigned_to?: string | null
+          priority?: 'low' | 'medium' | 'high' | 'urgent'
+          status?: 'pending' | 'in_progress' | 'done'
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
   }
 }
@@ -301,3 +445,6 @@ export type Expense = Database['public']['Tables']['expenses']['Row']
 export type Profile = Database['public']['Tables']['profiles']['Row']
 export type Booking = Database['public']['Tables']['bookings']['Row']
 export type PurchaseItem = Database['public']['Tables']['purchase_items']['Row']
+export type MaintenancePlan = Database['public']['Tables']['maintenance_plans']['Row']
+export type MaintenancePlanRun = Database['public']['Tables']['maintenance_plan_runs']['Row']
+export type Task = Database['public']['Tables']['tasks']['Row']
