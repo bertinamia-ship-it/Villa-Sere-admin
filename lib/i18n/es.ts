@@ -361,6 +361,51 @@ export const es = {
     never: 'Nunca',
   },
 
+  // Tasks
+  tasks: {
+    title: 'Tareas',
+    subtitle: 'Checklist operativo por propiedad',
+    createTask: 'Crear Tarea',
+    editTask: 'Editar Tarea',
+    taskTitle: 'Título',
+    taskDescription: 'Descripción',
+    taskType: 'Tipo',
+    dueDate: 'Fecha de Vencimiento',
+    startDate: 'Fecha de Inicio',
+    priority: 'Prioridad',
+    status: 'Estado',
+    markDone: 'Marcar como Hecho',
+    delete: 'Eliminar',
+    noTasks: 'No hay tareas',
+    noTasksDescription: 'Crea tareas operativas para gestionar tu propiedad',
+    noPropertySelected: 'No hay propiedad seleccionada',
+    noPropertyDescription: 'Selecciona o crea una propiedad para gestionar tareas',
+    taskSaved: 'Tarea guardada exitosamente',
+    taskDeleted: 'Tarea eliminada exitosamente',
+    taskCompleted: 'Tarea completada exitosamente',
+    saveError: 'Error al guardar tarea',
+    deleteError: 'Error al eliminar tarea',
+    completeError: 'Error al completar tarea',
+    filters: {
+      today: 'Hoy',
+      week: 'Esta semana',
+      overdue: 'Vencidas',
+      all: 'Todas',
+    },
+    cadence: {
+      once: 'Una vez',
+      daily: 'Diaria',
+      weekly: 'Semanal',
+      monthly: 'Mensual',
+      yearly: 'Anual',
+    },
+    statusLabels: {
+      pending: 'Pendiente',
+      in_progress: 'En Progreso',
+      done: 'Hecho',
+    },
+  },
+
   // Expenses
   expenses: {
     title: 'Gastos',
