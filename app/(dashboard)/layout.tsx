@@ -18,7 +18,8 @@ import {
   CreditCard,
   CalendarCheck,
   Settings,
-  ArrowRight
+  ArrowRight,
+  Sparkles
 } from 'lucide-react'
 import { useState } from 'react'
 import Header from '@/components/Header'
@@ -49,7 +50,7 @@ const navigation: NavItem[] = [
       { name: 'Reportes', href: '/reports', icon: BarChart3 },
     ]
   },
-  { name: 'Ajustes', href: '/settings', icon: Settings },
+  { name: 'Configuración', href: '/settings', icon: Settings },
 ]
 
 export default function DashboardLayout({
@@ -89,12 +90,17 @@ export default function DashboardLayout({
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex grow flex-col overflow-y-auto bg-white border-r border-gray-200/60 px-4 py-4">
           {/* Branding */}
-          <div className="shrink-0 mb-6">
-            <h1 className="text-base font-semibold text-[#0F172A] tracking-tight">CasaPilot</h1>
+          <div className="shrink-0 mb-8 pb-6 border-b border-[#E2E8F0]">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 bg-gradient-to-br from-[#0F172A] to-[#1E293B] rounded-lg">
+                <Sparkles className="h-4 w-4 text-white" />
+              </div>
+              <h1 className="text-base font-semibold text-[#0F172A] tracking-tight">CasaPilot</h1>
+            </div>
           </div>
 
           {/* Navigation */}
-          <nav className="flex flex-1 flex-col space-y-1">
+          <nav className="flex flex-1 flex-col space-y-2">
             {navigation.map((item) => {
               if ('href' in item) {
                 // Single item
@@ -103,19 +109,19 @@ export default function DashboardLayout({
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`group relative flex items-center gap-x-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150 ease-out ${
+                    className={`group relative flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-out ${
                       active
-                        ? 'bg-[#F8FAFC] text-[#0F172A]'
+                        ? 'bg-[#0F172A] text-white shadow-sm'
                         : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
                     }`}
                   >
                     {active && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[#2563EB] rounded-r-full" />
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-r-full" />
                     )}
-                    <item.icon className={`h-4 w-4 shrink-0 stroke-[1.5] ${
-                      active ? 'text-[#2563EB]' : 'text-[#64748B] group-hover:text-[#2563EB]'
+                    <item.icon className={`h-4.5 w-4.5 shrink-0 stroke-[1.5] ${
+                      active ? 'text-white' : 'text-[#64748B] group-hover:text-[#0F172A]'
                     }`} />
-                    <span>{item.name}</span>
+                    <span className={active ? 'font-semibold' : ''}>{item.name}</span>
                   </Link>
                 )
               } else {
@@ -124,37 +130,37 @@ export default function DashboardLayout({
                 const hasActiveChild = item.children.some(child => isActive(child.href))
                 
                 return (
-                  <div key={item.name}>
+                  <div key={item.name} className="space-y-1">
                     <button
                       onClick={() => toggleSection(item.name)}
-                      className={`w-full flex items-center justify-between gap-x-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150 ${
+                      className={`w-full flex items-center justify-between gap-x-2 rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
                         hasActiveChild
-                          ? 'text-[#0F172A] bg-[#F8FAFC]'
-                          : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
+                          ? 'text-[#0F172A]'
+                          : 'text-[#94A3B8] hover:text-[#64748B]'
                       }`}
                     >
                       <span>{item.name}</span>
                       <ArrowRight
-                        className={`h-3.5 w-3.5 transition-transform duration-150 ${
+                        className={`h-3 w-3 transition-transform duration-200 ${
                           isExpanded ? 'rotate-90' : ''
                         }`}
                       />
                     </button>
                     {isExpanded && (
-                      <div className="ml-4 mt-1 space-y-0.5">
+                      <div className="ml-2 space-y-0.5 border-l border-[#E2E8F0] pl-3">
                         {item.children.map((child) => {
                           const active = isActive(child.href)
                           return (
                             <Link
                               key={child.name}
                               href={child.href}
-                              className={`flex items-center gap-x-2.5 rounded-lg px-3 py-1.5 text-sm transition-all duration-150 ${
+                              className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
                                 active
-                                  ? 'text-[#2563EB] bg-[#2563EB]/10 font-medium'
+                                  ? 'text-[#0F172A] bg-[#F8FAFC] font-medium'
                                   : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
                               }`}
                             >
-                              <child.icon className="h-3.5 w-3.5 shrink-0 stroke-[1.5]" />
+                              <child.icon className="h-4 w-4 shrink-0 stroke-[1.5]" />
                               <span>{child.name}</span>
                             </Link>
                           )

@@ -13,12 +13,15 @@ import {
   ArrowRight,
   ArrowUpRight,
   ArrowDownRight,
-  CheckSquare
+  CheckSquare,
+  Clock,
+  LogIn,
+  LogOut,
+  CalendarCheck,
+  AlertCircle
 } from 'lucide-react'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
+import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import ResetDataButton from './ResetDataButton'
-import { UpcomingMaintenancePlans, UpcomingTasks } from '@/components/dashboard/UpcomingAutomation'
 import { t } from '@/lib/i18n/es'
 
 export default async function DashboardPage() {
@@ -47,29 +50,16 @@ export default async function DashboardPage() {
 
   // CRITICAL: Check for tenant_id
   if (!profile || !profile.tenant_id) {
-    console.error('[Dashboard] CRITICAL: No profile or tenant_id found:', {
-      user_id: user.id,
-      profile_exists: !!profile,
-      tenant_id: profile?.tenant_id,
-      error: 'User account is missing tenant_id. This should never happen after signup.'
-    })
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('dashboard.title')}</h1>
-          <p className="text-gray-600 mt-1">{t('dashboard.overview')}</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A]">{t('dashboard.title')}</h1>
         </div>
         <div className="bg-red-50 border-2 border-red-200 rounded-xl p-8 text-center">
           <h3 className="text-lg font-semibold text-red-900 mb-2">{t('dashboard.accountConfigError')}</h3>
           <p className="text-red-700 mb-4">
             {t('dashboard.accountConfigMessage', { email: user.email })}
           </p>
-          <p className="text-sm text-red-600 mb-4">
-            {t('dashboard.accountConfigDetails')}
-          </p>
-          <code className="block bg-red-100 p-3 rounded text-xs text-left overflow-x-auto mb-4">
-            UPDATE profiles SET tenant_id = (SELECT id FROM tenants WHERE owner_id = '{user.id}') WHERE id = '{user.id}';
-          </code>
         </div>
       </div>
     )
@@ -85,31 +75,30 @@ export default async function DashboardPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('dashboard.title')}</h1>
-          <p className="text-gray-600 mt-1">{t('dashboard.overview')}</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A]">{t('dashboard.title')}</h1>
+          <p className="text-sm text-[#64748B] mt-1">{t('dashboard.overview')}</p>
         </div>
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-8 text-center">
           <h3 className="text-lg font-semibold text-blue-900 mb-2">{t('dashboard.noPropertyTitle')}</h3>
           <p className="text-blue-700 mb-4">
             {t('dashboard.noPropertyDescription')}
           </p>
-          <p className="text-sm text-blue-600">
-            {t('dashboard.createProperty')}
-          </p>
         </div>
       </div>
     )
   }
 
-  // Calculate date ranges for automation widgets
+  // Calculate date ranges
   const now = new Date()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const todayStr = today.toISOString().split('T')[0]
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
   const next30Days = new Date(today)
   next30Days.setDate(next30Days.getDate() + 30)
   const next7Days = new Date(today)
   next7Days.setDate(next7Days.getDate() + 7)
 
-  // Fetch all data in parallel (with property_id filter)
+  // Fetch all data in parallel
   const [
     inventoryResult,
     ticketsResult,
@@ -137,7 +126,7 @@ export default async function DashboardPage() {
     propertyId
       ? supabase
           .from('maintenance_plans')
-          .select('id, title, next_run_date, priority, is_active, start_date, frequency_unit, frequency_interval')
+          .select('id, title, next_run_date, priority, is_active')
           .eq('property_id', propertyId)
           .eq('is_active', true)
           .lte('next_run_date', next30Days.toISOString().split('T')[0])
@@ -154,54 +143,43 @@ export default async function DashboardPage() {
       : { data: [], error: null }
   ])
 
-  // Process inventory data
+  // Process data
   const lowStockItems = inventoryResult.data?.filter(
     item => item.quantity <= item.min_threshold
   ) || []
-  const totalItems = inventoryResult.data?.length || 0
-
-  // Process maintenance tickets
   const openTickets = ticketsResult.data?.filter(
     ticket => ticket.status !== 'done'
   ) || []
   const urgentTickets = ticketsResult.data?.filter(
     ticket => ticket.priority === 'urgent' && ticket.status !== 'done'
   ) || []
-  const totalTickets = ticketsResult.data?.length || 0
 
-  // Process bookings
-  const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
-  const upcomingBookings = bookingsResult.data?.filter(
-    booking => {
-      const checkIn = new Date(booking.check_in)
-      return checkIn >= now && checkIn <= nextWeek && booking.status === 'confirmed'
-    }
-  ).slice(0, 5) || []
+  // TODAY'S EVENTS
+  const todayCheckIns = bookingsResult.data?.filter(booking => {
+    const checkIn = new Date(booking.check_in)
+    return checkIn.toISOString().split('T')[0] === todayStr && booking.status === 'confirmed'
+  }) || []
+  
+  const todayCheckOuts = bookingsResult.data?.filter(booking => {
+    const checkOut = new Date(booking.check_out)
+    return checkOut.toISOString().split('T')[0] === todayStr && booking.status === 'confirmed'
+  }) || []
 
-  // Process maintenance plans (next 30 days)
-  const upcomingMaintenancePlans = (maintenancePlansResult.data?.slice(0, 6) || []).map(plan => ({
-    id: plan.id,
-    title: plan.title,
-    next_run_date: plan.next_run_date,
-    priority: plan.priority,
-    is_active: plan.is_active,
-    start_date: plan.start_date,
-    frequency_unit: plan.frequency_unit,
-    frequency_interval: plan.frequency_interval,
-  }))
+  const todayTasks = tasksResult.data?.filter(task => {
+    return task.next_due_date === todayStr && task.status !== 'done'
+  }) || []
 
-  // Process tasks (next 7 days)
-  const upcomingTasks = (tasksResult.data?.slice(0, 6) || []).map(task => ({
-    id: task.id,
-    title: task.title,
-    next_due_date: task.next_due_date,
-    priority: task.priority,
-    status: task.status,
-    cadence: task.cadence,
-  }))
+  const todayMaintenance = maintenancePlansResult.data?.filter(plan => {
+    return plan.next_run_date === todayStr
+  }) || []
 
-  // Calculate current month expenses and income
-  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
+  // OVERDUE TASKS
+  const overdueTasks = tasksResult.data?.filter(task => {
+    const dueDate = new Date(task.next_due_date)
+    return dueDate < today && task.status !== 'done'
+  }) || []
+
+  // Current month calculations
   const monthExpenses = expensesResult.data?.filter(
     exp => new Date(exp.date) >= firstDay
   ) || []
@@ -216,307 +194,281 @@ export default async function DashboardPage() {
   const monthIncome = monthBookings.reduce((sum, booking) => sum + Number(booking.total_amount || 0), 0)
   const monthProfit = monthIncome - monthTotal
 
-  // Process purchase items
-  const pendingPurchases = purchaseItemsResult.data?.filter(
-    item => item.status === 'to_buy'
-  ).slice(0, 5) || []
+  // Calculate occupancy (current bookings)
+  const currentBookings = bookingsResult.data?.filter(booking => {
+    const checkIn = new Date(booking.check_in)
+    const checkOut = new Date(booking.check_out)
+    return checkIn <= now && checkOut > now && booking.status === 'confirmed'
+  }) || []
+  const occupancyRate = bookingsResult.data?.length > 0 
+    ? (currentBookings.length / bookingsResult.data.length) * 100 
+    : 0
+
+  // Month name in Spanish
+  const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+  const currentMonth = monthNames[now.getMonth()]
+  const currentYear = now.getFullYear()
 
   return (
     <div className="space-y-8">
-      {/* Role Info Banner */}
-      {profile?.role !== 'admin' && (
-        <Card padding="md" className="bg-blue-50/50 border-blue-200/60">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="h-4 w-4 text-blue-600 mt-0.5 stroke-[1.5]" />
-            <div className="flex-1">
-              <h3 className="text-sm font-medium text-[#0F172A]">{t('dashboard.staffAccount')}</h3>
-              <p className="text-xs text-[#64748B] mt-1">
-                {t('dashboard.staffAccountMessage')}
-              </p>
-            </div>
-          </div>
-        </Card>
-      )}
+      {/* Header / Hero */}
+      <div className="space-y-1">
+        <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">
+          {t('dashboard.todaySummary')}
+        </h1>
+        <p className="text-sm text-[#64748B]">
+          {t('dashboard.subtitleContext', { propertyName, month: currentMonth, year: currentYear })}
+        </p>
+      </div>
 
-      {/* Hero Summary - 3 métricas principales */}
-      <Card padding="lg" className="bg-gradient-to-br from-white to-gray-50/50">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          {/* Ingresos */}
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <ArrowUpRight className="h-5 w-5 text-blue-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Ingresos</p>
-              <p className="text-3xl font-bold text-[#0F172A] mb-1">
-                {monthIncome > 0 ? `$${monthIncome.toFixed(0)}` : '—'}
-              </p>
-              <p className="text-xs text-slate-500">Este mes</p>
-            </div>
-          </div>
-
-          {/* Gastos */}
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-emerald-50 rounded-lg">
-              <ArrowDownRight className="h-5 w-5 text-emerald-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Gastos</p>
-              <p className="text-3xl font-bold text-[#0F172A] mb-1">
-                {monthTotal > 0 ? `$${monthTotal.toFixed(0)}` : '—'}
-              </p>
-              <p className="text-xs text-slate-500">Este mes</p>
-            </div>
-          </div>
-
-          {/* Balance */}
-          <div className="flex items-start gap-4">
-            <div className={`p-3 rounded-lg ${monthProfit >= 0 ? 'bg-emerald-50' : 'bg-red-50'}`}>
-              <TrendingUp className={`h-5 w-5 ${monthProfit >= 0 ? 'text-emerald-600' : 'text-red-600'}`} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Balance</p>
-              <p className={`text-3xl font-bold mb-1 ${monthProfit >= 0 ? 'text-emerald-600' : monthProfit < 0 ? 'text-red-600' : 'text-[#0F172A]'}`}>
-                {monthProfit !== 0 ? `$${Math.abs(monthProfit).toFixed(0)}` : '—'}
-              </p>
-              <p className="text-xs text-slate-500">Este mes</p>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Grid de 4 Cards */}
+      {/* Key Metrics - Clean, minimal */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Rentas */}
-        <Link href="/rentals" className="block">
-          <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-blue-500 group" padding="md">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Rentas</p>
-                <p className="text-2xl font-bold text-[#0F172A] mb-1">{monthBookings.length}</p>
-                <p className="text-xs text-slate-500">Este mes</p>
-              </div>
-              <div className="p-3 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors duration-200 shrink-0">
-                <Calendar className="h-5 w-5 text-blue-600 stroke-[1.5]" />
-              </div>
+        {/* Ingresos */}
+        <div className="bg-white border border-[#E2E8F0] rounded-lg p-5 hover:border-[#CBD5E1] transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-medium text-[#64748B] uppercase tracking-wider">
+              {t('dashboard.income')}
+            </p>
+            <div className="p-2 bg-[#2563EB]/10 rounded-md">
+              <ArrowUpRight className="h-4 w-4 text-[#2563EB]" />
             </div>
-          </Card>
-        </Link>
-
-        {/* Mantenimiento */}
-        <Link href="/maintenance" className="block">
-          <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-amber-500 group" padding="md">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Mantenimiento</p>
-                <p className="text-2xl font-bold text-[#0F172A] mb-1">{openTickets.length}</p>
-                {urgentTickets.length > 0 ? (
-                  <p className="text-xs text-amber-600 font-medium">{urgentTickets.length} urgentes</p>
-                ) : (
-                  <p className="text-xs text-slate-500">Pendientes</p>
-                )}
-              </div>
-              <div className="p-3 bg-amber-50 rounded-lg group-hover:bg-amber-100 transition-colors duration-200 shrink-0">
-                <Wrench className="h-5 w-5 text-amber-600 stroke-[1.5]" />
-              </div>
-            </div>
-          </Card>
-        </Link>
-
-        {/* Inventario */}
-        <Link href="/inventory" className="block">
-          <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-emerald-500 group" padding="md">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Inventario</p>
-                <p className="text-2xl font-bold text-[#0F172A] mb-1">{totalItems}</p>
-                {lowStockItems.length > 0 ? (
-                  <p className="text-xs text-red-600 font-medium">{lowStockItems.length} bajo stock</p>
-                ) : (
-                  <p className="text-xs text-slate-500">Total items</p>
-                )}
-              </div>
-              <div className="p-3 bg-emerald-50 rounded-lg group-hover:bg-emerald-100 transition-colors duration-200 shrink-0">
-                <Package className="h-5 w-5 text-emerald-600 stroke-[1.5]" />
-              </div>
-            </div>
-          </Card>
-        </Link>
-
-        {/* To-Buy */}
-        <Link href="/to-buy" className="block">
-          <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-purple-500 group" padding="md">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Compras</p>
-                <p className="text-2xl font-bold text-[#0F172A] mb-1">{pendingPurchases.length}</p>
-                <p className="text-xs text-slate-500">Pendientes</p>
-              </div>
-              <div className="p-3 bg-purple-50 rounded-lg group-hover:bg-purple-100 transition-colors duration-200 shrink-0">
-                <ShoppingCart className="h-5 w-5 text-purple-600 stroke-[1.5]" />
-              </div>
-            </div>
-          </Card>
-        </Link>
-      </div>
-
-      {/* Próximos Eventos */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#0F172A]">Próximos Eventos</h2>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Próximas Rentas */}
-          <Card padding="md">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-blue-600 stroke-[1.5]" />
-                  Próximas Rentas
-                </CardTitle>
-                <Link href="/rentals">
-                  <Button size="sm" variant="ghost" className="text-xs">
-                    {t('dashboard.viewAll')}
-                    <ArrowRight className="h-3 w-3" />
-                  </Button>
-                </Link>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {upcomingBookings.length > 0 ? (
-                <div className="space-y-2">
-                  {upcomingBookings.slice(0, 6).map((booking) => {
-                    const checkIn = new Date(booking.check_in)
-                    const checkOut = new Date(booking.check_out)
-                    const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24))
-                    return (
-                      <Link
-                        key={booking.id}
-                        href="/rentals"
-                        className="block p-3 rounded-lg border border-gray-200/60 hover:border-blue-300/60 hover:bg-gray-50/50 transition-all duration-200"
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm text-[#0F172A] truncate">{booking.guest_name || t('dashboard.guest')}</p>
-                            <p className="text-xs text-slate-500 mt-0.5">
-                              {checkIn.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })} • {nights} {nights === 1 ? 'noche' : 'noches'}
-                            </p>
-                          </div>
-                          <p className="font-semibold text-sm text-blue-600 shrink-0">${Number(booking.total_amount || 0).toFixed(0)}</p>
-                        </div>
-                      </Link>
-                    )
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-6 text-slate-500">
-                  <Calendar className="h-10 w-10 mx-auto mb-2 text-gray-300" />
-                  <p className="text-xs">{t('dashboard.noUpcomingBookings')}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Tickets Urgentes */}
-          <Card padding="md" className={urgentTickets.length > 0 ? 'border-l-4 border-l-red-500 bg-red-50/30' : ''}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-red-600 stroke-[1.5]" />
-                Tickets Urgentes
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {urgentTickets.length > 0 ? (
-                <div className="space-y-2">
-                  {urgentTickets.slice(0, 6).map((ticket) => (
-                    <Link
-                      key={ticket.id}
-                      href="/maintenance"
-                      className="block p-3 rounded-lg bg-white border border-gray-200/60 hover:border-red-300/60 hover:bg-gray-50/50 transition-all duration-200"
-                    >
-                      <p className="font-medium text-sm text-[#0F172A]">{ticket.title}</p>
-                      <p className="text-xs text-slate-500 mt-0.5">{ticket.room}</p>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-6 text-slate-500">
-                  <AlertTriangle className="h-10 w-10 mx-auto mb-2 text-gray-300" />
-                  <p className="text-xs">No hay tickets urgentes</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Automatización: Mantenimientos y Tareas */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Próximos Mantenimientos */}
-          <Card padding="md">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Wrench className="h-4 w-4 text-amber-600 stroke-[1.5]" />
-                Próximos Mantenimientos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <UpcomingMaintenancePlans plans={upcomingMaintenancePlans} />
-            </CardContent>
-          </Card>
-
-          {/* Próximas Tareas */}
-          <Card padding="md">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckSquare className="h-4 w-4 text-blue-600 stroke-[1.5]" />
-                Próximas Tareas
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <UpcomingTasks tasks={upcomingTasks} />
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <Card className="bg-gray-50/50 border-gray-200/60" padding="md">
-        <CardHeader>
-          <CardTitle className="text-sm">{t('dashboard.quickActions')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Link href="/rentals">
-              <Button variant="secondary" size="sm" className="w-full justify-start">
-                <Plus className="h-4 w-4 stroke-[1.5]" />
-                {t('dashboard.newBooking')}
-              </Button>
-            </Link>
-            <Link href="/expenses">
-              <Button variant="secondary" size="sm" className="w-full justify-start">
-                <Plus className="h-4 w-4 stroke-[1.5]" />
-                {t('dashboard.addExpense')}
-              </Button>
-            </Link>
-            <Link href="/maintenance">
-              <Button variant="secondary" size="sm" className="w-full justify-start">
-                <Plus className="h-4 w-4 stroke-[1.5]" />
-                {t('dashboard.newTicket')}
-              </Button>
-            </Link>
-            <Link href="/inventory">
-              <Button variant="secondary" size="sm" className="w-full justify-start">
-                <Plus className="h-4 w-4 stroke-[1.5]" />
-                {t('dashboard.addItem')}
-              </Button>
-            </Link>
           </div>
-        </CardContent>
-      </Card>
+          <p className="text-2xl font-bold text-[#0F172A] mb-1">
+            {monthIncome > 0 ? `$${monthIncome.toFixed(0)}` : '—'}
+          </p>
+          <p className="text-xs text-[#64748B]">{t('dashboard.thisMonth')}</p>
+        </div>
 
-      {/* Admin Tools - Only visible to admins */}
-      {profile?.role === 'admin' && (
-        <ResetDataButton />
+        {/* Gastos */}
+        <div className="bg-white border border-[#E2E8F0] rounded-lg p-5 hover:border-[#CBD5E1] transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-medium text-[#64748B] uppercase tracking-wider">
+              {t('dashboard.expenses')}
+            </p>
+            <div className="p-2 bg-[#EF4444]/10 rounded-md">
+              <ArrowDownRight className="h-4 w-4 text-[#EF4444]" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-[#0F172A] mb-1">
+            {monthTotal > 0 ? `$${monthTotal.toFixed(0)}` : '—'}
+          </p>
+          <p className="text-xs text-[#64748B]">{t('dashboard.thisMonth')}</p>
+        </div>
+
+        {/* Balance */}
+        <div className="bg-white border border-[#E2E8F0] rounded-lg p-5 hover:border-[#CBD5E1] transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-medium text-[#64748B] uppercase tracking-wider">
+              {t('dashboard.balance')}
+            </p>
+            <div className={`p-2 rounded-md ${monthProfit >= 0 ? 'bg-[#10B981]/10' : 'bg-[#EF4444]/10'}`}>
+              <TrendingUp className={`h-4 w-4 ${monthProfit >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`} />
+            </div>
+          </div>
+          <p className={`text-2xl font-bold mb-1 ${monthProfit >= 0 ? 'text-[#10B981]' : monthProfit < 0 ? 'text-[#EF4444]' : 'text-[#0F172A]'}`}>
+            {monthProfit !== 0 ? `$${Math.abs(monthProfit).toFixed(0)}` : '—'}
+          </p>
+          <p className="text-xs text-[#64748B]">{t('dashboard.thisMonth')}</p>
+        </div>
+
+        {/* Ocupación */}
+        <div className="bg-white border border-[#E2E8F0] rounded-lg p-5 hover:border-[#CBD5E1] transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-medium text-[#64748B] uppercase tracking-wider">
+              {t('dashboard.occupancy')}
+            </p>
+            <div className="p-2 bg-[#8B5CF6]/10 rounded-md">
+              <Calendar className="h-4 w-4 text-[#8B5CF6]" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-[#0F172A] mb-1">
+            {occupancyRate > 0 ? `${Math.round(occupancyRate)}%` : '0%'}
+          </p>
+          <p className="text-xs text-[#64748B]">{t('dashboard.current')}</p>
+        </div>
+      </div>
+
+      {/* TODAY SECTION - Most Important */}
+      {(todayCheckIns.length > 0 || todayCheckOuts.length > 0 || todayTasks.length > 0 || todayMaintenance.length > 0) && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-[#0F172A]">{t('dashboard.today')}</h2>
+          </div>
+
+          <div className="bg-white border border-[#E2E8F0] rounded-lg divide-y divide-[#E2E8F0]">
+            {/* Check-ins */}
+            {todayCheckIns.map(booking => (
+              <Link
+                key={`checkin-${booking.id}`}
+                href="/rentals"
+                className="flex items-center gap-3 p-4 hover:bg-[#F8FAFC] transition-colors group"
+              >
+                <div className="p-2 bg-[#2563EB]/10 rounded-md group-hover:bg-[#2563EB]/15 transition-colors">
+                  <LogIn className="h-4 w-4 text-[#2563EB]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#0F172A]">
+                    {t('dashboard.checkIn')}: {booking.guest_name || t('dashboard.guest')}
+                  </p>
+                  <p className="text-xs text-[#64748B] mt-0.5">
+                    {t('dashboard.total')}: ${Number(booking.total_amount || 0).toFixed(0)}
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-[#64748B] group-hover:text-[#2563EB] transition-colors shrink-0" />
+              </Link>
+            ))}
+
+            {/* Check-outs */}
+            {todayCheckOuts.map(booking => (
+              <Link
+                key={`checkout-${booking.id}`}
+                href="/rentals"
+                className="flex items-center gap-3 p-4 hover:bg-[#F8FAFC] transition-colors group"
+              >
+                <div className="p-2 bg-[#10B981]/10 rounded-md group-hover:bg-[#10B981]/15 transition-colors">
+                  <LogOut className="h-4 w-4 text-[#10B981]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#0F172A]">
+                    {t('dashboard.checkOut')}: {booking.guest_name || t('dashboard.guest')}
+                  </p>
+                  <p className="text-xs text-[#64748B] mt-0.5">
+                    {t('dashboard.total')}: ${Number(booking.total_amount || 0).toFixed(0)}
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-[#64748B] group-hover:text-[#10B981] transition-colors shrink-0" />
+              </Link>
+            ))}
+
+            {/* Tasks */}
+            {todayTasks.map(task => (
+              <Link
+                key={`task-${task.id}`}
+                href="/tasks"
+                className="flex items-center gap-3 p-4 hover:bg-[#F8FAFC] transition-colors group"
+              >
+                <div className="p-2 bg-[#8B5CF6]/10 rounded-md group-hover:bg-[#8B5CF6]/15 transition-colors">
+                  <CheckSquare className="h-4 w-4 text-[#8B5CF6]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#0F172A]">{task.title}</p>
+                  <p className="text-xs text-[#64748B] mt-0.5">{t('dashboard.dueToday')}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-[#64748B] group-hover:text-[#8B5CF6] transition-colors shrink-0" />
+              </Link>
+            ))}
+
+            {/* Maintenance */}
+            {todayMaintenance.map(plan => (
+              <Link
+                key={`plan-${plan.id}`}
+                href="/maintenance-plans"
+                className="flex items-center gap-3 p-4 hover:bg-[#F8FAFC] transition-colors group"
+              >
+                <div className="p-2 bg-[#F59E0B]/10 rounded-md group-hover:bg-[#F59E0B]/15 transition-colors">
+                  <CalendarCheck className="h-4 w-4 text-[#F59E0B]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#0F172A]">{plan.title}</p>
+                  <p className="text-xs text-[#64748B] mt-0.5">{t('dashboard.scheduledToday')}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-[#64748B] group-hover:text-[#F59E0B] transition-colors shrink-0" />
+              </Link>
+            ))}
+          </div>
+        </div>
       )}
+
+      {/* Alerts - Only if there are alerts */}
+      {(overdueTasks.length > 0 || lowStockItems.length > 0 || urgentTickets.length > 0) && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-[#0F172A]">{t('dashboard.attention')}</h2>
+
+          <div className="space-y-2">
+            {/* Overdue Tasks */}
+            {overdueTasks.length > 0 && (
+              <div className="bg-[#FEF3C7] border border-[#F59E0B]/30 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="h-5 w-5 text-[#F59E0B] shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#92400E] mb-1">
+                      {t('dashboard.overdueTasks', { count: overdueTasks.length })}
+                    </p>
+                    <Link href="/tasks" className="text-xs text-[#92400E] hover:underline">
+                      {t('dashboard.viewAll')} →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Low Stock */}
+            {lowStockItems.length > 0 && (
+              <div className="bg-[#FEE2E2] border border-[#EF4444]/30 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Package className="h-5 w-5 text-[#EF4444] shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#991B1B] mb-1">
+                      {t('dashboard.lowStockAlert', { count: lowStockItems.length })}
+                    </p>
+                    <Link href="/inventory" className="text-xs text-[#991B1B] hover:underline">
+                      {t('dashboard.viewAll')} →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Urgent Tickets */}
+            {urgentTickets.length > 0 && (
+              <div className="bg-[#FEE2E2] border border-[#EF4444]/30 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-[#EF4444] shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#991B1B] mb-1">
+                      {t('dashboard.urgentTickets', { count: urgentTickets.length })}
+                    </p>
+                    <Link href="/maintenance" className="text-xs text-[#991B1B] hover:underline">
+                      {t('dashboard.viewAll')} →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Quick Actions - Secondary */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-[#0F172A]">{t('dashboard.quickActions')}</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Link href="/rentals">
+            <Button variant="secondary" size="sm" className="w-full justify-start gap-2">
+              <Plus className="h-4 w-4" />
+              {t('dashboard.newBooking')}
+            </Button>
+          </Link>
+          <Link href="/tasks">
+            <Button variant="secondary" size="sm" className="w-full justify-start gap-2">
+              <Plus className="h-4 w-4" />
+              {t('dashboard.newTask')}
+            </Button>
+          </Link>
+          <Link href="/expenses">
+            <Button variant="secondary" size="sm" className="w-full justify-start gap-2">
+              <Plus className="h-4 w-4" />
+              {t('dashboard.addExpense')}
+            </Button>
+          </Link>
+          <Link href="/maintenance">
+            <Button variant="secondary" size="sm" className="w-full justify-start gap-2">
+              <Plus className="h-4 w-4" />
+              {t('dashboard.newTicket')}
+            </Button>
+          </Link>
+        </div>
+      </div>
     </div>
   )
 }

@@ -19,7 +19,7 @@ const sectionNames: Record<string, string> = {
   '/vendors': 'Proveedores',
   '/reports': 'Reportes',
   '/rentals': 'Rentas',
-  '/settings': 'Ajustes',
+  '/settings': 'Configuración',
   '/billing': 'Facturación',
 }
 
