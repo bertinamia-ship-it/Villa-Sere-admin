@@ -200,8 +200,9 @@ export default async function DashboardPage() {
     const checkOut = new Date(booking.check_out)
     return checkIn <= now && checkOut > now && booking.status === 'confirmed'
   }) || []
-  const occupancyRate = bookingsResult.data?.length > 0 
-    ? (currentBookings.length / bookingsResult.data.length) * 100 
+  const totalBookings = bookingsResult.data?.length || 0
+  const occupancyRate = totalBookings > 0 
+    ? (currentBookings.length / totalBookings) * 100 
     : 0
 
   // Month name in Spanish
