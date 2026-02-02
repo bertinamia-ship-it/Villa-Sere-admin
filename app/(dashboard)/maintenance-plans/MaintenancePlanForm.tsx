@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { MaintenancePlan, Vendor } from '@/lib/types/database'
-import { PRIORITIES, PRIORITY_LABELS } from '@/lib/constants'
+import { PRIORITIES, PRIORITY_LABELS, MaintenanceTemplate } from '@/lib/constants'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
@@ -13,20 +13,21 @@ import { t } from '@/lib/i18n/es'
 
 interface MaintenancePlanFormProps {
   plan: MaintenancePlan | null
+  template?: MaintenanceTemplate | null
   vendors: Vendor[]
   onClose: () => void
 }
 
-export default function MaintenancePlanForm({ plan, vendors, onClose }: MaintenancePlanFormProps) {
+export default function MaintenancePlanForm({ plan, template, vendors, onClose }: MaintenancePlanFormProps) {
   const [formData, setFormData] = useState({
-    title: plan?.title || '',
+    title: plan?.title || template?.title || '',
     next_run_date: plan?.next_run_date || new Date().toISOString().split('T')[0],
-    is_recurrent: plan ? (plan.frequency_unit && plan.frequency_interval > 0) : false,
-    frequency_unit: plan?.frequency_unit || ('month' as 'day' | 'week' | 'month' | 'year'),
-    frequency_interval: plan?.frequency_interval?.toString() || '1',
+    is_recurrent: plan ? (plan.frequency_unit && plan.frequency_interval > 0) : (template ? true : false),
+    frequency_unit: plan?.frequency_unit || template?.default_frequency_unit || ('month' as 'day' | 'week' | 'month' | 'year'),
+    frequency_interval: plan?.frequency_interval?.toString() || template?.default_frequency_interval?.toString() || '1',
     vendor_id: plan?.vendor_id || '',
-    priority: plan?.priority || ('medium' as 'low' | 'medium' | 'high' | 'urgent'),
-    notes: plan?.description || '',
+    priority: plan?.priority || template?.default_priority || ('medium' as 'low' | 'medium' | 'high' | 'urgent'),
+    notes: plan?.description || template?.suggested_notes || '',
   })
   const [loading, setLoading] = useState(false)
   const supabase = createClient()

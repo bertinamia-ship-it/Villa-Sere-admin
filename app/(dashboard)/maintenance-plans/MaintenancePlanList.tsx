@@ -3,14 +3,15 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { MaintenancePlan, Vendor } from '@/lib/types/database'
-import { PRIORITIES, PRIORITY_LABELS } from '@/lib/constants'
-import { Plus, Calendar, CheckCircle2, Edit, Trash2, Power, PowerOff, AlertCircle, Wrench, ExternalLink } from 'lucide-react'
+import { PRIORITIES, PRIORITY_LABELS, MAINTENANCE_TEMPLATES, MaintenanceTemplate } from '@/lib/constants'
+import { Plus, Calendar, CheckCircle2, Edit, Trash2, Power, PowerOff, AlertCircle, Wrench, ExternalLink, FileText } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { Modal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
 import MaintenancePlanForm from './MaintenancePlanForm'
 import { t } from '@/lib/i18n/es'
@@ -25,7 +26,9 @@ export default function MaintenancePlanList() {
   const [hasProperty, setHasProperty] = useState(true)
   const [activeTab, setActiveTab] = useState<TabType>('pending')
   const [showForm, setShowForm] = useState(false)
+  const [showTemplates, setShowTemplates] = useState(false)
   const [editingPlan, setEditingPlan] = useState<MaintenancePlan | null>(null)
+  const [templateData, setTemplateData] = useState<MaintenanceTemplate | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; planId: string | null }>({ isOpen: false, planId: null })
   const [completingPlanId, setCompletingPlanId] = useState<string | null>(null)
   const [creatingTicketPlanId, setCreatingTicketPlanId] = useState<string | null>(null)
@@ -336,7 +339,14 @@ export default function MaintenancePlanList() {
   const handleFormClose = () => {
     setShowForm(false)
     setEditingPlan(null)
+    setTemplateData(null)
     fetchData()
+  }
+
+  const handleSelectTemplate = (template: MaintenanceTemplate) => {
+    setTemplateData(template)
+    setShowTemplates(false)
+    setShowForm(true)
   }
 
   const getVendorName = (vendorId: string | null): string | null => {
@@ -426,13 +436,26 @@ export default function MaintenancePlanList() {
           <h1 className="text-2xl font-semibold text-[#0F172A]">{t('maintenancePlans.title')}</h1>
           <p className="text-sm text-slate-500 mt-1">{t('maintenancePlans.subtitle')}</p>
         </div>
-        <Button 
-          onClick={() => setShowForm(true)}
-          disabled={!hasProperty}
-        >
-          <Plus className="h-4 w-4" />
-          {t('maintenancePlans.createPlan')}
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => setShowTemplates(true)}
+            variant="secondary"
+            disabled={!hasProperty}
+          >
+            <FileText className="h-4 w-4" />
+            {t('maintenancePlans.addTemplate')}
+          </Button>
+          <Button 
+            onClick={() => {
+              setTemplateData(null)
+              setShowForm(true)
+            }}
+            disabled={!hasProperty}
+          >
+            <Plus className="h-4 w-4" />
+            {t('maintenancePlans.createPlan')}
+          </Button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -571,10 +594,41 @@ export default function MaintenancePlanList() {
         </div>
       )}
 
+      {/* Templates Modal */}
+      {showTemplates && (
+        <Modal
+          isOpen={true}
+          onClose={() => setShowTemplates(false)}
+          title={t('maintenancePlans.selectTemplate')}
+          size="lg"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto">
+            {MAINTENANCE_TEMPLATES.map(template => (
+              <button
+                key={template.id}
+                onClick={() => handleSelectTemplate(template)}
+                className="p-4 text-left border border-[#E2E8F0] rounded-lg hover:border-[#2563EB] hover:bg-[#F8FAFC] transition-all duration-150"
+              >
+                <h3 className="font-semibold text-[#0F172A] mb-1">{template.title}</h3>
+                <div className="flex items-center gap-2 text-xs text-[#64748B]">
+                  <span>Cada {template.default_frequency_interval} {template.default_frequency_unit === 'month' ? 'meses' : template.default_frequency_unit === 'week' ? 'semanas' : template.default_frequency_unit === 'year' ? 'años' : 'días'}</span>
+                  <span>•</span>
+                  <span>{PRIORITY_LABELS[template.default_priority]}</span>
+                </div>
+                {template.suggested_notes && (
+                  <p className="text-xs text-[#64748B] mt-2 line-clamp-2">{template.suggested_notes}</p>
+                )}
+              </button>
+            ))}
+          </div>
+        </Modal>
+      )}
+
       {/* Form Modal */}
       {showForm && (
         <MaintenancePlanForm
           plan={editingPlan}
+          template={templateData}
           vendors={vendors}
           onClose={handleFormClose}
         />

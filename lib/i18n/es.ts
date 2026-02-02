@@ -370,6 +370,9 @@ export const es = {
     noPendingPlansDescription: 'Todos los mantenimientos están al día o no hay mantenimientos programados',
     deletePlanTitle: 'Eliminar Mantenimiento',
     deletePlanMessage: '¿Estás seguro de que quieres eliminar este mantenimiento? Esta acción no se puede deshacer.',
+    addTemplate: 'Agregar plantilla',
+    selectTemplate: 'Seleccionar Plantilla',
+    templateDescription: 'Elige una plantilla para crear un mantenimiento recurrente rápidamente',
   },
 
   // Tasks
