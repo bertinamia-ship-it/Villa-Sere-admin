@@ -9,14 +9,17 @@ import PropertySelector from './PropertySelector'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 
 const sectionNames: Record<string, string> = {
-  '/dashboard': 'Dashboard',
+  '/dashboard': 'Inicio',
+  '/calendar': 'Calendario',
   '/inventory': 'Inventario',
   '/to-buy': 'Compras',
   '/maintenance': 'Mantenimiento',
-  '/expenses': 'Gastos',
+  '/maintenance-plans': 'Mantenimiento',
+  '/expenses': 'Movimientos',
   '/vendors': 'Proveedores',
   '/reports': 'Reportes',
   '/rentals': 'Rentas',
+  '/settings': 'Ajustes',
   '/billing': 'Facturación',
 }
 
@@ -26,6 +29,7 @@ export default function Header() {
   const supabase = createClient()
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [propertyName, setPropertyName] = useState<string | null>(null)
 
   useEffect(() => {
     async function loadUser() {
@@ -33,6 +37,33 @@ export default function Header() {
       setUserEmail(user?.email || null)
     }
     loadUser()
+  }, [supabase])
+
+  useEffect(() => {
+    async function loadPropertyName() {
+      const propertyId = await getActivePropertyId()
+      if (propertyId) {
+        const { data } = await supabase
+          .from('properties')
+          .select('name')
+          .eq('id', propertyId)
+          .maybeSingle()
+        if (data?.name) {
+          setPropertyName(data.name)
+        } else {
+          setPropertyName(null)
+        }
+      } else {
+        setPropertyName(null)
+      }
+    }
+    loadPropertyName()
+
+    const handlePropertyChange = () => {
+      loadPropertyName()
+    }
+    window.addEventListener('propertyChanged', handlePropertyChange)
+    return () => window.removeEventListener('propertyChanged', handlePropertyChange)
   }, [supabase])
 
   const handleLogout = async () => {
@@ -46,7 +77,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-gray-200/60">
       <div className="flex items-center justify-between h-14 px-4 sm:px-6">
-        {/* Left: Section Name */}
+        {/* Left: Section Name (no property name duplication) */}
         <div className="min-w-0 flex-1">
           <h1 className="text-sm sm:text-base font-semibold text-[#0F172A] truncate">{sectionName}</h1>
         </div>
@@ -92,4 +123,3 @@ export default function Header() {
     </header>
   )
 }
-

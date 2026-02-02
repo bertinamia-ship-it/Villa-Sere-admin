@@ -450,10 +450,10 @@ export default function PropertySelector() {
       <button
         onClick={() => setShowCreateModal(true)}
         className="flex items-center justify-center gap-1 px-2 py-1.5 rounded-md border border-transparent hover:border-gray-200/60 hover:bg-gray-50/50 transition-all duration-200 ease-out text-xs font-medium text-[#64748B] hover:text-[#0F172A] min-w-[32px] sm:min-w-0"
-        title="Agregar nueva propiedad"
+        title="Agregar propiedad"
       >
         <Plus className="h-3.5 w-3.5 stroke-[1.5]" />
-        <span className="hidden sm:inline">Agregar</span>
+        <span className="hidden sm:inline">Agregar propiedad</span>
       </button>
 
       {/* Modal para crear propiedad */}

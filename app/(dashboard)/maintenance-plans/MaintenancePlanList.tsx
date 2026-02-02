@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { MaintenancePlan, Vendor } from '@/lib/types/database'
 import { PRIORITIES, PRIORITY_LABELS, MAINTENANCE_TEMPLATES, MaintenanceTemplate } from '@/lib/constants'
-import { Plus, Calendar, CheckCircle2, Edit, Trash2, Power, PowerOff, AlertCircle, Wrench, ExternalLink, FileText } from 'lucide-react'
+import { Plus, Calendar, CheckCircle2, Edit, Trash2, Power, PowerOff, AlertCircle, Wrench, ExternalLink, FileText, CalendarCheck } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -15,7 +15,8 @@ import { Modal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
 import MaintenancePlanForm from './MaintenancePlanForm'
 import { t } from '@/lib/i18n/es'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
 
 type TabType = 'pending' | 'all'
 
@@ -35,6 +36,7 @@ export default function MaintenancePlanList() {
   const supabase = createClient()
   const { showToast } = useToast()
   const router = useRouter()
+  const pathname = usePathname()
 
   const fetchData = async () => {
     setLoading(true)
@@ -435,6 +437,36 @@ export default function MaintenancePlanList() {
         <div>
           <h1 className="text-2xl font-semibold text-[#0F172A]">{t('maintenancePlans.title')}</h1>
           <p className="text-sm text-slate-500 mt-1">{t('maintenancePlans.subtitle')}</p>
+        </div>
+        
+        {/* Tabs */}
+        <div className="flex gap-2 border-b border-slate-200">
+          <Link
+            href="/maintenance"
+            className={`px-4 py-2 text-sm font-medium transition-colors duration-200 border-b-2 ${
+              pathname === '/maintenance'
+                ? 'border-[#0F172A] text-[#0F172A]'
+                : 'border-transparent text-slate-500 hover:text-[#0F172A]'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Wrench className="h-4 w-4" />
+              <span>Tickets</span>
+            </div>
+          </Link>
+          <Link
+            href="/maintenance-plans"
+            className={`px-4 py-2 text-sm font-medium transition-colors duration-200 border-b-2 ${
+              pathname === '/maintenance-plans'
+                ? 'border-[#0F172A] text-[#0F172A]'
+                : 'border-transparent text-slate-500 hover:text-[#0F172A]'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <CalendarCheck className="h-4 w-4" />
+              <span>Recurrentes</span>
+            </div>
+          </Link>
         </div>
         <div className="flex gap-2">
           <Button 
