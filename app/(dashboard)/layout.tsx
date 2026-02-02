@@ -27,8 +27,8 @@ import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 
 // Navigation structure: compact and organized
 type NavItem = 
-  | { name: string; href: string; icon: typeof LayoutDashboard }
-  | { name: string; children: Array<{ name: string; href: string; icon: typeof Wrench }> }
+  | { name: string; href: string; icon: React.ComponentType<{ className?: string }> }
+  | { name: string; children: Array<{ name: string; href: string; icon: React.ComponentType<{ className?: string }> }> }
 
 const navigation: NavItem[] = [
   { name: 'Inicio', href: '/dashboard', icon: LayoutDashboard },
@@ -96,7 +96,7 @@ export default function DashboardLayout({
           {/* Navigation */}
           <nav className="flex flex-1 flex-col space-y-1">
             {navigation.map((item) => {
-              if ('href' in item && item.href) {
+              if ('href' in item) {
                 // Single item
                 const active = isActive(item.href)
                 return (

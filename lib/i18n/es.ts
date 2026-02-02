@@ -560,6 +560,30 @@ export const es = {
     errorCreatingPropertyRetry: 'Error al crear propiedad. Por favor intenta de nuevo.',
     propertyCreatedFailedRetrieve: 'Error: Propiedad creada pero falló al recuperar datos.',
   },
+
+  // Calendar
+  calendar: {
+    title: 'Calendario',
+    subtitle: 'Todo lo importante en un solo lugar',
+    today: 'Hoy',
+    week: 'Semana',
+    month: 'Mes',
+    singleProperty: 'Solo esta propiedad',
+    new: 'Nuevo',
+    newBooking: 'Nueva renta',
+    newTask: 'Nueva tarea',
+    newTicket: 'Nuevo ticket',
+    newPlan: 'Nuevo mantenimiento recurrente',
+    noEvents: 'No hay eventos',
+    noEventsDescription: 'No hay eventos programados para este período',
+    viewBooking: 'Ver renta',
+    viewTask: 'Ver tarea',
+    viewPlan: 'Ver mantenimiento',
+    createTicket: 'Crear ticket',
+    markDone: 'Marcar como hecho',
+    edit: 'Editar',
+    noPropertySelected: 'Por favor selecciona una propiedad primero',
+  },
 }
 
 // Helper function para acceder a traducciones con interpolación
