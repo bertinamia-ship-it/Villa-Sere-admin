@@ -1,4 +1,4 @@
-export type CalendarItemType = 'booking' | 'plan' | 'task'
+export type CalendarItemType = 'booking'
 
 export interface CalendarItem {
   id: string

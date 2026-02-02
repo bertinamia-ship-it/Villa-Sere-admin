@@ -43,17 +43,21 @@ export function CalendarView({ items, view, onItemClick, onRefresh }: CalendarVi
     })
   }
 
-  const getItemColor = (type: string) => {
-    switch (type) {
-      case 'booking':
-        return 'bg-[#2563EB] text-white border-[#2563EB]/30'
-      case 'plan':
-        return 'bg-[#F59E0B] text-white border-[#F59E0B]/30'
-      case 'task':
-        return 'bg-[#8B5CF6] text-white border-[#8B5CF6]/30'
-      default:
-        return 'bg-slate-500 text-white'
+  const getItemColor = (type: string, status?: string) => {
+    // Only bookings are shown, but handle status for visual distinction
+    if (type === 'booking') {
+      switch (status) {
+        case 'confirmed':
+          return 'bg-[#2563EB] text-white border-[#2563EB]/30'
+        case 'cancelled':
+          return 'bg-[#64748B] text-white border-[#64748B]/30 opacity-60'
+        case 'completed':
+          return 'bg-[#10B981] text-white border-[#10B981]/30'
+        default:
+          return 'bg-[#2563EB] text-white border-[#2563EB]/30'
+      }
     }
+    return 'bg-[#2563EB] text-white border-[#2563EB]/30'
   }
 
   const isToday = (date: Date) => {
@@ -88,7 +92,7 @@ export function CalendarView({ items, view, onItemClick, onRefresh }: CalendarVi
               <button
                 key={item.id}
                 onClick={() => onItemClick(item)}
-                className={`w-full text-left px-1.5 py-0.5 rounded text-[9px] font-medium truncate ${getItemColor(item.type)} hover:opacity-90 transition-opacity`}
+                className={`w-full text-left px-1.5 py-0.5 rounded text-[9px] font-medium truncate ${getItemColor(item.type, item.status)} hover:opacity-90 transition-opacity`}
                 title={item.title}
               >
                 {item.title}
@@ -146,15 +150,15 @@ export function CalendarView({ items, view, onItemClick, onRefresh }: CalendarVi
         <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-[#E2E8F0] text-xs">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded bg-[#2563EB]" />
-            <span className="text-[#64748B] font-medium">{t('calendar.newBooking')}</span>
+            <span className="text-[#64748B] font-medium">{t('calendar.legendConfirmed')}</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-[#F59E0B]" />
-            <span className="text-[#64748B] font-medium">{t('calendar.newPlan')}</span>
+            <div className="w-3 h-3 rounded bg-[#10B981]" />
+            <span className="text-[#64748B] font-medium">{t('calendar.legendCompleted')}</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-[#8B5CF6]" />
-            <span className="text-[#64748B] font-medium">{t('calendar.newTask')}</span>
+            <div className="w-3 h-3 rounded bg-[#64748B] opacity-60" />
+            <span className="text-[#64748B] font-medium">{t('calendar.legendCancelled')}</span>
           </div>
         </div>
       </div>
