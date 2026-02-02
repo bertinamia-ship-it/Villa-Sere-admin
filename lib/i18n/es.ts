@@ -153,6 +153,9 @@ export const es = {
     guest: 'Invitado',
     checkInDate: 'Entrada',
     checkOutDate: 'Salida',
+    statusConfirmed: 'Confirmada',
+    statusCancelled: 'Cancelada',
+    statusCompleted: 'Completada',
   },
 
   // Common
