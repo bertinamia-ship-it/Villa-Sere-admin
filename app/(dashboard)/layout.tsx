@@ -32,7 +32,7 @@ type NavItem =
 
 const navigation: NavItem[] = [
   { name: 'Inicio', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Calendario', href: '/calendar', icon: Calendar },
+  { name: 'Calendario', href: '/calendario', icon: Calendar },
   {
     name: 'Operación',
     children: [

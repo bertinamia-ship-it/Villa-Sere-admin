@@ -10,7 +10,7 @@ import { getActivePropertyId } from '@/lib/utils/property-client'
 
 const sectionNames: Record<string, string> = {
   '/dashboard': 'Inicio',
-  '/calendar': 'Calendario',
+  '/calendario': 'Calendario',
   '/inventory': 'Inventario',
   '/to-buy': 'Compras',
   '/maintenance': 'Mantenimiento',
