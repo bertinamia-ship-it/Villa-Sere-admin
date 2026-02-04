@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Minus, Plus } from 'lucide-react'
 import { InventoryItem } from '@/lib/types/database'
+import { t } from '@/lib/i18n/es'
 
 interface QuickAdjustProps {
   item: InventoryItem
