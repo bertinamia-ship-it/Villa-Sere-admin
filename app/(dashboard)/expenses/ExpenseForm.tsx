@@ -6,6 +6,7 @@ import { Expense, Vendor, MaintenanceTicket } from '@/lib/types/database'
 import { EXPENSE_CATEGORIES } from '@/lib/constants'
 import { X, Upload } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
+import { useToast } from '@/components/ui/Toast'
 import { t } from '@/lib/i18n/es'
 
 interface ExpenseFormProps {
