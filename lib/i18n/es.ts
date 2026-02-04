@@ -291,6 +291,7 @@ export const es = {
     minThresholdShort: 'Mín',
     importFailed: '{count} artículos fallaron al importar',
     importSuccess: 'Se importaron exitosamente {success} artículos',
+    importError: 'Error al importar CSV',
   },
 
   // Maintenance
