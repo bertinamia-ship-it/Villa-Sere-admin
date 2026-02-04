@@ -377,20 +377,27 @@ export default function ReportsPage() {
 
                 const balance = account.current_balance ?? account.opening_balance ?? 0
 
+                const accountColors: Record<string, { bg: string; border: string; text: string }> = {
+                  'cash': { bg: 'from-emerald-50 to-green-50', border: 'border-emerald-200/50', text: 'text-emerald-700' },
+                  'card': { bg: 'from-blue-50 to-indigo-50', border: 'border-blue-200/50', text: 'text-blue-700' },
+                  'bank': { bg: 'from-slate-50 to-gray-50', border: 'border-slate-200/50', text: 'text-slate-700' },
+                }
+                const colors = accountColors[account.account_type] || accountColors['bank']
+                
                 return (
                   <div
                     key={account.id}
-                    className="bg-white border border-[#E2E8F0] rounded-lg p-4 hover:border-[#CBD5E1] transition-colors"
+                    className={`bg-gradient-to-br ${colors.bg} border ${colors.border} rounded-xl p-5 hover:shadow-lg hover:scale-[1.02] transition-all duration-300`}
                   >
-                    <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-[#0F172A] text-base truncate">{account.name}</h3>
-                        <p className="text-xs text-[#64748B] mt-0.5">{getAccountTypeLabel(account.account_type)}</p>
+                        <h3 className="font-bold text-slate-900 text-base truncate">{account.name}</h3>
+                        <p className={`text-xs font-medium mt-0.5 ${colors.text}`}>{getAccountTypeLabel(account.account_type)}</p>
                       </div>
                     </div>
                     <div className="mt-3">
-                      <p className="text-2xl font-bold text-[#0F172A]">{formatCurrency(balance)}</p>
-                      <p className="text-xs text-[#64748B] mt-1">{account.currency || 'USD'}</p>
+                      <p className="text-2xl font-bold text-slate-900">{formatCurrency(balance)}</p>
+                      <p className={`text-xs font-medium mt-1 ${colors.text}`}>{account.currency || 'USD'}</p>
                     </div>
                   </div>
                 )
@@ -412,17 +419,17 @@ export default function ReportsPage() {
           {expenseSummary && expenseSummary.total > 0 ? (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                  <p className="text-sm font-medium text-blue-600">{t('reports.totalExpenses')}</p>
-                  <p className="text-2xl font-bold text-blue-900 mt-1">${expenseSummary.total.toFixed(2)}</p>
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-200/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
+                  <p className="text-sm font-bold text-blue-700 uppercase tracking-wider">{t('reports.totalExpenses')}</p>
+                  <p className="text-3xl font-bold text-blue-900 mt-2">${expenseSummary.total.toFixed(2)}</p>
                 </div>
-                <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-                  <p className="text-sm font-medium text-red-600">{t('reports.maintenance')}</p>
-                  <p className="text-2xl font-bold text-red-900 mt-1">${expenseSummary.maintenance.toFixed(2)}</p>
+                <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl p-5 border border-red-200/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
+                  <p className="text-sm font-bold text-red-700 uppercase tracking-wider">{t('reports.maintenance')}</p>
+                  <p className="text-3xl font-bold text-red-900 mt-2">${expenseSummary.maintenance.toFixed(2)}</p>
                 </div>
-                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                  <p className="text-sm font-medium text-green-600">{t('reports.other')}</p>
-                  <p className="text-2xl font-bold text-green-900 mt-1">${expenseSummary.other.toFixed(2)}</p>
+                <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-5 border border-emerald-200/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
+                  <p className="text-sm font-bold text-emerald-700 uppercase tracking-wider">{t('reports.other')}</p>
+                  <p className="text-3xl font-bold text-emerald-900 mt-2">${expenseSummary.other.toFixed(2)}</p>
                 </div>
               </div>
 

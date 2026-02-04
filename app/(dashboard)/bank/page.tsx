@@ -192,29 +192,35 @@ export default function BankPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {accounts.map(account => (
+          {accounts.map(account => {
+            const accountColors: Record<string, { bg: string; border: string; icon: string; text: string }> = {
+              'cash': { bg: 'from-emerald-50 to-green-50', border: 'border-emerald-200/50', icon: 'bg-gradient-to-br from-emerald-500 to-green-500', text: 'text-emerald-700' },
+              'card': { bg: 'from-blue-50 to-indigo-50', border: 'border-blue-200/50', icon: 'bg-gradient-to-br from-blue-500 to-indigo-500', text: 'text-blue-700' },
+              'bank': { bg: 'from-slate-50 to-gray-50', border: 'border-slate-200/50', icon: 'bg-gradient-to-br from-slate-500 to-gray-500', text: 'text-slate-700' },
+            }
+            const colors = accountColors[account.account_type] || accountColors['bank']
+            
+            return (
             <Card
               key={account.id}
               padding="md"
-              className="hover:shadow-md transition-all duration-200 cursor-pointer"
+              className={`bg-gradient-to-br ${colors.bg} ${colors.border} hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer`}
             >
               <div onClick={() => setSelectedAccount(account)}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${
-                      account.account_type === 'cash' ? 'bg-[#10B981]/10 text-[#10B981]' :
-                      account.account_type === 'card' ? 'bg-[#2563EB]/10 text-[#2563EB]' :
-                      'bg-[#64748B]/10 text-[#64748B]'
-                    }`}>
-                      {getAccountIcon(account.account_type)}
+                    <div className={`p-3 ${colors.icon} rounded-xl shadow-md`}>
+                      <div className="text-white">
+                        {getAccountIcon(account.account_type)}
+                      </div>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-[#0F172A] text-base">{account.name}</h3>
-                      <p className="text-xs text-[#64748B] mt-0.5">{getAccountTypeLabel(account.account_type)}</p>
+                      <h3 className="font-bold text-slate-900 text-base">{account.name}</h3>
+                      <p className={`text-xs font-medium mt-0.5 ${colors.text}`}>{getAccountTypeLabel(account.account_type)}</p>
                     </div>
                   </div>
                   {!account.is_active && (
-                    <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded">
+                    <span className="px-2.5 py-1 text-xs font-semibold bg-slate-200 text-slate-700 rounded-lg">
                       {t('bank.inactive')}
                     </span>
                   )}
@@ -222,8 +228,8 @@ export default function BankPage() {
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-[#64748B]">{t('bank.currentBalance')}</span>
-                    <span className="text-lg font-bold text-[#0F172A]">
+                    <span className={`text-sm font-medium ${colors.text}`}>{t('bank.currentBalance')}</span>
+                    <span className="text-xl font-bold text-slate-900">
                       {new Intl.NumberFormat('es-ES', {
                         style: 'currency',
                         currency: account.currency || 'USD',
@@ -235,7 +241,8 @@ export default function BankPage() {
                 </div>
               </div>
             </Card>
-          ))}
+            )
+          })}
         </div>
       )}
 

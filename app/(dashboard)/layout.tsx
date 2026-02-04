@@ -87,41 +87,49 @@ export default function DashboardLayout({
   return (
     <BillingGuard>
     <ErrorBoundary moduleName="Dashboard">
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
       {/* Desktop Sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex grow flex-col overflow-y-auto bg-white border-r border-gray-200/60 px-4 py-4">
+        <div className="flex grow flex-col overflow-y-auto bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/50 px-4 py-6 shadow-2xl">
           {/* Branding */}
-          <div className="shrink-0 mb-8 pb-6 border-b border-[#E2E8F0]">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 bg-gradient-to-br from-[#0F172A] to-[#1E293B] rounded-lg">
-                <Sparkles className="h-4 w-4 text-white" />
+          <div className="shrink-0 mb-8 pb-6 border-b border-slate-700/50">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-xl shadow-lg shadow-blue-500/20">
+                <Sparkles className="h-5 w-5 text-white" />
               </div>
-              <h1 className="text-base font-semibold text-[#0F172A] tracking-tight">CasaPilot</h1>
+              <h1 className="text-lg font-bold text-white tracking-tight">CasaPilot</h1>
             </div>
           </div>
 
           {/* Navigation */}
-          <nav className="flex flex-1 flex-col space-y-2">
+          <nav className="flex flex-1 flex-col space-y-1.5">
             {navigation.map((item) => {
               if ('href' in item) {
                 // Single item
                 const active = isActive(item.href)
+                // Color mapping for icons
+                const iconColors: Record<string, string> = {
+                  '/dashboard': 'text-blue-400',
+                  '/calendario': 'text-purple-400',
+                  '/settings': 'text-slate-400',
+                }
+                const iconColor = iconColors[item.href] || 'text-slate-400'
+                
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`group relative flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-out ${
+                    className={`group relative flex items-center gap-x-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-300 ease-out ${
                       active
-                        ? 'bg-[#0F172A] text-white shadow-sm'
-                        : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30 scale-[1.02]'
+                        : 'text-slate-300 hover:text-white hover:bg-slate-700/50 hover:scale-[1.01]'
                     }`}
                   >
                     {active && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-r-full" />
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full shadow-sm" />
                     )}
-                    <item.icon className={`h-4.5 w-4.5 shrink-0 stroke-[1.5] ${
-                      active ? 'text-white' : 'text-[#64748B] group-hover:text-[#0F172A]'
+                    <item.icon className={`h-5 w-5 shrink-0 stroke-[1.5] transition-colors duration-300 ${
+                      active ? 'text-white' : `${iconColor} group-hover:text-white`
                     }`} />
                     <span className={active ? 'font-semibold' : ''}>{item.name}</span>
                   </Link>
@@ -131,38 +139,59 @@ export default function DashboardLayout({
                 const isExpanded = expandedSections.has(item.name)
                 const hasActiveChild = item.children.some(child => isActive(child.href))
                 
+                // Color mapping for sections
+                const sectionColors: Record<string, { text: string; bg: string; icon: string }> = {
+                  'Operación': { text: 'text-emerald-300', bg: 'bg-emerald-500/10', icon: 'text-emerald-400' },
+                  'Finanzas': { text: 'text-amber-300', bg: 'bg-amber-500/10', icon: 'text-amber-400' },
+                }
+                const sectionColor = sectionColors[item.name] || { text: 'text-slate-300', bg: 'bg-slate-700/30', icon: 'text-slate-400' }
+                
                 return (
-                  <div key={item.name} className="space-y-1">
+                  <div key={item.name} className="space-y-1.5">
                     <button
                       onClick={() => toggleSection(item.name)}
-                      className={`w-full flex items-center justify-between gap-x-2 rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
+                      className={`w-full flex items-center justify-between gap-x-2 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
                         hasActiveChild
-                          ? 'text-[#0F172A]'
-                          : 'text-[#94A3B8] hover:text-[#64748B]'
+                          ? `${sectionColor.text} ${sectionColor.bg}`
+                          : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700/30'
                       }`}
                     >
                       <span>{item.name}</span>
                       <ArrowRight
-                        className={`h-3 w-3 transition-transform duration-200 ${
+                        className={`h-3.5 w-3.5 transition-all duration-300 ${
                           isExpanded ? 'rotate-90' : ''
-                        }`}
+                        } ${hasActiveChild ? sectionColor.icon : 'text-slate-500'}`}
                       />
                     </button>
                     {isExpanded && (
-                      <div className="ml-2 space-y-0.5 border-l border-[#E2E8F0] pl-3">
+                      <div className="ml-2 space-y-1 border-l-2 border-slate-700/50 pl-3">
                         {item.children.map((child) => {
                           const active = isActive(child.href)
+                          // Icon colors for children
+                          const childIconColors: Record<string, string> = {
+                            '/maintenance': 'text-orange-400',
+                            '/inventory': 'text-blue-400',
+                            '/to-buy': 'text-purple-400',
+                            '/vendors': 'text-cyan-400',
+                            '/expenses': 'text-green-400',
+                            '/bank': 'text-emerald-400',
+                            '/reports': 'text-indigo-400',
+                          }
+                          const childIconColor = childIconColors[child.href] || 'text-slate-400'
+                          
                           return (
                             <Link
                               key={child.name}
                               href={child.href}
-                              className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
+                              className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm transition-all duration-300 ${
                                 active
-                                  ? 'text-[#0F172A] bg-[#F8FAFC] font-medium'
-                                  : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
+                                  ? 'text-white bg-gradient-to-r from-slate-700 to-slate-600 font-semibold shadow-md scale-[1.02]'
+                                  : 'text-slate-300 hover:text-white hover:bg-slate-700/50 hover:scale-[1.01]'
                               }`}
                             >
-                              <child.icon className="h-4 w-4 shrink-0 stroke-[1.5]" />
+                              <child.icon className={`h-4.5 w-4.5 shrink-0 stroke-[1.5] transition-colors duration-300 ${
+                                active ? 'text-white' : `${childIconColor} group-hover:text-white`
+                              }`} />
                               <span>{child.name}</span>
                             </Link>
                           )
@@ -176,12 +205,12 @@ export default function DashboardLayout({
           </nav>
 
           {/* User Menu at bottom */}
-          <div className="mt-auto pt-4 border-t border-gray-200/60">
+          <div className="mt-auto pt-4 border-t border-slate-700/50">
             <button
               onClick={handleLogout}
-              className="flex w-full items-center gap-x-2.5 rounded-lg px-3 py-2 text-sm font-medium text-[#64748B] hover:text-[#EF4444] hover:bg-[#F8FAFC] transition-all duration-150"
+              className="flex w-full items-center gap-x-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 hover:scale-[1.01]"
             >
-              <LogOut className="h-4 w-4 stroke-[1.5]" />
+              <LogOut className="h-4 w-4 stroke-[1.5] transition-colors duration-300" />
               <span>Cerrar Sesión</span>
             </button>
           </div>
@@ -189,12 +218,12 @@ export default function DashboardLayout({
       </div>
 
       {/* Mobile top bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200/60 z-40">
+      <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-slate-900 to-slate-800 border-b border-slate-700/50 z-40 shadow-lg">
         <div className="flex items-center justify-between h-14 px-4">
-          <h1 className="text-sm font-semibold text-[#0F172A]">CasaPilot</h1>
+          <h1 className="text-sm font-bold text-white">CasaPilot</h1>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-[#64748B] hover:text-[#0F172A] transition-colors"
+            className="text-slate-300 hover:text-white transition-colors"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -202,7 +231,7 @@ export default function DashboardLayout({
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="border-t border-gray-200/60 bg-white max-h-[calc(100vh-3.5rem)] overflow-y-auto">
+          <div className="border-t border-slate-700/50 bg-gradient-to-b from-slate-900 to-slate-800 max-h-[calc(100vh-3.5rem)] overflow-y-auto">
             <nav className="px-4 py-4 space-y-1">
               {navigation.map((item) => {
                 if ('href' in item) {
@@ -212,10 +241,10 @@ export default function DashboardLayout({
                       key={item.name}
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
+                      className={`flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-300 ${
                         active
-                          ? 'bg-[#F8FAFC] text-[#0F172A]'
-                          : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
+                          ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                          : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
                       }`}
                     >
                       <item.icon className="h-4 w-4 stroke-[1.5]" />
@@ -225,7 +254,7 @@ export default function DashboardLayout({
                 } else {
                   return (
                     <div key={item.name} className="space-y-1">
-                      <div className="px-3 py-2 text-xs font-semibold text-[#64748B] uppercase tracking-wide">
+                      <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wide">
                         {item.name}
                       </div>
                       {item.children.map((child) => {
@@ -235,10 +264,10 @@ export default function DashboardLayout({
                             key={child.name}
                             href={child.href}
                             onClick={() => setMobileMenuOpen(false)}
-                            className={`flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
+                            className={`flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-300 ${
                               active
-                                ? 'bg-[#2563EB]/10 text-[#2563EB]'
-                                : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
+                                ? 'bg-slate-700 text-white font-semibold'
+                                : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
                             }`}
                           >
                             <child.icon className="h-4 w-4 stroke-[1.5]" />
@@ -250,10 +279,10 @@ export default function DashboardLayout({
                   )
                 }
               })}
-              <div className="pt-4 mt-4 border-t border-gray-200/60">
+              <div className="pt-4 mt-4 border-t border-slate-700/50">
                 <button
                   onClick={handleLogout}
-                  className="flex w-full items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#EF4444] transition-all duration-150"
+                  className="flex w-full items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-red-500/10 hover:text-red-400 transition-all duration-300"
                 >
                   <LogOut className="h-4 w-4 stroke-[1.5]" />
                   <span>Cerrar Sesión</span>
@@ -267,8 +296,10 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className="lg:pl-64">
         <Header />
-        <main className="py-6 px-4 sm:px-6">
-          {children}
+        <main className="py-6 px-4 sm:px-6 min-h-screen">
+          <div className="page-soft">
+            {children}
+          </div>
         </main>
       </div>
     </div>

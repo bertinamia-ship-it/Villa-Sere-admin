@@ -8,10 +8,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants = {
-  primary: 'bg-[#0F172A] text-white hover:bg-[#1E293B] active:scale-[0.98] shadow-sm transition-all duration-200',
-  secondary: 'bg-white text-[#0F172A] border border-gray-200/60 hover:bg-gray-50 hover:border-gray-300/60 active:scale-[0.98] shadow-sm transition-all duration-200',
-  danger: 'bg-[#EF4444] hover:bg-[#DC2626] text-white active:scale-[0.98] shadow-sm transition-all duration-200',
-  ghost: 'bg-transparent hover:bg-gray-50 text-[#64748B] active:scale-[0.98] border border-transparent hover:border-gray-200/60 transition-all duration-200',
+  primary: 'bg-gradient-to-r from-slate-900 to-slate-800 text-white hover:from-slate-800 hover:to-slate-700 active:scale-[0.97] shadow-lg hover:shadow-xl transition-all duration-300 ease-out',
+  secondary: 'bg-white/90 backdrop-blur-sm text-slate-900 border border-slate-200/60 hover:bg-white hover:border-slate-300/60 hover:shadow-md active:scale-[0.97] transition-all duration-300 ease-out',
+  danger: 'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white active:scale-[0.97] shadow-lg hover:shadow-xl transition-all duration-300 ease-out',
+  ghost: 'bg-transparent hover:bg-slate-100/80 text-slate-600 hover:text-slate-900 active:scale-[0.97] border border-transparent hover:border-slate-200/60 transition-all duration-300 ease-out',
 }
 
 const sizes = {

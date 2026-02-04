@@ -222,70 +222,86 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      {/* Key Metrics - Clean, minimal */}
+      {/* Key Metrics - Colorful and animated */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Ingresos */}
-        <div className="bg-white border border-[#E2E8F0] rounded-lg p-5 hover:border-[#CBD5E1] transition-colors">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] font-medium text-[#64748B] uppercase tracking-wider">
+        <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200/50 rounded-xl p-6 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 ease-out">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
               {t('dashboard.income')}
             </p>
-            <div className="p-2 bg-[#2563EB]/10 rounded-md">
-              <ArrowUpRight className="h-4 w-4 text-[#2563EB]" />
+            <div className="p-2.5 bg-gradient-to-br from-emerald-500 to-green-500 rounded-lg shadow-md">
+              <ArrowUpRight className="h-5 w-5 text-white" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-[#0F172A] mb-1">
+          <p className="text-3xl font-bold text-emerald-900 mb-1">
             {monthIncome > 0 ? `$${monthIncome.toFixed(0)}` : '—'}
           </p>
-          <p className="text-xs text-[#64748B]">{t('dashboard.thisMonth')}</p>
+          <p className="text-xs font-medium text-emerald-700/70">{t('dashboard.thisMonth')}</p>
         </div>
 
         {/* Gastos */}
-        <div className="bg-white border border-[#E2E8F0] rounded-lg p-5 hover:border-[#CBD5E1] transition-colors">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] font-medium text-[#64748B] uppercase tracking-wider">
+        <div className="bg-gradient-to-br from-red-50 to-rose-50 border border-red-200/50 rounded-xl p-6 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 ease-out">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-[10px] font-bold text-red-700 uppercase tracking-wider">
               {t('dashboard.expenses')}
             </p>
-            <div className="p-2 bg-[#EF4444]/10 rounded-md">
-              <ArrowDownRight className="h-4 w-4 text-[#EF4444]" />
+            <div className="p-2.5 bg-gradient-to-br from-red-500 to-rose-500 rounded-lg shadow-md">
+              <ArrowDownRight className="h-5 w-5 text-white" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-[#0F172A] mb-1">
+          <p className="text-3xl font-bold text-red-900 mb-1">
             {monthTotal > 0 ? `$${monthTotal.toFixed(0)}` : '—'}
           </p>
-          <p className="text-xs text-[#64748B]">{t('dashboard.thisMonth')}</p>
+          <p className="text-xs font-medium text-red-700/70">{t('dashboard.thisMonth')}</p>
         </div>
 
         {/* Balance */}
-        <div className="bg-white border border-[#E2E8F0] rounded-lg p-5 hover:border-[#CBD5E1] transition-colors">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] font-medium text-[#64748B] uppercase tracking-wider">
+        <div className={`border rounded-xl p-6 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 ease-out ${
+          monthProfit >= 0 
+            ? 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200/50' 
+            : 'bg-gradient-to-br from-orange-50 to-amber-50 border-orange-200/50'
+        }`}>
+          <div className="flex items-center justify-between mb-4">
+            <p className={`text-[10px] font-bold uppercase tracking-wider ${
+              monthProfit >= 0 ? 'text-blue-700' : 'text-orange-700'
+            }`}>
               {t('dashboard.balance')}
             </p>
-            <div className={`p-2 rounded-md ${monthProfit >= 0 ? 'bg-[#10B981]/10' : 'bg-[#EF4444]/10'}`}>
-              <TrendingUp className={`h-4 w-4 ${monthProfit >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`} />
+            <div className={`p-2.5 rounded-lg shadow-md ${
+              monthProfit >= 0 
+                ? 'bg-gradient-to-br from-blue-500 to-indigo-500' 
+                : 'bg-gradient-to-br from-orange-500 to-amber-500'
+            }`}>
+              <TrendingUp className="h-5 w-5 text-white" />
             </div>
           </div>
-          <p className={`text-2xl font-bold mb-1 ${monthProfit >= 0 ? 'text-[#10B981]' : monthProfit < 0 ? 'text-[#EF4444]' : 'text-[#0F172A]'}`}>
+          <p className={`text-3xl font-bold mb-1 ${
+            monthProfit >= 0 ? 'text-blue-900' : 'text-orange-900'
+          }`}>
             {monthProfit !== 0 ? `$${Math.abs(monthProfit).toFixed(0)}` : '—'}
           </p>
-          <p className="text-xs text-[#64748B]">{t('dashboard.thisMonth')}</p>
+          <p className={`text-xs font-medium ${
+            monthProfit >= 0 ? 'text-blue-700/70' : 'text-orange-700/70'
+          }`}>
+            {t('dashboard.thisMonth')}
+          </p>
         </div>
 
         {/* Ocupación */}
-        <div className="bg-white border border-[#E2E8F0] rounded-lg p-5 hover:border-[#CBD5E1] transition-colors">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] font-medium text-[#64748B] uppercase tracking-wider">
+        <div className="bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200/50 rounded-xl p-6 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 ease-out">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-[10px] font-bold text-purple-700 uppercase tracking-wider">
               {t('dashboard.occupancy')}
             </p>
-            <div className="p-2 bg-[#8B5CF6]/10 rounded-md">
-              <Calendar className="h-4 w-4 text-[#8B5CF6]" />
+            <div className="p-2.5 bg-gradient-to-br from-purple-500 to-violet-500 rounded-lg shadow-md">
+              <Calendar className="h-5 w-5 text-white" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-[#0F172A] mb-1">
+          <p className="text-3xl font-bold text-purple-900 mb-1">
             {occupancyRate > 0 ? `${Math.round(occupancyRate)}%` : '0%'}
           </p>
-          <p className="text-xs text-[#64748B]">{t('dashboard.current')}</p>
+          <p className="text-xs font-medium text-purple-700/70">{t('dashboard.current')}</p>
         </div>
       </div>
 
@@ -296,7 +312,7 @@ export default async function DashboardPage() {
             <h2 className="text-lg font-semibold text-[#0F172A]">{t('dashboard.today')}</h2>
           </div>
 
-          <div className="bg-white border border-[#E2E8F0] rounded-lg divide-y divide-[#E2E8F0]">
+          <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-xl divide-y divide-slate-200/60 shadow-lg">
             {/* Check-ins */}
             {todayCheckIns.map(booking => (
               <Link
