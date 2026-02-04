@@ -12,6 +12,8 @@ import { buildExportFilename } from '@/lib/utils/download'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { Card } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
 import { t } from '@/lib/i18n/es'
 
 export default function ExpensesManager() {
