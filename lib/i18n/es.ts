@@ -632,6 +632,20 @@ export const es = {
     dangerousActions: 'Acciones Peligrosas',
     comingSoon: 'Más opciones de configuración próximamente',
   },
+
+  // Errors
+  errors: {
+    unknownError: 'Ocurrió un error desconocido',
+    notFound: 'No se encontró el recurso solicitado',
+    duplicateEntry: 'Este registro ya existe',
+    foreignKeyViolation: 'No se puede eliminar porque está en uso',
+    permissionDenied: 'No tienes permiso para realizar esta acción',
+    tableNotFound: 'Error de base de datos: tabla no encontrada',
+    networkError: 'Error de conexión. Verifica tu internet.',
+    validationError: 'Por favor completa todos los campos requeridos',
+    propertyRequired: 'Por favor selecciona una propiedad primero',
+    tenantRequired: 'Error: No se encontró tenant_id. Contacta soporte.',
+  },
 }
 
 // Helper function para acceder a traducciones con interpolación
@@ -660,21 +674,6 @@ export function t(key: string, params?: Record<string, any>): string {
   }
   
   return value
-}
-
-  // Errors
-  errors: {
-    unknownError: 'Ocurrió un error desconocido',
-    notFound: 'No se encontró el recurso solicitado',
-    duplicateEntry: 'Este registro ya existe',
-    foreignKeyViolation: 'No se puede eliminar porque está en uso',
-    permissionDenied: 'No tienes permiso para realizar esta acción',
-    tableNotFound: 'Error de base de datos: tabla no encontrada',
-    networkError: 'Error de conexión. Verifica tu internet.',
-    validationError: 'Por favor completa todos los campos requeridos',
-    propertyRequired: 'Por favor selecciona una propiedad primero',
-    tenantRequired: 'Error: No se encontró tenant_id. Contacta soporte.',
-  },
 }
 
 // Export default para uso directo
