@@ -218,7 +218,7 @@ export default function VendorForm({ vendor, onClose }: VendorFormProps) {
               onClick={onClose}
               className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition"
             >
-              {t('vendors.cancel')}
+              {t('common.cancel')}
             </button>
           </div>
         </form>
