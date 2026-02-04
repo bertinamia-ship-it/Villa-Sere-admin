@@ -60,7 +60,7 @@ export default function RentalsPage() {
       await Promise.all([loadBookings(), loadMonthlyStats()])
     } catch (error) {
       console.error('Error loading data:', error)
-      showToast('Error al cargar datos', 'error')
+      showToast(t('rentals.loadError'), 'error')
     } finally {
       setLoading(false)
     }

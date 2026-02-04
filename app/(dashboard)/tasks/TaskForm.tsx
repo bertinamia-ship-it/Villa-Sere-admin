@@ -48,20 +48,20 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
 
     const propertyId = await getActivePropertyId()
     if (!propertyId) {
-      showToast('Por favor selecciona una propiedad primero', 'error')
+      showToast(t('tasks.propertyRequired'), 'error')
       setLoading(false)
       return
     }
 
     // Validations
     if (!formData.title.trim()) {
-      showToast('El título es requerido', 'error')
+      showToast(t('tasks.titleRequired'), 'error')
       setLoading(false)
       return
     }
 
     if (formData.cadence === 'once' && !formData.due_date) {
-      showToast('La fecha es requerida para tareas de una vez', 'error')
+      showToast(t('tasks.dateRequiredForOnce'), 'error')
       setLoading(false)
       return
     }
@@ -70,7 +70,7 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
       // Get tenant_id
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        showToast('Error: Usuario no encontrado', 'error')
+        showToast(t('tasks.userNotFound'), 'error')
         setLoading(false)
         return
       }
@@ -82,7 +82,7 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
         .maybeSingle()
 
       if (!profile?.tenant_id) {
-        showToast('Error: No se encontró tenant_id', 'error')
+        showToast(t('tasks.tenantNotFound'), 'error')
         setLoading(false)
         return
       }
@@ -95,7 +95,7 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
       if (formData.cadence === 'once') {
         // Once: use due_date
         if (!formData.due_date) {
-          showToast('La fecha de vencimiento es requerida para tareas de una vez', 'error')
+          showToast(t('tasks.dueDateRequiredForOnce'), 'error')
           setLoading(false)
           return
         }
@@ -103,7 +103,7 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
       } else {
         // Recurrent: calculate using helper
         if (!formData.start_date) {
-          showToast('La fecha de inicio es requerida para tareas recurrentes', 'error')
+          showToast(t('tasks.startDateRequiredForRecurrent'), 'error')
           setLoading(false)
           return
         }
@@ -112,7 +112,7 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
 
       // Validate interval/frequency for recurrent tasks
       if (formData.cadence !== 'once' && !formData.start_date) {
-        showToast('La fecha de inicio es requerida para tareas recurrentes', 'error')
+        showToast(t('tasks.startDateRequiredForRecurrent'), 'error')
         setLoading(false)
         return
       }

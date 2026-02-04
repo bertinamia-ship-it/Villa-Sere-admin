@@ -44,19 +44,19 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
 
     // Validation
     if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      showToast('El monto debe ser mayor que 0', 'error')
+      showToast(t('errors.amountGreaterThanZero'), 'error')
       setLoading(false)
       return
     }
 
     if (!formData.date) {
-      showToast('La fecha es requerida', 'error')
+      showToast(t('errors.dateRequired'), 'error')
       setLoading(false)
       return
     }
 
     if (!formData.category) {
-      showToast('La categoría es requerida', 'error')
+      showToast(t('errors.categoryRequired'), 'error')
       setLoading(false)
       return
     }

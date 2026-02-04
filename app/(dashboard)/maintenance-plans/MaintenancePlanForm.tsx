@@ -39,27 +39,27 @@ export default function MaintenancePlanForm({ plan, template, vendors, onClose }
 
     const propertyId = await getActivePropertyId()
     if (!propertyId) {
-      showToast('Por favor selecciona una propiedad primero', 'error')
+      showToast(t('maintenancePlans.propertyRequired'), 'error')
       setLoading(false)
       return
     }
 
     // Validations
     if (!formData.title.trim()) {
-      showToast('El título es requerido', 'error')
+      showToast(t('maintenancePlans.titleRequired'), 'error')
       setLoading(false)
       return
     }
 
     if (!formData.next_run_date) {
-      showToast('La próxima fecha es requerida', 'error')
+      showToast(t('maintenancePlans.nextRunDateRequired'), 'error')
       setLoading(false)
       return
     }
 
     const interval = formData.is_recurrent ? parseInt(formData.frequency_interval) : 0
     if (formData.is_recurrent && (isNaN(interval) || interval <= 0)) {
-      showToast('El intervalo debe ser mayor que 0', 'error')
+      showToast(t('maintenancePlans.intervalGreaterThanZero'), 'error')
       setLoading(false)
       return
     }
@@ -68,7 +68,7 @@ export default function MaintenancePlanForm({ plan, template, vendors, onClose }
       // Get tenant_id
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        showToast('Error: Usuario no encontrado', 'error')
+        showToast(t('maintenancePlans.userNotFound'), 'error')
         setLoading(false)
         return
       }
@@ -80,7 +80,7 @@ export default function MaintenancePlanForm({ plan, template, vendors, onClose }
         .maybeSingle()
 
       if (!profile?.tenant_id) {
-        showToast('Error: No se encontró tenant_id', 'error')
+        showToast(t('maintenancePlans.tenantNotFound'), 'error')
         setLoading(false)
         return
       }
@@ -90,7 +90,7 @@ export default function MaintenancePlanForm({ plan, template, vendors, onClose }
 
       // If recurrent, ensure we have valid frequency_unit and frequency_interval
       if (formData.is_recurrent && (!formData.frequency_unit || interval <= 0)) {
-        showToast('Para mantenimientos recurrentes, el intervalo debe ser mayor que 0', 'error')
+        showToast(t('maintenancePlans.intervalGreaterThanZeroForRecurrent'), 'error')
         setLoading(false)
         return
       }

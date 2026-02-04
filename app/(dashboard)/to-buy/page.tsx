@@ -48,7 +48,7 @@ export default function ToBuyPage() {
       setItems(data || [])
     } catch (error) {
       console.error('Error loading items:', error)
-      showToast('Error al cargar items', 'error')
+      showToast(t('toBuy.loadError'), 'error')
     } finally {
       setLoading(false)
     }
@@ -126,7 +126,7 @@ export default function ToBuyPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('¿Estás seguro de que quieres eliminar este artículo?')) return
+    if (!confirm(t('toBuy.confirmDelete'))) return
 
     try {
       const propertyId = await getActivePropertyId()

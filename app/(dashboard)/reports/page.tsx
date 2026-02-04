@@ -77,7 +77,7 @@ export default function ReportsPage() {
       ])
     } catch (error) {
       console.error('Error loading reports:', error)
-      showToast('Error al cargar reportes', 'error')
+      showToast(t('reports.loadError'), 'error')
     } finally {
       setLoading(false)
     }

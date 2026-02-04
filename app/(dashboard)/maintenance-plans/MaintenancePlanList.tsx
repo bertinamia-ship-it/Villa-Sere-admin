@@ -127,7 +127,7 @@ export default function MaintenancePlanList() {
     setCompletingPlanId(planId)
     const propertyId = await getActivePropertyId()
     if (!propertyId) {
-      showToast('Por favor selecciona una propiedad primero', 'error')
+      showToast(t('maintenancePlans.propertyRequired'), 'error')
       setCompletingPlanId(null)
       return
     }
@@ -150,7 +150,7 @@ export default function MaintenancePlanList() {
         .maybeSingle()
       
       if (!profile?.tenant_id) {
-        showToast('Error: No se encontró tenant_id', 'error')
+        showToast(t('maintenancePlans.tenantNotFound'), 'error')
         setCompletingPlanId(null)
         return
       }
@@ -216,7 +216,7 @@ export default function MaintenancePlanList() {
       }
 
       if (shouldDeactivate) {
-        showToast('Listo. Se archivó porque no es recurrente.', 'success')
+        showToast(t('maintenancePlans.archivedNonRecurrent'), 'success')
       } else {
         showToast(t('maintenancePlans.planCompleted'), 'success')
       }
@@ -234,7 +234,7 @@ export default function MaintenancePlanList() {
     setCreatingTicketPlanId(plan.id)
     const propertyId = await getActivePropertyId()
     if (!propertyId) {
-      showToast('Por favor selecciona una propiedad primero', 'error')
+      showToast(t('maintenancePlans.propertyRequired'), 'error')
       setCreatingTicketPlanId(null)
       return
     }
@@ -250,7 +250,7 @@ export default function MaintenancePlanList() {
         .maybeSingle()
 
       if (!profile?.tenant_id) {
-        showToast('Error: No se encontró tenant_id', 'error')
+        showToast(t('maintenancePlans.tenantNotFound'), 'error')
         setCreatingTicketPlanId(null)
         return
       }

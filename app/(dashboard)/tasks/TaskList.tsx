@@ -110,7 +110,7 @@ export default function TaskList() {
     setCompletingTaskId(taskId)
     const propertyId = await getActivePropertyId()
     if (!propertyId) {
-      showToast('Por favor selecciona una propiedad primero', 'error')
+      showToast(t('tasks.propertyRequired'), 'error')
       setCompletingTaskId(null)
       return
     }
@@ -133,7 +133,7 @@ export default function TaskList() {
         .maybeSingle()
       
       if (!profile?.tenant_id) {
-        showToast('Error: No se encontró tenant_id', 'error')
+        showToast(t('tasks.tenantNotFound'), 'error')
         setCompletingTaskId(null)
         return
       }

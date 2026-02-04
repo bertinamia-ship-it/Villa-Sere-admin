@@ -25,7 +25,7 @@ export default function CSVImport() {
     if (!file) return
 
     if (!file.name.endsWith('.csv')) {
-      showToast('Por favor sube un archivo CSV', 'error')
+      showToast(t('errors.csvUploadRequired'), 'error')
       return
     }
 
