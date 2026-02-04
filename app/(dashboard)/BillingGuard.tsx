@@ -15,70 +15,67 @@ export default function BillingGuard({ children }: { children: React.ReactNode }
   const [trialExpired, setTrialExpired] = useState(false)
 
   useEffect(() => {
-    checkSubscription()
-  }, [])
+    async function checkSubscription() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+          router.push('/login')
+          return
+        }
 
-  async function checkSubscription() {
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push('/login')
-        return
-      }
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('tenant_id')
+          .eq('id', user.id)
+          .maybeSingle()
 
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('tenant_id')
-        .eq('id', user.id)
-        .maybeSingle()
+        if (profileError) {
+          console.error('[BillingGuard] Error fetching profile:', {
+            message: profileError.message,
+            details: profileError.details,
+            hint: profileError.hint,
+            code: profileError.code
+          })
+          setLoading(false)
+          return
+        }
 
-      if (profileError) {
-        console.error('[BillingGuard] Error fetching profile:', {
-          message: profileError.message,
-          details: profileError.details,
-          hint: profileError.hint,
-          code: profileError.code
-        })
+        if (!profile || !profile.tenant_id) {
+          console.warn('[BillingGuard] No profile or tenant_id found')
+          setLoading(false)
+          return
+        }
+
+        const { data: tenant } = await supabase
+          .from('tenants')
+          .select('subscription_status, trial_ends_at')
+          .eq('id', profile.tenant_id)
+          .single()
+
+        if (!tenant) {
+          setLoading(false)
+          return
+        }
+
+        // Check if active
+        const active = tenant.subscription_status === 'active' || 
+          (tenant.subscription_status === 'trial' && 
+           (!tenant.trial_ends_at || new Date(tenant.trial_ends_at) > new Date()))
+
+        setIsActive(active)
+        setTrialExpired(tenant.subscription_status === 'trial' && 
+                       tenant.trial_ends_at && 
+                       new Date(tenant.trial_ends_at) <= new Date())
+      } catch (error) {
+        console.error('Error checking subscription:', error)
+      } finally {
         setLoading(false)
-        return
       }
-
-      if (!profile || !profile.tenant_id) {
-        console.warn('[BillingGuard] No profile or tenant_id found')
-        setLoading(false)
-        return
-      }
-
-      const { data: tenant } = await supabase
-        .from('tenants')
-        .select('subscription_status, trial_ends_at')
-        .eq('id', profile.tenant_id)
-        .single()
-
-      if (!tenant) {
-        setLoading(false)
-        return
-      }
-
-      // Check if active
-      const active = tenant.subscription_status === 'active' || 
-        (tenant.subscription_status === 'trial' && 
-         (!tenant.trial_ends_at || new Date(tenant.trial_ends_at) > new Date()))
-
-      setIsActive(active)
-      setTrialExpired(tenant.subscription_status === 'trial' && 
-                     tenant.trial_ends_at && 
-                     new Date(tenant.trial_ends_at) <= new Date())
-    } catch (error) {
-      console.error('Error checking subscription:', error)
-    } finally {
-      setLoading(false)
     }
-  }
 
-  useEffect(() => {
     checkSubscription()
-  }, [checkSubscription])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if (loading) {
     return (

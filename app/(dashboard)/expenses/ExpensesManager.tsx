@@ -249,25 +249,28 @@ export default function ExpensesManager() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('expenses.title')}</h1>
-          <p className="text-sm text-[#64748B] mt-1.5">
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('expenses.title')}</h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-1.5">
             {expenses.length === 0 
               ? t('expenses.emptyTitle')
               : t('expenses.totalExpenses', { count: expenses.length })}
           </p>
         </div>
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <Button
             variant="secondary"
             size="sm"
             onClick={exportToCSV}
+            className="min-h-[44px] sm:min-h-0"
           >
             <Download className="h-4 w-4" />
-            {t('expenses.exportCSV')}
+            <span className="hidden sm:inline">{t('expenses.exportCSV')}</span>
+            <span className="sm:hidden">CSV</span>
           </Button>
           <Button
             size="sm"
             onClick={() => setShowForm(true)}
+            className="min-h-[44px] sm:min-h-0"
           >
             <Plus className="h-4 w-4" />
             {t('expenses.addExpense')}
@@ -277,14 +280,14 @@ export default function ExpensesManager() {
 
       {/* Month Selector */}
       <Card padding="md">
-        <label className="block text-xs font-medium text-[#64748B] uppercase tracking-wide mb-3">
+        <label className="block text-xs font-medium text-slate-600 uppercase tracking-wide mb-3">
           {t('expenses.selectMonth')}
         </label>
         <input
           type="month"
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(e.target.value)}
-          className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#0F172A] bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+          className="w-full border border-slate-200/60 rounded-lg px-3.5 py-3 text-base sm:text-sm text-slate-900 bg-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all min-h-[44px] sm:min-h-0"
         />
       </Card>
 

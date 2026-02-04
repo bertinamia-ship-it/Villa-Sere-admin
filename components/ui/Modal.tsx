@@ -102,7 +102,7 @@ export function Modal({
     <Portal>
       <div
         ref={overlayRef}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity duration-200 ease-out"
+        className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-200 ease-out safe-area-y"
         onClick={handleOverlayClick}
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}
@@ -111,19 +111,19 @@ export function Modal({
         <div
           ref={modalRef}
           className={`
-            bg-white rounded-lg shadow-2xl border border-[#E5E7EB]
+            bg-white rounded-t-2xl sm:rounded-xl shadow-2xl border-t sm:border border-slate-200/60
             w-full ${sizes[size]}
-            max-h-[90vh] overflow-y-auto
-            transform transition-all duration-200 ease-out
-            animate-modal-enter
+            h-[95vh] sm:h-auto sm:max-h-[90vh] overflow-hidden
+            transform transition-all duration-300 ease-out
+            flex flex-col
             ${className}
           `}
           onClick={(e) => e.stopPropagation()}
         >
           {(title || showCloseButton) && (
-            <div className="flex items-center justify-between p-6 border-b border-[#E5E7EB]">
+            <div className="flex items-center justify-between px-4 py-3 sm:p-6 border-b border-slate-200/60 shrink-0 safe-area-top safe-area-x">
               {title && (
-                <h2 id="modal-title" className="text-xl font-semibold text-slate-900">
+                <h2 id="modal-title" className="text-lg sm:text-xl font-semibold text-slate-900">
                   {typeof title === 'string' ? title : title}
                 </h2>
               )}
@@ -132,15 +132,15 @@ export function Modal({
                   variant="ghost"
                   size="sm"
                   onClick={onClose}
-                  className="ml-auto -mr-2"
-                  aria-label="Close modal"
+                  className="ml-auto -mr-2 min-w-[44px] min-h-[44px]"
+                  aria-label="Cerrar"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-5 w-5" />
                 </Button>
               )}
             </div>
           )}
-          <div className={title || showCloseButton ? 'p-6' : 'p-6'}>
+          <div className={`flex-1 overflow-y-auto ${title || showCloseButton ? 'px-4 py-4 sm:p-6' : 'p-4 sm:p-6'} safe-area-x safe-area-bottom`}>
             {children}
           </div>
         </div>

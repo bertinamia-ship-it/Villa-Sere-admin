@@ -20,15 +20,16 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         <select
           ref={ref}
           className={`
-            w-full px-3 py-2 
-            text-[#0F172A] placeholder-[#64748B]
-            bg-white border border-[#E2E8F0] rounded-md
+            w-full px-3.5 sm:px-3 py-3 sm:py-2.5
+            text-base sm:text-sm text-slate-900
+            bg-white border border-slate-200/60 rounded-lg sm:rounded-md
             transition-all duration-150 ease-out
-            focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] focus:shadow-sm
-            hover:border-[#CBD5E1]
-            disabled:bg-[#F8FAFC] disabled:text-[#64748B] disabled:cursor-not-allowed
-            autofill:!text-[#0F172A] autofill:!bg-white
-            ${error ? 'border-[#EF4444] focus:ring-[#EF4444]/30' : ''}
+            focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 focus:shadow-sm
+            hover:border-slate-300/60
+            disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed
+            autofill:!text-slate-900 autofill:!bg-white
+            min-h-[44px] sm:min-h-0
+            ${error ? 'border-red-500 focus:ring-red-500/30' : ''}
             ${className}
           `}
           {...props}

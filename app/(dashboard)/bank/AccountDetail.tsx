@@ -203,62 +203,105 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
           />
         </Card>
       ) : (
-        <Card padding="none">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-[#64748B] uppercase tracking-wider">
-                    {t('bank.transactionDate')}
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-[#64748B] uppercase tracking-wider">
-                    {t('bank.direction')}
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-[#64748B] uppercase tracking-wider">
-                    {t('bank.amount')}
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-[#64748B] uppercase tracking-wider">
-                    {t('bank.transactionNote')}
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-[#64748B] uppercase tracking-wider">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#E2E8F0]">
-                {transactions.map(transaction => (
-                  <tr key={transaction.id} className="hover:bg-[#F8FAFC]/50 transition-colors">
-                    <td className="px-4 py-3 text-sm text-[#0F172A]">{formatDate(transaction.transaction_date)}</td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+        <>
+          {/* Desktop Table View */}
+          <Card padding="none" className="hidden md:block">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-slate-50/80 border-b border-slate-200/60">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
+                      {t('bank.transactionDate')}
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
+                      {t('bank.direction')}
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-600 uppercase tracking-wider">
+                      {t('bank.amount')}
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
+                      {t('bank.transactionNote')}
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-600 uppercase tracking-wider">
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200/60">
+                  {transactions.map(transaction => (
+                    <tr key={transaction.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-4 py-3 text-sm text-slate-900">{formatDate(transaction.transaction_date)}</td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          transaction.direction === 'in'
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-red-100 text-red-700'
+                        }`}>
+                          {transaction.direction === 'in' ? t('bank.directionIn') : t('bank.directionOut')}
+                        </span>
+                      </td>
+                      <td className={`px-4 py-3 text-sm font-semibold text-right ${
+                        transaction.direction === 'in' ? 'text-emerald-700' : 'text-red-700'
+                      }`}>
+                        {transaction.direction === 'in' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-slate-600">{transaction.note || '—'}</td>
+                      <td className="px-4 py-3 text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeleteConfirm({ isOpen: true, transactionId: transaction.id })}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-600" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-3">
+            {transactions.map(transaction => (
+              <Card key={transaction.id} padding="md" className="hover:shadow-lg transition-all duration-300">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium text-slate-900">{formatDate(transaction.transaction_date)}</span>
+                      <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${
                         transaction.direction === 'in'
-                          ? 'bg-[#10B981]/10 text-[#10B981]'
-                          : 'bg-[#EF4444]/10 text-[#EF4444]'
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-red-100 text-red-700'
                       }`}>
                         {transaction.direction === 'in' ? t('bank.directionIn') : t('bank.directionOut')}
                       </span>
-                    </td>
-                    <td className={`px-4 py-3 text-sm font-semibold text-right ${
-                      transaction.direction === 'in' ? 'text-[#10B981]' : 'text-[#EF4444]'
-                    }`}>
-                      {transaction.direction === 'in' ? '+' : '-'}{formatCurrency(transaction.amount)}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-[#64748B]">{transaction.note || '—'}</td>
-                    <td className="px-4 py-3 text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setDeleteConfirm({ isOpen: true, transactionId: transaction.id })}
-                      >
-                        <Trash2 className="h-4 w-4 text-[#EF4444]" />
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <p className={`text-lg font-bold ${
+                        transaction.direction === 'in' ? 'text-emerald-700' : 'text-red-700'
+                      }`}>
+                        {transaction.direction === 'in' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                      </p>
+                    </div>
+                    {transaction.note && (
+                      <p className="text-sm text-slate-600 pt-2 border-t border-slate-200">{transaction.note}</p>
+                    )}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDeleteConfirm({ isOpen: true, transactionId: transaction.id })}
+                    className="shrink-0 min-w-[44px] min-h-[44px]"
+                  >
+                    <Trash2 className="h-5 w-5 text-red-600" />
+                  </Button>
+                </div>
+              </Card>
+            ))}
           </div>
-        </Card>
+        </>
       )}
 
       {showTransactionForm && (

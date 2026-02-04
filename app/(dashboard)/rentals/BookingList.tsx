@@ -93,22 +93,22 @@ export default function BookingList({ bookings, onEdit, onDelete }: BookingListP
               )}
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 shrink-0">
               <Button
                 size="sm"
                 variant="ghost"
                 onClick={() => onEdit(booking)}
-                className="hover:bg-[#2563EB]/10 hover:text-[#2563EB]"
+                className="hover:bg-blue-50 hover:text-blue-600 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0"
               >
-                <Edit className="h-4 w-4" />
+                <Edit className="h-5 w-5 sm:h-4 sm:w-4" />
               </Button>
               <Button
                 size="sm"
                 variant="ghost"
                 onClick={() => onDelete(booking.id)}
-                className="hover:bg-[#EF4444]/10 hover:text-[#EF4444]"
+                className="hover:bg-red-50 hover:text-red-600 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-5 w-5 sm:h-4 sm:w-4" />
               </Button>
             </div>
           </div>

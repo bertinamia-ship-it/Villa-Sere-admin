@@ -164,12 +164,12 @@ export default function MaintenanceList() {
 
   if (loading) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('maintenance.title')}</h1>
-          <p className="text-sm text-[#64748B] mt-1.5">{t('maintenance.subtitle')}</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('maintenance.title')}</h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-1.5">{t('maintenance.subtitle')}</p>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i} padding="md">
               <Skeleton variant="rectangular" height={120} className="rounded-lg" />
@@ -182,10 +182,10 @@ export default function MaintenanceList() {
 
   if (!hasProperty) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('maintenance.title')}</h1>
-          <p className="text-sm text-[#64748B] mt-1.5">{t('maintenance.subtitle')}</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('maintenance.title')}</h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-1.5">{t('maintenance.subtitle')}</p>
         </div>
         <Card padding="lg">
           <EmptyState
@@ -199,12 +199,12 @@ export default function MaintenanceList() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('maintenance.title')}</h1>
-          <p className="text-sm text-[#64748B] mt-1.5">{t('maintenance.subtitle')}</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('maintenance.title')}</h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-1.5">{t('maintenance.subtitle')}</p>
         </div>
         {activeTab === 'tickets' && (
           <Button
@@ -213,6 +213,7 @@ export default function MaintenanceList() {
               setShowForm(true)
             }}
             size="sm"
+            className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
           >
             <Plus className="h-4 w-4" />
             {t('maintenance.newTicket')}

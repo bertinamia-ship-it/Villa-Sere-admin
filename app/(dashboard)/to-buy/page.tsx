@@ -408,17 +408,19 @@ export default function ToBuyPage() {
 
       {/* Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <PurchaseItemForm
-              item={editingItem}
-              areas={areas}
-              onSave={handleSave}
-              onCancel={() => {
-                setShowForm(false)
-                setEditingItem(null)
-              }}
-            />
+        <div className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 backdrop-blur-sm safe-area-y">
+          <div className="bg-white rounded-t-2xl sm:rounded-xl max-w-2xl w-full h-[95vh] sm:h-auto sm:max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border-t sm:border border-slate-200/60">
+            <div className="flex-1 overflow-y-auto safe-area-x">
+              <PurchaseItemForm
+                item={editingItem}
+                areas={areas}
+                onSave={handleSave}
+                onCancel={() => {
+                  setShowForm(false)
+                  setEditingItem(null)
+                }}
+              />
+            </div>
           </div>
         </div>
       )}

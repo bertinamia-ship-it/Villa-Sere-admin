@@ -206,26 +206,26 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
         />
 
         <div>
-          <label className="block text-xs font-medium text-[#0F172A] mb-1.5">
+          <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1.5">
             {t('tasks.taskDescription')}
           </label>
           <textarea
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-3 py-2 text-sm text-[#0F172A] placeholder-[#64748B] bg-white border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+            className="w-full px-3.5 sm:px-3 py-3 sm:py-2.5 text-base sm:text-sm text-slate-900 placeholder-slate-500 bg-white border border-slate-200/60 rounded-lg sm:rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all resize-none"
             rows={3}
             placeholder="Descripción opcional de la tarea"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-[#0F172A] mb-1.5">
+          <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1.5">
             {t('tasks.taskType')} *
           </label>
           <select
             value={formData.cadence}
             onChange={(e) => setFormData({ ...formData, cadence: e.target.value as 'once' | 'daily' | 'weekly' | 'monthly' | 'yearly' })}
-            className="w-full px-3 py-2 text-sm text-[#0F172A] bg-white border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+            className="w-full px-3.5 sm:px-3 py-3 sm:py-2.5 text-base sm:text-sm text-slate-900 bg-white border border-slate-200/60 rounded-lg sm:rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all min-h-[44px] sm:min-h-0"
             required
           >
             {CADENCE_OPTIONS.map(option => (
@@ -252,15 +252,15 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
           />
         )}
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-[#0F172A] mb-1.5">
+            <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1.5">
               {t('tasks.priority')}
             </label>
             <select
               value={formData.priority}
               onChange={(e) => setFormData({ ...formData, priority: e.target.value as 'low' | 'medium' | 'high' | 'urgent' })}
-              className="w-full px-3 py-2 text-sm text-[#0F172A] bg-white border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+              className="w-full px-3.5 sm:px-3 py-3 sm:py-2.5 text-base sm:text-sm text-slate-900 bg-white border border-slate-200/60 rounded-lg sm:rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all min-h-[44px] sm:min-h-0"
             >
               {PRIORITIES.map(p => (
                 <option key={p} value={p}>{PRIORITY_LABELS[p]}</option>
@@ -269,13 +269,13 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#0F172A] mb-1.5">
+            <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1.5">
               {t('tasks.status')}
             </label>
             <select
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value as 'pending' | 'in_progress' | 'done' })}
-              className="w-full px-3 py-2 text-sm text-[#0F172A] bg-white border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+              className="w-full px-3.5 sm:px-3 py-3 sm:py-2.5 text-base sm:text-sm text-slate-900 bg-white border border-slate-200/60 rounded-lg sm:rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all min-h-[44px] sm:min-h-0"
             >
               {(['pending', 'in_progress', 'done'] as const).map((status) => (
                 <option key={status} value={status}>{getStatusLabel(status)}</option>
@@ -284,13 +284,13 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
           </div>
         </div>
 
-        <div className="flex gap-2 pt-4">
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <Button
             type="button"
             variant="secondary"
             onClick={onClose}
             disabled={loading}
-            className="flex-1"
+            className="flex-1 min-h-[44px] sm:min-h-0"
           >
             {t('common.cancel')}
           </Button>
@@ -298,7 +298,7 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
             type="submit"
             loading={loading}
             disabled={loading}
-            className="flex-1"
+            className="flex-1 min-h-[44px] sm:min-h-0"
           >
             {t('common.save')}
           </Button>

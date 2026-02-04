@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/Loading'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/Toast'
-import { Calendar as CalendarIcon, Plus, DollarSign, TrendingUp, Percent } from 'lucide-react'
+import { Calendar as CalendarIcon, Plus, DollarSign, TrendingUp, Percent, X } from 'lucide-react'
 import BookingForm from './BookingForm'
 import BookingList from './BookingList'
 import BookingCalendar from './BookingCalendar'
@@ -303,18 +303,18 @@ export default function RentalsPage() {
 
   return (
     <>
-      <div className="max-w-7xl mx-auto space-y-8 px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8 px-4 sm:px-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('rentals.title')}</h1>
-          <p className="text-sm text-[#64748B] mt-1.5">{t('rentals.subtitle')}</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('rentals.title')}</h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-1.5">{t('rentals.subtitle')}</p>
         </div>
         <Button 
           onClick={() => {
             setEditingBooking(null)
             setShowForm(true)
           }}
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
         >
           <Plus className="h-4 w-4" />
           {t('rentals.addBooking')}
@@ -418,16 +418,33 @@ export default function RentalsPage() {
 
       {/* Booking Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl border border-[#E2E8F0]">
-            <BookingForm
-              booking={editingBooking}
-              onSave={handleSave}
-              onCancel={() => {
-                setShowForm(false)
-                setEditingBooking(null)
-              }}
-            />
+        <div className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 backdrop-blur-sm safe-area-y">
+          <div className="bg-white rounded-t-2xl sm:rounded-xl max-w-2xl w-full h-[95vh] sm:h-auto sm:max-h-[90vh] overflow-y-auto shadow-2xl border-t sm:border border-slate-200/60 flex flex-col">
+            <div className="sticky top-0 bg-white border-b border-slate-200/60 px-4 py-3 flex items-center justify-between z-10 safe-area-top">
+              <h2 className="text-lg font-semibold text-slate-900">
+                {editingBooking ? 'Editar Reserva' : 'Nueva Reserva'}
+              </h2>
+              <button
+                onClick={() => {
+                  setShowForm(false)
+                  setEditingBooking(null)
+                }}
+                className="p-2 -mr-2 text-slate-500 hover:text-slate-900 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                aria-label="Cerrar"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-4 py-4 safe-area-x">
+              <BookingForm
+                booking={editingBooking}
+                onSave={handleSave}
+                onCancel={() => {
+                  setShowForm(false)
+                  setEditingBooking(null)
+                }}
+              />
+            </div>
           </div>
         </div>
       )}

@@ -139,10 +139,10 @@ export default function BankPage() {
 
   if (loading) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('bank.title')}</h1>
-          <p className="text-sm text-[#64748B] mt-1.5">{t('bank.subtitle')}</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('bank.title')}</h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-1.5">{t('bank.subtitle')}</p>
         </div>
         <LoadingSpinner />
       </div>
@@ -162,16 +162,19 @@ export default function BankPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 sm:space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('bank.title')}</h1>
-          <p className="text-sm text-[#64748B] mt-1.5">{t('bank.subtitle')}</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('bank.title')}</h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-1.5">{t('bank.subtitle')}</p>
         </div>
-        <Button onClick={() => {
-          setEditingAccount(null)
-          setShowForm(true)
-        }}>
+        <Button 
+          onClick={() => {
+            setEditingAccount(null)
+            setShowForm(true)
+          }}
+          className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
+        >
           <Plus className="h-4 w-4" />
           {t('bank.newAccount')}
         </Button>
