@@ -117,15 +117,9 @@ export default function MaintenancePlanForm({ plan, template, vendors, onClose }
         const { error } = await updateWithPropertyClient('maintenance_plans', plan.id, dataToSave)
 
         if (error) {
-          console.error('Error updating plan:', error, {
-            message: (error as any)?.message,
-            details: (error as any)?.details,
-            hint: (error as any)?.hint,
-            code: (error as any)?.code,
-            status: (error as any)?.status
-          })
-          const errorMsg = (error as any)?.message || t('maintenancePlans.saveError')
-          showToast(errorMsg, 'error')
+          const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+          logError('MaintenancePlanForm.update', error)
+          showToast(getUserFriendlyError(error), 'error')
         } else {
           showToast(t('maintenancePlans.planSaved'), 'success')
           onClose()
@@ -135,23 +129,18 @@ export default function MaintenancePlanForm({ plan, template, vendors, onClose }
         const { error } = await insertWithPropertyClient('maintenance_plans', dataToSave)
 
         if (error) {
-          console.error('Error creating plan:', error, {
-            message: (error as any)?.message,
-            details: (error as any)?.details,
-            hint: (error as any)?.hint,
-            code: (error as any)?.code,
-            status: (error as any)?.status
-          })
-          const errorMsg = (error as any)?.message || t('maintenancePlans.saveError')
-          showToast(errorMsg, 'error')
+          const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+          logError('MaintenancePlanForm.insert', error)
+          showToast(getUserFriendlyError(error), 'error')
         } else {
           showToast(t('maintenancePlans.planSaved'), 'success')
           onClose()
         }
       }
     } catch (error) {
-      console.error('Error saving plan:', error)
-      showToast(t('maintenancePlans.saveError'), 'error')
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('MaintenancePlanForm.save', error)
+      showToast(getUserFriendlyError(error), 'error')
     } finally {
       setLoading(false)
     }

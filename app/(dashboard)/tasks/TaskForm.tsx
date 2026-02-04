@@ -102,28 +102,24 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
         nextDueDate = formData.due_date
       } else {
         // Recurrent: calculate using helper
-        if (!formData.start_date) {
+        if (!formData.start_date || formData.start_date.trim() === '') {
           showToast(t('tasks.startDateRequiredForRecurrent'), 'error')
           setLoading(false)
           return
         }
-        nextDueDate = calculateNextDueDate(formData.cadence, formData.start_date, null)
-      }
-
-      // Validate interval/frequency for recurrent tasks
-      if (formData.cadence !== 'once' && !formData.start_date) {
-        showToast(t('tasks.startDateRequiredForRecurrent'), 'error')
-        setLoading(false)
-        return
+        // Ensure date is in ISO format (YYYY-MM-DD)
+        const normalizedStartDate = formData.start_date.split('T')[0]
+        nextDueDate = calculateNextDueDate(formData.cadence, normalizedStartDate, null)
       }
 
       // Prepare data (helpers will add tenant_id and property_id)
+      // Ensure all dates are in ISO format (YYYY-MM-DD)
       const dataToSave = {
         title: formData.title.trim(),
         description: formData.description.trim() || null,
         cadence: formData.cadence,
-        due_date: formData.cadence === 'once' ? formData.due_date : null,
-        next_due_date: nextDueDate,
+        due_date: formData.cadence === 'once' ? (formData.due_date?.split('T')[0] || null) : null,
+        next_due_date: nextDueDate.split('T')[0], // Ensure ISO format
         priority: formData.priority,
         status: formData.status,
       }
