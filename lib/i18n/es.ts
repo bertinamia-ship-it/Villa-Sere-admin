@@ -455,6 +455,13 @@ export const es = {
   // Expenses
   expenses: {
     title: 'Gastos',
+    subtitle: 'Gestiona los gastos de tu propiedad',
+    totalExpenses: '{count} gastos en total',
+    emptyTitle: 'Aún no has registrado gastos',
+    emptyDescription: 'Comienza registrando tus primeros gastos para llevar un control financiero preciso.',
+    emptyAction: 'Registrar Primer Gasto',
+    selectMonth: 'Seleccionar Mes',
+    selectOrCreatePropertyExpenses: 'Selecciona o crea una propiedad para gestionar gastos.',
     addExpense: 'Agregar Gasto',
     editExpense: 'Editar Gasto',
     exportCSV: 'Exportar CSV',
