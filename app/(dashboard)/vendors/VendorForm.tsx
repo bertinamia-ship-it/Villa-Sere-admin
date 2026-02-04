@@ -6,6 +6,7 @@ import { Vendor } from '@/lib/types/database'
 import { X } from 'lucide-react'
 import { getCurrentTenantId } from '@/lib/utils/tenant'
 import { t } from '@/lib/i18n/es'
+import { useToast } from '@/components/ui/Toast'
 
 interface VendorFormProps {
   vendor?: Vendor | null
@@ -23,6 +24,7 @@ export default function VendorForm({ vendor, onClose }: VendorFormProps) {
   })
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
+  const { showToast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -76,15 +78,6 @@ export default function VendorForm({ vendor, onClose }: VendorFormProps) {
           .update(dataToSave)
           .eq('id', vendor.id)
           .eq('tenant_id', profile.tenant_id)
-
-        if (!error) {
-          onClose()
-        }
-      } else {
-        // Insert: include tenant_id (vendors shared across all properties in tenant)
-        const { error } = await supabase
-          .from('vendors')
-          .insert([dataToSave])
 
         if (error) {
           const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
@@ -147,7 +140,7 @@ export default function VendorForm({ vendor, onClose }: VendorFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Especialidad
+              {t('vendors.specialty')}
             </label>
             <input
               type="text"
@@ -218,14 +211,14 @@ export default function VendorForm({ vendor, onClose }: VendorFormProps) {
               disabled={loading}
               className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition"
             >
-              {loading ? 'Guardando...' : vendor ? 'Actualizar Proveedor' : 'Agregar Proveedor'}
+              {loading ? t('vendors.saving') : vendor ? t('vendors.updateVendor') : t('vendors.addVendor')}
             </button>
             <button
               type="button"
               onClick={onClose}
               className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition"
             >
-              Cancelar
+              {t('vendors.cancel')}
             </button>
           </div>
         </form>

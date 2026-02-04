@@ -7,6 +7,7 @@ import { ROOMS, PRIORITIES, TICKET_STATUSES, PRIORITY_LABELS, STATUS_LABELS } fr
 import { X, Upload } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { t } from '@/lib/i18n/es'
+import { useToast } from '@/components/ui/Toast'
 
 interface TicketFormProps {
   ticket?: MaintenanceTicket | null
@@ -29,6 +30,7 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
   const [photoUrl, setPhotoUrl] = useState(ticket?.photo_url || '')
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
+  const { showToast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,9 +38,6 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
 
     const propertyId = await getActivePropertyId()
     if (!propertyId) {
-      const { useToast } = await import('@/components/ui/Toast')
-      const { showToast } = useToast()
-      const { t } = await import('@/lib/i18n/es')
       showToast(t('errors.propertyRequired'), 'error')
       setLoading(false)
       return

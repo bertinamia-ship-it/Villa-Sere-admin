@@ -152,8 +152,9 @@ export default function TaskList() {
           .eq('property_id', propertyId)
 
         if (error) {
-          console.error('Error updating task:', error)
-          showToast(t('tasks.completeError'), 'error')
+          const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+          logError('TaskList.completeOnce', error)
+          showToast(getUserFriendlyError(error), 'error')
         } else {
           showToast(t('tasks.taskCompleted'), 'success')
           fetchData()
@@ -172,8 +173,9 @@ export default function TaskList() {
         })
 
         if (error) {
-          console.error('Error updating task:', error)
-          showToast(t('tasks.completeError'), 'error')
+          const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+          logError('TaskList.completeRecurrent', error)
+          showToast(getUserFriendlyError(error), 'error')
         } else {
           showToast(t('tasks.taskCompleted'), 'success')
           fetchData()
