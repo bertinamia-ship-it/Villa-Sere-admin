@@ -44,7 +44,7 @@ export default function QuickAdjust({ item, onQuantityChange }: QuickAdjustProps
 
           <div className="flex-1 text-center">
           <div className="text-2xl font-bold text-gray-900">{quantity}</div>
-          <div className="text-xs text-gray-500">{t('inventory.minThreshold')}: {item.min_threshold}</div>
+          <div className="text-xs text-gray-500">{t('inventory.minThresholdShort')}: {item.min_threshold}</div>
         </div>
 
         <button
