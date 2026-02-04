@@ -26,6 +26,7 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
   const [photoUrl, setPhotoUrl] = useState(item?.photo_url || '')
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
+  const { showToast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,7 +34,7 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
 
     const propertyId = await getActivePropertyId()
     if (!propertyId) {
-      alert('Por favor selecciona una propiedad primero')
+      showToast(t('errors.propertyRequired'), 'error')
       setLoading(false)
       return
     }
@@ -55,7 +56,11 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
         .eq('id', item.id)
         .eq('property_id', propertyId)
 
-      if (!error) {
+      if (error) {
+        const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+        logError('InventoryForm.update', error)
+        showToast(getUserFriendlyError(error), 'error')
+      } else {
         onClose()
       }
     } else {
@@ -64,7 +69,11 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
         .from('inventory_items')
         .insert([dataToSave])
 
-      if (!error) {
+      if (error) {
+        const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+        logError('InventoryForm.insert', error)
+        showToast(getUserFriendlyError(error), 'error')
+      } else {
         onClose()
       }
     }

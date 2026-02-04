@@ -28,6 +28,7 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
   const [receiptUrl, setReceiptUrl] = useState(expense?.receipt_url || '')
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
+  const { showToast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,26 +36,26 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
 
     const propertyId = await getActivePropertyId()
     if (!propertyId) {
-      alert('Por favor selecciona una propiedad primero')
+      showToast(t('errors.propertyRequired'), 'error')
       setLoading(false)
       return
     }
 
     // Validation
     if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      alert('El monto debe ser mayor que 0')
+      showToast('El monto debe ser mayor que 0', 'error')
       setLoading(false)
       return
     }
 
     if (!formData.date) {
-      alert('La fecha es requerida')
+      showToast('La fecha es requerida', 'error')
       setLoading(false)
       return
     }
 
     if (!formData.category) {
-      alert('La categoría es requerida')
+      showToast('La categoría es requerida', 'error')
       setLoading(false)
       return
     }
@@ -79,7 +80,11 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
         .eq('id', expense.id)
         .eq('property_id', propertyId)
 
-      if (!error) {
+      if (error) {
+        const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+        logError('ExpenseForm.update', error)
+        showToast(getUserFriendlyError(error), 'error')
+      } else {
         onClose()
       }
     } else {
@@ -88,7 +93,11 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
         .from('expenses')
         .insert([dataToSave])
 
-      if (!error) {
+      if (error) {
+        const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+        logError('ExpenseForm.insert', error)
+        showToast(getUserFriendlyError(error), 'error')
+      } else {
         onClose()
       }
     }
