@@ -218,7 +218,7 @@ export default async function DashboardPage() {
       <div className="-mx-4 sm:-mx-6 lg:-mx-8 mb-6 sm:mb-8 relative overflow-hidden rounded-b-2xl lg:rounded-2xl shadow-xl">
         <div className="relative h-64 sm:h-80 lg:h-96 w-full bg-slate-900">
           <Image
-            src="/splash-screen.png"
+            src="/splash-screen.png?v=3"
             alt={propertyName}
             fill
             priority
