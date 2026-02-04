@@ -286,7 +286,7 @@ export const es = {
     selectOrCreatePropertyInventory: 'Selecciona o crea una propiedad para gestionar artículos de inventario.',
     setCustomAmount: 'Establecer cantidad personalizada',
     enterQuantity: 'Ingresa la cantidad',
-    minThreshold: 'Mín',
+    minThresholdShort: 'Mín',
   },
 
   // Maintenance
