@@ -107,13 +107,13 @@ export default function CSVImport() {
       setResult({ success, errors })
       
       if (success > 0) {
-        showToast(`Se importaron exitosamente ${success} artículos`, 'success')
+        showToast(t('inventory.importSuccess', { success }), 'success')
       }
       if (errors.length > 0) {
-        showToast(`${errors.length} artículos fallaron al importar`, 'warning')
+        showToast(t('inventory.importFailed', { count: errors.length }), 'warning')
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Error al importar CSV'
+      const message = error instanceof Error ? error.message : t('inventory.importError')
       showToast(message, 'error')
     } finally {
       setImporting(false)
@@ -174,7 +174,7 @@ export default function CSVImport() {
                   <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-green-900">
-                      Se importaron exitosamente {result.success} artículos
+                      {t('inventory.importSuccess', { success: result.success })}
                     </p>
                   </div>
                 </div>

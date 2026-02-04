@@ -289,6 +289,8 @@ export const es = {
     setCustomAmount: 'Establecer cantidad personalizada',
     enterQuantity: 'Ingresa la cantidad',
     minThresholdShort: 'Mín',
+    importFailed: '{count} artículos fallaron al importar',
+    importSuccess: 'Se importaron exitosamente {success} artículos',
   },
 
   // Maintenance
