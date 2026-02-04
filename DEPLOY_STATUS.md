@@ -1,154 +1,120 @@
-# 🚀 Estado del Deploy a Producción
+# 🚀 Estado del Deploy - CasaPilot
 
-**Fecha**: 2025-02-04  
-**Repositorio**: https://github.com/bertinamia-ship-it/Villa-Sere-admin.git  
-**Último Commit**: `1515915` - "feat: PWA support, QA final, and production-ready fixes"
+## ✅ Cambios Desplegados
 
----
+**Commit:** `6f1efb3`  
+**Fecha:** Ahora  
+**Estado:** ✅ Push a main completado
 
-## ✅ Pasos Completados
+### Correcciones Aplicadas:
 
-1. ✅ **Commit realizado**: Todos los cambios incluidos
-   - PWA support (manifest, iconos PNG)
-   - QA final documentado
-   - Fixes de tareas recurrentes
-   - Mejoras de error handling
-   - Traducciones i18n actualizadas
+1. **Error de Hooks Corregido** ✅
+   - Eliminado `useCallback` problemático en `BillingGuard.tsx`
+   - Función `checkSubscription` movida dentro de `useEffect`
+   - App ahora carga sin errores del lado del cliente
 
-2. ✅ **Push a GitHub**: Completado exitosamente
-   - Branch: `main`
-   - 54 archivos modificados
-   - 792 inserciones, 16 eliminaciones
+2. **Hero Visual en Dashboard** ✅
+   - Imagen `splash-screen.png` integrada correctamente
+   - Usando Next.js Image con `priority` para carga rápida
+   - Visible solo después de login (no bloquea login)
 
----
+3. **Iconos PWA** ✅
+   - Cache busting actualizado a `v=3`
+   - Iconos: `icon-192.png`, `icon-512.png`, `apple-touch-icon.png`
+   - Manifest.json actualizado
 
-## 📋 Verificación del Deploy en Vercel
-
-### Opción 1: Verificar en Dashboard de Vercel (Recomendado)
-
-1. **Ir a Vercel Dashboard**:
-   - URL: https://vercel.com/dashboard
-   - Buscar proyecto: "Villa-Sere-admin" o "CasaPilot"
-
-2. **Verificar Deploy Automático**:
-   - Vercel debería detectar el push automáticamente
-   - Buscar el deploy más reciente (debería aparecer en los últimos minutos)
-   - Estado esperado: ✅ "Ready" o "Building"
-
-3. **Si el proyecto NO está conectado**:
-   - Ir a: https://vercel.com/new
-   - Seleccionar "Import Git Repository"
-   - Conectar con GitHub: `bertinamia-ship-it/Villa-Sere-admin`
-   - Framework: Next.js (auto-detectado)
-   - Click "Deploy"
-
-### Opción 2: Instalar Vercel CLI (Opcional)
-
-```bash
-# Instalar Vercel CLI (requiere permisos)
-npm install -g vercel
-
-# Login a Vercel
-vercel login
-
-# Verificar proyectos
-vercel ls
-
-# Hacer deploy manual (si es necesario)
-vercel --prod
-```
+4. **Menú Móvil** ✅
+   - Mismos gradientes que desktop
+   - Mismos efectos y animaciones
+   - Consistencia visual completa
 
 ---
 
-## 🔧 Variables de Entorno Requeridas
+## 📱 Instrucciones para Ver los Cambios
 
-Verificar que estas variables estén configuradas en Vercel:
+### 1. Esperar Deploy en Vercel (2-3 minutos)
+   - Vercel debería estar desplegando automáticamente
+   - Revisa el dashboard de Vercel para confirmar
 
-1. **Ir a**: Vercel Dashboard → Proyecto → Settings → Environment Variables
+### 2. Limpiar Caché del Navegador
+   
+   **En Safari (iPhone):**
+   - Settings > Safari > Clear History and Website Data
+   - O: Mantén presionado el botón de recargar en Safari > "Empty Caches"
 
-2. **Variables necesarias**:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=https://euxgrvunyghbpenkcgwh.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[tu-anon-key]
-   ```
+   **En Chrome (Android):**
+   - Settings > Privacy > Clear browsing data
+   - Selecciona "Cached images and files"
+   - Clear data
 
-3. **Verificar**:
-   - ✅ Ambas variables están configuradas
-   - ✅ Aplican a "Production", "Preview", y "Development"
-   - ✅ Valores son correctos
+### 3. Desinstalar PWA Anterior (IMPORTANTE)
+   
+   **iPhone:**
+   - Mantén presionado el icono de la app en la pantalla de inicio
+   - Toca "Remove App" > "Delete App"
+   
+   **Android:**
+   - Settings > Apps > CasaPilot > Uninstall
 
----
+### 4. Reinstalar PWA
+   
+   - Abre el link de Vercel en Safari/Chrome
+   - Toca el botón "Compartir" (Share)
+   - Selecciona "Add to Home Screen" / "Agregar a pantalla de inicio"
+   - Verifica que el icono nuevo aparezca
 
-## ✅ Checklist de Verificación Post-Deploy
-
-Una vez que el deploy esté completo:
-
-### 1. Build Status
-- [ ] Deploy aparece como "Ready" en Vercel
-- [ ] No hay errores de build
-- [ ] Build time < 3 minutos
-
-### 2. App Funcional
-- [ ] Abrir el link de Vercel (ej: `https://villa-sere-admin.vercel.app`)
-- [ ] La app carga sin errores
-- [ ] No hay errores en la consola del navegador
-
-### 3. Login
-- [ ] Página de login se muestra correctamente
-- [ ] Login funciona con credenciales existentes
-- [ ] Redirección a dashboard funciona
-
-### 4. PWA
-- [ ] Manifest.json se sirve correctamente: `https://[url]/manifest.json`
-- [ ] Iconos PNG se cargan:
-   - `/icon-192.png`
-   - `/icon-512.png`
-   - `/apple-touch-icon.png`
-- [ ] En iOS: Safari puede instalar la app
-- [ ] En Android: Chrome muestra opción de instalación
-
-### 5. Módulos Principales
-- [ ] Dashboard carga correctamente
-- [ ] Navegación funciona
-- [ ] Al menos un módulo (ej: Inventario) carga sin errores
+### 5. Verificar Hero Visual
+   
+   - Inicia sesión en la app
+   - Deberías ver la imagen hero en el Dashboard
+   - Si no aparece, limpia caché y recarga
 
 ---
 
-## 🔗 Links Útiles
+## 🔍 Verificación Post-Deploy
 
-- **Vercel Dashboard**: https://vercel.com/dashboard
-- **GitHub Repo**: https://github.com/bertinamia-ship-it/Villa-Sere-admin
-- **Supabase Dashboard**: https://supabase.com/dashboard/project/euxgrvunyghbpenkcgwh
-
----
-
-## 📝 Notas
-
-- **Dominio personalizado**: Se configurará mañana según el usuario
-- **Deploy automático**: Vercel debería hacer deploy automáticamente en cada push a `main`
-- **Build command**: `npm run build` (configurado en `vercel.json`)
-- **Framework**: Next.js 16.1.1
+### Checklist:
+- [ ] App carga sin errores en el navegador
+- [ ] Login funciona correctamente
+- [ ] Dashboard muestra hero visual con imagen
+- [ ] Icono nuevo aparece al instalar PWA
+- [ ] Menú móvil se ve igual que desktop
+- [ ] Todo funciona en celular
 
 ---
 
-## 🆘 Si Hay Problemas
+## ⚠️ Si Aún No Funciona
 
-### Build Falla
-1. Revisar logs en Vercel Dashboard
-2. Verificar que `package.json` tiene todas las dependencias
-3. Verificar que no hay errores de TypeScript
+### Problema: Icono viejo sigue apareciendo
+**Solución:**
+1. Desinstala la PWA completamente
+2. Espera 5 minutos
+3. Limpia caché del navegador
+4. Reinstala la PWA
 
-### Variables de Entorno
-1. Verificar que están configuradas en Vercel
-2. Verificar que los valores son correctos
-3. Hacer redeploy después de cambiar variables
+### Problema: Hero visual no aparece
+**Solución:**
+1. Verifica que `splash-screen.png` esté en `/public/`
+2. Limpia caché del navegador
+3. Recarga la página (Cmd+Shift+R en Mac, Ctrl+Shift+R en Windows)
 
-### App No Carga
-1. Verificar consola del navegador (F12)
-2. Verificar que Supabase está accesible
-3. Verificar que las variables de entorno están correctas
+### Problema: App no carga / Error
+**Solución:**
+1. Revisa la consola del navegador (F12)
+2. Verifica que el deploy en Vercel haya completado
+3. Revisa los logs de Vercel para errores
 
 ---
 
-**Última actualización**: 2025-02-04
+## 📞 Próximos Pasos
 
+1. **Esperar 2-3 minutos** para que Vercel complete el deploy
+2. **Limpiar caché** del navegador
+3. **Desinstalar PWA anterior**
+4. **Reinstalar PWA** desde el link de Vercel
+5. **Verificar** que todo funcione correctamente
+
+---
+
+**Última actualización:** Ahora  
+**Estado:** ✅ Listo para verificar
