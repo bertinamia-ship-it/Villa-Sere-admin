@@ -518,7 +518,6 @@ export const es = {
     saveError: 'Error al guardar proveedor',
     updateVendor: 'Actualizar Proveedor',
     saving: 'Guardando...',
-    cancel: 'Cancelar',
   },
 
   // ToBuy
