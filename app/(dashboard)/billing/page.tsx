@@ -233,9 +233,6 @@ export default function BillingPage() {
               </p>
               <Button onClick={() => {
                 // Placeholder: Link to Stripe checkout or payment page
-                const { useToast } = await import('@/components/ui/Toast')
-                const { showToast } = useToast()
-                const { t } = await import('@/lib/i18n/es')
                 showToast(t('billing.paymentIntegrationComingSoon'), 'info')
               }}>
                 <CreditCard className="h-4 w-4" />
@@ -289,9 +286,6 @@ export default function BillingPage() {
                 Desbloquea propiedades y usuarios ilimitados con un plan de pago.
               </p>
               <Button onClick={() => {
-                const { useToast } = await import('@/components/ui/Toast')
-                const { showToast } = useToast()
-                const { t } = await import('@/lib/i18n/es')
                 showToast(t('billing.paymentIntegrationComingSoon'), 'info')
               }}>
                 <CreditCard className="h-4 w-4" />
