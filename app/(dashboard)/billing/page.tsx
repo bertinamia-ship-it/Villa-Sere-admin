@@ -8,6 +8,7 @@ import { LoadingSpinner } from '@/components/ui/Loading'
 import { CreditCard, Calendar, CheckCircle2, XCircle, AlertCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { t } from '@/lib/i18n/es'
+import { useToast } from '@/components/ui/Toast'
 
 interface Tenant {
   id: string

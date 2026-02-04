@@ -515,6 +515,9 @@ export const es = {
     vendorSaved: 'Proveedor guardado exitosamente',
     deleteError: 'Error al eliminar proveedor',
     saveError: 'Error al guardar proveedor',
+    updateVendor: 'Actualizar Proveedor',
+    saving: 'Guardando...',
+    cancel: 'Cancelar',
   },
 
   // ToBuy
