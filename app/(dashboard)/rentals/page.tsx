@@ -140,13 +140,13 @@ export default function RentalsPage() {
     try {
       const propertyId = await getActivePropertyId()
       if (!propertyId) {
-        showToast('No active property selected', 'error')
+        showToast(t('errors.propertyRequired'), 'error')
         return
       }
 
       // Validation
       if (!booking.check_in || !booking.check_out) {
-        showToast('Check-in and check-out dates are required', 'error')
+        showToast(t('rentals.datesRequired'), 'error')
         return
       }
 
@@ -154,22 +154,20 @@ export default function RentalsPage() {
       const checkOut = new Date(booking.check_out)
 
       if (checkOut <= checkIn) {
-        showToast('Check-out date must be after check-in date', 'error')
+        showToast(t('rentals.checkOutAfterCheckIn'), 'error')
         return
       }
 
       if (!booking.guest_name || booking.guest_name.trim() === '') {
-        showToast('Guest name is required', 'error')
+        showToast(t('rentals.guestNameRequired'), 'error')
         return
       }
 
       if (booking.total_amount && parseFloat(String(booking.total_amount)) < 0) {
-        showToast('Total amount cannot be negative', 'error')
+        showToast(t('rentals.amountCannotBeNegative'), 'error')
         return
       }
 
-      console.log('📝 Saving booking:', booking)
-      
       // Validate date overlap for same property (only for new bookings or if dates changed)
       if (!editingBooking || booking.check_in !== editingBooking.check_in || booking.check_out !== editingBooking.check_out) {
         if (booking.check_in && booking.check_out) {
@@ -192,14 +190,13 @@ export default function RentalsPage() {
           })
           
           if (hasOverlap) {
-            showToast('Booking dates overlap with an existing booking for this property', 'error')
+            showToast(t('rentals.overlappingDates'), 'error')
             return
           }
         }
       }
       
       if (editingBooking) {
-        console.log('✏️ Updating booking:', editingBooking.id)
         const { data, error } = await supabase
           .from('bookings')
           .update({ ...booking, property_id: propertyId })
@@ -208,23 +205,24 @@ export default function RentalsPage() {
           .select()
         
         if (error) {
-          console.error('❌ Update error:', error)
-          throw error
+          const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+          logError('RentalsPage.update', error)
+          showToast(getUserFriendlyError(error), 'error')
+          return
         }
-        console.log('✅ Booking updated:', data)
         showToast(t('rentals.bookingUpdated'), 'success')
       } else {
-        console.log('➕ Creating new booking')
         const { data, error } = await supabase
           .from('bookings')
           .insert([{ ...booking, property_id: propertyId }])
           .select()
         
         if (error) {
-          console.error('❌ Insert error:', error)
-          throw error
+          const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+          logError('RentalsPage.insert', error)
+          showToast(getUserFriendlyError(error), 'error')
+          return
         }
-        console.log('✅ Booking created:', data)
         showToast(t('rentals.bookingCreated'), 'success')
       }
       
@@ -232,9 +230,9 @@ export default function RentalsPage() {
       setEditingBooking(null)
       await loadData()
     } catch (error) {
-      console.error('❌ Error saving booking:', error)
-      const errorMsg = error instanceof Error ? error.message : String(error)
-      showToast(`${t('rentals.saveError')}: ${errorMsg}`, 'error')
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('RentalsPage.save', error)
+      showToast(getUserFriendlyError(error), 'error')
     }
   }
 
@@ -265,8 +263,9 @@ export default function RentalsPage() {
       showToast(t('rentals.bookingDeleted'), 'success')
       loadData()
     } catch (error) {
-      console.error('Error deleting booking:', error)
-      showToast(t('rentals.deleteError'), 'error')
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('RentalsPage.delete', error)
+      showToast(getUserFriendlyError(error), 'error')
     } finally {
       setDeleting(false)
       setDeleteConfirm({ isOpen: false, bookingId: null })

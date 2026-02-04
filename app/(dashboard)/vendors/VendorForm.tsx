@@ -49,14 +49,16 @@ export default function VendorForm({ vendor, onClose }: VendorFormProps) {
           hint: profileError.hint,
           code: profileError.code
         })
-        alert(`Error: ${profileError.message || 'Failed to fetch profile'}`)
+        const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+        logError('VendorForm.fetchProfile', profileError)
+        showToast(getUserFriendlyError(profileError), 'error')
         setLoading(false)
         return
       }
 
       if (!profile || !profile.tenant_id) {
         console.error('[VendorForm] No profile or tenant_id found')
-        alert('Error: No tenant found. Please contact support.')
+        showToast(t('errors.tenantRequired'), 'error')
         setLoading(false)
         return
       }
@@ -84,12 +86,33 @@ export default function VendorForm({ vendor, onClose }: VendorFormProps) {
           .from('vendors')
           .insert([dataToSave])
 
-        if (!error) {
+        if (error) {
+          const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+          logError('VendorForm.update', error)
+          showToast(getUserFriendlyError(error), 'error')
+        } else {
+          showToast(t('vendors.vendorSaved'), 'success')
+          onClose()
+        }
+      } else {
+        // Insert: include tenant_id (vendors shared across all properties in tenant)
+        const { error } = await supabase
+          .from('vendors')
+          .insert([dataToSave])
+
+        if (error) {
+          const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+          logError('VendorForm.insert', error)
+          showToast(getUserFriendlyError(error), 'error')
+        } else {
+          showToast(t('vendors.vendorSaved'), 'success')
           onClose()
         }
       }
     } catch (error) {
-      console.error('Error saving vendor:', error)
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('VendorForm.save', error)
+      showToast(getUserFriendlyError(error), 'error')
     } finally {
       setLoading(false)
     }

@@ -58,8 +58,9 @@ export default function TaskList() {
       .order('next_due_date', { ascending: true })
 
     if (error) {
-      console.error('Error fetching tasks:', error)
-      showToast('Error al cargar tareas', 'error')
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('TaskList.fetch', error)
+      showToast(getUserFriendlyError(error), 'error')
     } else {
       setTasks(data || [])
     }
@@ -179,8 +180,9 @@ export default function TaskList() {
         }
       }
     } catch (error) {
-      console.error('Error completing task:', error)
-      showToast(t('tasks.completeError'), 'error')
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('TaskList.complete', error)
+      showToast(getUserFriendlyError(error), 'error')
     } finally {
       setCompletingTaskId(null)
     }
@@ -199,7 +201,9 @@ export default function TaskList() {
     if (!error) {
       fetchData()
     } else {
-      showToast('Error al actualizar estado', 'error')
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('TaskList.statusChange', error)
+      showToast(getUserFriendlyError(error), 'error')
     }
   }
 
@@ -215,11 +219,13 @@ export default function TaskList() {
       .eq('id', deleteConfirm.taskId)
       .eq('property_id', propertyId)
 
-    if (!error) {
+    if (error) {
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('TaskList.delete', error)
+      showToast(getUserFriendlyError(error), 'error')
+    } else {
       showToast(t('tasks.taskDeleted'), 'success')
       setTasks(tasks.filter(t => t.id !== deleteConfirm.taskId))
-    } else {
-      showToast(t('tasks.deleteError'), 'error')
     }
 
     setDeleteConfirm({ isOpen: false, taskId: null })

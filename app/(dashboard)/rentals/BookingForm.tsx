@@ -30,8 +30,6 @@ export default function BookingForm({ booking, onSave, onCancel }: BookingFormPr
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('📋 Form submitted with data:', formData)
-    
     const bookingData = {
       guest_name: formData.guest_name || null,
       platform: formData.platform,
@@ -44,7 +42,6 @@ export default function BookingForm({ booking, onSave, onCancel }: BookingFormPr
       status: formData.status as 'confirmed' | 'cancelled' | 'completed',
     }
     
-    console.log('✅ Parsed booking data:', bookingData)
     onSave(bookingData)
   }
 

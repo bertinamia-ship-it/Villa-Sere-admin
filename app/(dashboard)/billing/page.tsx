@@ -21,6 +21,7 @@ interface Tenant {
 export default function BillingPage() {
   const supabase = createClient()
   const router = useRouter()
+  const { showToast } = useToast()
   const [loading, setLoading] = useState(true)
   const [tenant, setTenant] = useState<Tenant | null>(null)
   const [propertyCount, setPropertyCount] = useState(0)
@@ -232,7 +233,10 @@ export default function BillingPage() {
               </p>
               <Button onClick={() => {
                 // Placeholder: Link to Stripe checkout or payment page
-                alert('La integración de pagos llegará pronto. Por ahora, contacta soporte para actualizar.')
+                const { useToast } = await import('@/components/ui/Toast')
+                const { showToast } = useToast()
+                const { t } = await import('@/lib/i18n/es')
+                showToast(t('billing.paymentIntegrationComingSoon'), 'info')
               }}>
                 <CreditCard className="h-4 w-4" />
                 {t('billing.upgrade')}
@@ -285,7 +289,10 @@ export default function BillingPage() {
                 Desbloquea propiedades y usuarios ilimitados con un plan de pago.
               </p>
               <Button onClick={() => {
-                alert('La integración de pagos llegará pronto. Por ahora, contacta soporte para actualizar.')
+                const { useToast } = await import('@/components/ui/Toast')
+                const { showToast } = useToast()
+                const { t } = await import('@/lib/i18n/es')
+                showToast(t('billing.paymentIntegrationComingSoon'), 'info')
               }}>
                 <CreditCard className="h-4 w-4" />
                 {t('billing.upgrade')}

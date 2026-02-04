@@ -36,7 +36,10 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
 
     const propertyId = await getActivePropertyId()
     if (!propertyId) {
-      alert('Por favor selecciona una propiedad primero')
+      const { useToast } = await import('@/components/ui/Toast')
+      const { showToast } = useToast()
+      const { t } = await import('@/lib/i18n/es')
+      showToast(t('errors.propertyRequired'), 'error')
       setLoading(false)
       return
     }

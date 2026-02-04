@@ -41,9 +41,9 @@ export default function QuickAdjust({ item, onQuantityChange }: QuickAdjustProps
           <Minus className="h-4 w-4 text-gray-700" />
         </button>
 
-        <div className="flex-1 text-center">
+          <div className="flex-1 text-center">
           <div className="text-2xl font-bold text-gray-900">{quantity}</div>
-          <div className="text-xs text-gray-500">Min: {item.min_threshold}</div>
+          <div className="text-xs text-gray-500">{t('inventory.minThreshold')}: {item.min_threshold}</div>
         </div>
 
         <button
@@ -59,7 +59,7 @@ export default function QuickAdjust({ item, onQuantityChange }: QuickAdjustProps
           onClick={() => setShowCustom(true)}
           className="w-full text-sm text-blue-600 hover:text-blue-700"
         >
-          Set custom amount
+          {t('inventory.setCustomAmount')}
         </button>
       ) : (
         <div className="flex gap-2">
@@ -68,7 +68,7 @@ export default function QuickAdjust({ item, onQuantityChange }: QuickAdjustProps
             min="0"
             value={customValue}
             onChange={(e) => setCustomValue(e.target.value)}
-            placeholder="Enter quantity"
+            placeholder={t('inventory.enterQuantity')}
             className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 placeholder-gray-400"
             autoFocus
           />
@@ -76,7 +76,7 @@ export default function QuickAdjust({ item, onQuantityChange }: QuickAdjustProps
             onClick={handleSetCustom}
             className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
           >
-            Set
+            {t('common.apply')}
           </button>
           <button
             onClick={() => {
@@ -85,7 +85,7 @@ export default function QuickAdjust({ item, onQuantityChange }: QuickAdjustProps
             }}
             className="px-3 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       )}

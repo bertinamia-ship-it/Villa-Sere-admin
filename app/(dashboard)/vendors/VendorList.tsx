@@ -142,7 +142,7 @@ export default function VendorList() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{t('vendors.title')}</h1>
-          <p className="text-gray-600 mt-1">{vendors.length} proveedores en total</p>
+          <p className="text-gray-600 mt-1">{t('vendors.totalVendors', { count: vendors.length })}</p>
         </div>
         <button
           onClick={() => setShowForm(true)}

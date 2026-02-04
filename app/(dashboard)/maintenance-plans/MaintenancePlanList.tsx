@@ -222,8 +222,9 @@ export default function MaintenancePlanList() {
       }
       fetchData()
     } catch (error) {
-      console.error('Error completing plan:', error)
-      showToast(t('maintenancePlans.completeError'), 'error')
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('MaintenancePlanList.complete', error)
+      showToast(getUserFriendlyError(error), 'error')
     } finally {
       setCompletingPlanId(null)
     }
@@ -272,16 +273,18 @@ export default function MaintenancePlanList() {
         .single()
 
       if (error) {
-        console.error('Error creating ticket:', error)
-        showToast('Error al crear ticket', 'error')
+        const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+        logError('MaintenancePlanList.createTicket', error)
+        showToast(getUserFriendlyError(error), 'error')
       } else {
-        showToast('Ticket creado exitosamente', 'success')
+        showToast(t('maintenancePlans.ticketCreated'), 'success')
         // Navigate to maintenance page
         router.push('/maintenance')
       }
     } catch (error) {
-      console.error('Error creating ticket:', error)
-      showToast('Error al crear ticket', 'error')
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('MaintenancePlanList.createTicket', error)
+      showToast(getUserFriendlyError(error), 'error')
     } finally {
       setCreatingTicketPlanId(null)
     }

@@ -284,6 +284,9 @@ export const es = {
     deleteItemTitle: 'Eliminar Artículo',
     deleteItemMessage: '¿Estás seguro de que quieres eliminar este artículo? Esta acción no se puede deshacer.',
     selectOrCreatePropertyInventory: 'Selecciona o crea una propiedad para gestionar artículos de inventario.',
+    setCustomAmount: 'Establecer cantidad personalizada',
+    enterQuantity: 'Ingresa la cantidad',
+    minThreshold: 'Mín',
   },
 
   // Maintenance
@@ -329,7 +332,8 @@ export const es = {
     details: 'Detalles adicionales...',
     none: 'Ninguno',
     provider: 'Proveedor:',
-    ticketPhoto: 'Ticket photo',
+    ticketPhoto: 'Foto del ticket',
+    subtitle: 'Gestiona los tickets de mantenimiento de tu propiedad',
   },
 
   // Maintenance Plans
@@ -388,6 +392,7 @@ export const es = {
     repeat: 'Repetir',
     notes: 'Notas',
     createTicket: 'Crear ticket',
+    ticketCreated: 'Ticket creado exitosamente',
     tabs: {
       pending: 'Pendientes',
       all: 'Todos',
@@ -492,6 +497,8 @@ export const es = {
   // Vendors
   vendors: {
     title: 'Proveedores',
+    subtitle: 'Gestiona tus proveedores de servicios',
+    totalVendors: '{count} {count, plural, one {proveedor} other {proveedores}} en total',
     confirmDelete: '¿Estás seguro de que quieres eliminar este proveedor?',
     addVendor: 'Agregar Proveedor',
     editVendor: 'Editar Proveedor',
@@ -526,6 +533,9 @@ export const es = {
     itemArea: 'Área',
     itemQuantity: 'Cantidad',
     itemEstCost: 'Costo Estimado (por artículo)',
+    estimatedCost: 'Costo Est.',
+    ordered: 'Ordenado',
+    received: 'Recibido',
     itemLink: 'Enlace',
     itemStatus: 'Estado',
     itemNotes: 'Notas',

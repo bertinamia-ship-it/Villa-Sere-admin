@@ -9,6 +9,7 @@ import { Plus, Calendar as CalendarIcon } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { t } from '@/lib/i18n/es'
+import { useToast } from '@/components/ui/Toast'
 import BookingForm from '@/app/(dashboard)/rentals/BookingForm'
 import { CalendarItemModal } from '@/components/calendar/CalendarItemModal'
 import { Modal } from '@/components/ui/Modal'
@@ -24,6 +25,7 @@ export default function CalendarioPage() {
   const [showBookingForm, setShowBookingForm] = useState(false)
   const [selectedItem, setSelectedItem] = useState<CalendarItem | null>(null)
   const supabase = createClient()
+  const { showToast } = useToast()
 
   useEffect(() => {
     loadData()
@@ -144,7 +146,7 @@ export default function CalendarioPage() {
     try {
       const propertyId = await getActivePropertyId()
       if (!propertyId) {
-        alert(t('calendar.noPropertySelected'))
+        showToast(t('calendar.noPropertySelected'), 'error')
         return
       }
 
@@ -172,8 +174,9 @@ export default function CalendarioPage() {
       setShowBookingForm(false)
       loadData()
     } catch (error) {
-      console.error('Error saving booking:', error)
-      alert(t('rentals.failedToSaveBooking'))
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('CalendarioPage.saveBooking', error)
+      showToast(getUserFriendlyError(error), 'error')
     }
   }
 

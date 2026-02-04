@@ -136,15 +136,9 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
         const { error } = await updateWithPropertyClient('tasks', task.id, dataToSave)
 
         if (error) {
-          console.error('Error updating task:', error, {
-            message: (error as any)?.message,
-            details: (error as any)?.details,
-            hint: (error as any)?.hint,
-            code: (error as any)?.code,
-            status: (error as any)?.status
-          })
-          const errorMsg = (error as any)?.message || t('tasks.saveError')
-          showToast(errorMsg, 'error')
+          const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+          logError('TaskForm.update', error)
+          showToast(getUserFriendlyError(error), 'error')
         } else {
           showToast(t('tasks.taskSaved'), 'success')
           onClose()
@@ -154,23 +148,18 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
         const { error } = await insertWithPropertyClient('tasks', dataToSave)
 
         if (error) {
-          console.error('Error creating task:', error, {
-            message: (error as any)?.message,
-            details: (error as any)?.details,
-            hint: (error as any)?.hint,
-            code: (error as any)?.code,
-            status: (error as any)?.status
-          })
-          const errorMsg = (error as any)?.message || t('tasks.saveError')
-          showToast(errorMsg, 'error')
+          const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+          logError('TaskForm.insert', error)
+          showToast(getUserFriendlyError(error), 'error')
         } else {
           showToast(t('tasks.taskSaved'), 'success')
           onClose()
         }
       }
     } catch (error) {
-      console.error('Error saving task:', error)
-      showToast(t('tasks.saveError'), 'error')
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('TaskForm.save', error)
+      showToast(getUserFriendlyError(error), 'error')
     } finally {
       setLoading(false)
     }

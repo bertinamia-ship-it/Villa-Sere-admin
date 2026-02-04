@@ -94,7 +94,7 @@ export default function ToBuyPage() {
     try {
       const propertyId = await getActivePropertyId()
       if (!propertyId) {
-        showToast('No active property selected', 'error')
+        showToast(t('errors.propertyRequired'), 'error')
         return
       }
 
@@ -191,7 +191,7 @@ export default function ToBuyPage() {
       <div className="max-w-7xl mx-auto space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('toBuy.title')}</h1>
-          <p className="mt-1 text-sm text-gray-500">Artículos para comprar para tu propiedad</p>
+          <p className="mt-1 text-sm text-gray-500">{t('toBuy.subtitle')}</p>
         </div>
         <EmptyState
           icon={<ShoppingCart className="h-12 w-12" />}
@@ -207,7 +207,7 @@ export default function ToBuyPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">{t('toBuy.title')}</h1>
-          <p className="mt-1 text-sm text-gray-700">Artículos para comprar para la villa</p>
+          <p className="mt-1 text-sm text-gray-700">{t('toBuy.subtitle')}</p>
         </div>
         <Button 
           onClick={() => {
@@ -241,7 +241,7 @@ export default function ToBuyPage() {
               <ShoppingCart className="h-5 w-5 text-yellow-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Ordenado</p>
+              <p className="text-sm text-gray-600">{t('toBuy.ordered')}</p>
               <p className="text-xl font-bold text-gray-900">{statusCounts.ordered}</p>
             </div>
           </div>
@@ -253,7 +253,7 @@ export default function ToBuyPage() {
               <ShoppingCart className="h-5 w-5 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Recibido</p>
+              <p className="text-sm text-gray-600">{t('toBuy.received')}</p>
               <p className="text-xl font-bold text-gray-900">{statusCounts.received}</p>
             </div>
           </div>
@@ -265,7 +265,7 @@ export default function ToBuyPage() {
               <ShoppingCart className="h-5 w-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Costo Est.</p>
+              <p className="text-sm text-gray-600">{t('toBuy.estimatedCost')}</p>
               <p className="text-xl font-bold text-gray-900">${totalCost.toFixed(2)}</p>
             </div>
           </div>
@@ -296,8 +296,8 @@ export default function ToBuyPage() {
               >
                 <option value="all">{t('toBuy.allStatuses')}</option>
                 <option value="to_buy">{t('status.toBuy')}</option>
-                <option value="ordered">Ordenado</option>
-                <option value="received">Recibido</option>
+                <option value="ordered">{t('toBuy.ordered')}</option>
+                <option value="received">{t('toBuy.received')}</option>
               </select>
             </div>
 
@@ -358,7 +358,7 @@ export default function ToBuyPage() {
                     </div>
                     {item.est_cost && (
                       <div>
-                        <p className="text-gray-500">Costo Est.</p>
+                        <p className="text-gray-500">{t('toBuy.estimatedCost')}</p>
                         <p className="font-medium text-gray-900">${(item.est_cost * item.quantity).toFixed(2)}</p>
                       </div>
                     )}
