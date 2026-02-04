@@ -35,31 +35,31 @@ export default function MonthlySummary({ expenses, vendors, selectedMonth }: Mon
   }, [expenses, selectedMonth])
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">
+    <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
+      <h2 className="text-lg font-semibold text-[#0F172A] tracking-tight mb-6">
         Resumen Mensual: {new Date(selectedMonth + '-01').toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
       </h2>
 
       {/* Total */}
-      <div className="bg-blue-50 rounded-lg p-4 mb-6">
-        <p className="text-sm text-gray-600 mb-1">Total de Gastos</p>
-        <p className="text-3xl font-bold text-blue-600">${monthlyData.total.toFixed(2)}</p>
-        <p className="text-sm text-gray-600 mt-1">{monthlyData.count} transacciones</p>
+      <div className="bg-[#2563EB]/5 rounded-xl p-6 mb-6 border border-[#2563EB]/10">
+        <p className="text-xs font-medium text-[#64748B] uppercase tracking-wide mb-2">Total de Gastos</p>
+        <p className="text-3xl font-bold text-[#2563EB] mb-1">${monthlyData.total.toFixed(2)}</p>
+        <p className="text-sm text-[#64748B]">{monthlyData.count} {monthlyData.count === 1 ? 'transacción' : 'transacciones'}</p>
       </div>
 
       {/* By Category */}
       <div className="mb-6">
-        <h3 className="font-semibold text-gray-900 mb-3">Por Categoría</h3>
+        <h3 className="text-sm font-semibold text-[#0F172A] mb-4 tracking-tight">Por Categoría</h3>
         <div className="space-y-2">
           {Object.entries(monthlyData.byCategory).length === 0 ? (
-            <p className="text-sm text-gray-500">No hay gastos este mes</p>
+            <p className="text-sm text-[#64748B]">No hay gastos este mes</p>
           ) : (
             Object.entries(monthlyData.byCategory)
               .sort(([, a], [, b]) => b - a)
               .map(([category, amount]) => (
-                <div key={category} className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-sm text-gray-700">{category}</span>
-                  <span className="text-sm font-semibold text-gray-900">${amount.toFixed(2)}</span>
+                <div key={category} className="flex items-center justify-between py-2.5 border-b border-[#E2E8F0] last:border-0">
+                  <span className="text-sm text-[#0F172A]">{category}</span>
+                  <span className="text-sm font-semibold text-[#0F172A]">${amount.toFixed(2)}</span>
                 </div>
               ))
           )}
@@ -69,16 +69,16 @@ export default function MonthlySummary({ expenses, vendors, selectedMonth }: Mon
       {/* By Vendor */}
       {Object.keys(monthlyData.byVendor).length > 0 && (
         <div>
-          <h3 className="font-semibold text-gray-900 mb-3">Por Proveedor</h3>
+          <h3 className="text-sm font-semibold text-[#0F172A] mb-4 tracking-tight">Por Proveedor</h3>
           <div className="space-y-2">
             {Object.entries(monthlyData.byVendor)
               .sort(([, a], [, b]) => b - a)
               .map(([vendorId, amount]) => {
                 const vendor = vendors.find(v => v.id === vendorId)
                 return (
-                  <div key={vendorId} className="flex items-center justify-between py-2 border-b border-gray-100">
-                    <span className="text-sm text-gray-700">{vendor?.company_name || 'Desconocido'}</span>
-                    <span className="text-sm font-semibold text-gray-900">${amount.toFixed(2)}</span>
+                  <div key={vendorId} className="flex items-center justify-between py-2.5 border-b border-[#E2E8F0] last:border-0">
+                    <span className="text-sm text-[#0F172A]">{vendor?.company_name || 'Desconocido'}</span>
+                    <span className="text-sm font-semibold text-[#0F172A]">${amount.toFixed(2)}</span>
                   </div>
                 )
               })}

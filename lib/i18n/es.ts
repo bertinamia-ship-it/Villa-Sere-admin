@@ -249,7 +249,11 @@ export const es = {
   // Inventory
   inventory: {
     title: 'Inventario',
+    subtitle: 'Gestiona el inventario de tu propiedad',
     addItem: 'Agregar Artículo',
+    emptyTitle: 'Tu inventario está vacío',
+    emptyDescription: 'Comienza agregando artículos para llevar un control preciso de lo que tienes en tu propiedad.',
+    emptyAction: 'Agregar Primer Artículo',
     editItem: 'Editar Artículo',
     importCSV: 'Importar CSV',
     exportCSV: 'Exportar CSV',
@@ -275,6 +279,11 @@ export const es = {
     saveError: 'Error al guardar artículo',
     itemNotFound: 'No se encontraron artículos',
     exportSuccess: 'Inventario exportado exitosamente',
+    searchItems: 'Buscar artículos...',
+    tryDifferentFilters: 'Intenta ajustar los filtros para encontrar lo que buscas.',
+    deleteItemTitle: 'Eliminar Artículo',
+    deleteItemMessage: '¿Estás seguro de que quieres eliminar este artículo? Esta acción no se puede deshacer.',
+    selectOrCreatePropertyInventory: 'Selecciona o crea una propiedad para gestionar artículos de inventario.',
   },
 
   // Maintenance
@@ -409,8 +418,14 @@ export const es = {
     delete: 'Eliminar',
     noTasks: 'No hay tareas',
     noTasksDescription: 'Crea tareas operativas para gestionar tu propiedad',
+    emptyTitle: 'Aún no tienes tareas',
+    emptyDescription: 'Comienza creando tareas para organizar el trabajo diario de tu propiedad. Pueden ser de una vez o recurrentes.',
+    emptyAction: 'Crear Primera Tarea',
+    tryDifferentFilters: 'Intenta ajustar los filtros para encontrar lo que buscas.',
+    markCompleted: 'Marcar como Hecho',
     noPropertySelected: 'No hay propiedad seleccionada',
     noPropertyDescription: 'Selecciona o crea una propiedad para gestionar tareas',
+    selectOrCreatePropertyTasks: 'Por favor selecciona o crea una propiedad para gestionar tareas.',
     taskSaved: 'Tarea guardada exitosamente',
     taskDeleted: 'Tarea eliminada exitosamente',
     taskCompleted: 'Tarea completada exitosamente',

@@ -188,14 +188,14 @@ export default function ExpensesManager() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gastos</h1>
-          <p className="text-gray-600 mt-1">Gestiona los gastos de tu propiedad</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('expenses.title')}</h1>
+          <p className="text-sm text-[#64748B] mt-1.5">{t('expenses.subtitle')}</p>
         </div>
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-lg shadow-sm border border-slate-200/60 p-4">
+            <Card key={i} padding="md">
               <div className="flex items-center justify-between">
                 <div className="flex-1 space-y-2">
                   <Skeleton variant="text" width="40%" height={20} />
@@ -203,7 +203,7 @@ export default function ExpensesManager() {
                 </div>
                 <Skeleton variant="text" width="80px" height={20} />
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       </div>
@@ -212,59 +212,66 @@ export default function ExpensesManager() {
 
   if (!hasProperty) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gastos</h1>
-          <p className="text-gray-600 mt-1">Gestiona los gastos de tu propiedad</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('expenses.title')}</h1>
+          <p className="text-sm text-[#64748B] mt-1.5">{t('expenses.subtitle')}</p>
         </div>
-        <EmptyState
-          icon={<Download className="h-12 w-12" />}
-          title={t('expenses.noPropertySelected')}
-          description={t('expenses.noPropertyDescription')}
-        />
+        <Card padding="lg">
+          <EmptyState
+            icon={<Download className="h-14 w-14" />}
+            title={t('expenses.noPropertySelected')}
+            description={t('expenses.selectOrCreatePropertyExpenses')}
+          />
+        </Card>
       </div>
     )
   }
 
   return (
     <>
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('expenses.title')}</h1>
-          <p className="text-gray-600 mt-1">{expenses.length} gastos en total</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('expenses.title')}</h1>
+          <p className="text-sm text-[#64748B] mt-1.5">
+            {expenses.length === 0 
+              ? t('expenses.emptyTitle')
+              : t('expenses.totalExpenses', { count: expenses.length })}
+          </p>
         </div>
-        <div className="flex gap-2">
-          <button
+        <div className="flex items-center gap-3 flex-wrap">
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={exportToCSV}
-            className="flex items-center justify-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
           >
-            <Download className="h-5 w-5" />
+            <Download className="h-4 w-4" />
             {t('expenses.exportCSV')}
-          </button>
-          <button
+          </Button>
+          <Button
+            size="sm"
             onClick={() => setShowForm(true)}
-            className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-4 w-4" />
             {t('expenses.addExpense')}
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Month Selector */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Seleccionar Mes
+      <Card padding="md">
+        <label className="block text-xs font-medium text-[#64748B] uppercase tracking-wide mb-3">
+          {t('expenses.selectMonth')}
         </label>
         <input
           type="month"
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2"
+          className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#0F172A] bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
         />
-      </div>
+      </Card>
 
       {/* Monthly Summary */}
       <MonthlySummary

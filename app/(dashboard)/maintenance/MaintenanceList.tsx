@@ -10,6 +10,8 @@ import TicketForm from './TicketForm'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { Card } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
 import { t } from '@/lib/i18n/es'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -162,14 +164,16 @@ export default function MaintenanceList() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A]">{t('maintenance.title')}</h1>
-          <p className="text-sm text-slate-500 mt-1">{t('maintenance.subtitle')}</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('maintenance.title')}</h1>
+          <p className="text-sm text-[#64748B] mt-1.5">{t('maintenance.subtitle')}</p>
         </div>
-        <div className="space-y-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} variant="rectangular" height={120} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} padding="md">
+              <Skeleton variant="rectangular" height={120} className="rounded-lg" />
+            </Card>
           ))}
         </div>
       </div>
@@ -178,50 +182,52 @@ export default function MaintenanceList() {
 
   if (!hasProperty) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A]">{t('maintenance.title')}</h1>
-          <p className="text-sm text-slate-500 mt-1">{t('maintenance.subtitle')}</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('maintenance.title')}</h1>
+          <p className="text-sm text-[#64748B] mt-1.5">{t('maintenance.subtitle')}</p>
         </div>
-        <EmptyState
-          icon={<AlertCircle className="h-12 w-12" />}
-          title={t('maintenance.noPropertySelected')}
-          description={t('maintenance.selectOrCreatePropertyMaintenance')}
-        />
+        <Card padding="lg">
+          <EmptyState
+            icon={<AlertCircle className="h-14 w-14" />}
+            title={t('maintenance.noPropertySelected')}
+            description={t('maintenance.selectOrCreatePropertyMaintenance')}
+          />
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A]">{t('maintenance.title')}</h1>
-          <p className="text-sm text-slate-500 mt-1">{t('maintenance.subtitle')}</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('maintenance.title')}</h1>
+          <p className="text-sm text-[#64748B] mt-1.5">{t('maintenance.subtitle')}</p>
         </div>
         {activeTab === 'tickets' && (
-          <button
+          <Button
             onClick={() => {
               setEditingTicket(null)
               setShowForm(true)
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-[#0F172A] text-white rounded-lg hover:bg-[#1E293B] transition-colors duration-150 text-sm font-medium"
+            size="sm"
           >
             <Plus className="h-4 w-4" />
             {t('maintenance.newTicket')}
-          </button>
+          </Button>
         )}
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-slate-200">
+      <div className="flex gap-1 border-b border-[#E2E8F0]">
         <Link
           href="/maintenance"
-          className={`px-4 py-2 text-sm font-medium transition-colors duration-200 border-b-2 ${
+          className={`px-4 py-2.5 text-sm font-medium transition-all duration-200 border-b-2 ${
             activeTab === 'tickets'
               ? 'border-[#0F172A] text-[#0F172A]'
-              : 'border-transparent text-slate-500 hover:text-[#0F172A]'
+              : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -231,10 +237,10 @@ export default function MaintenanceList() {
         </Link>
         <Link
           href="/maintenance-plans"
-          className={`px-4 py-2 text-sm font-medium transition-colors duration-200 border-b-2 ${
+          className={`px-4 py-2.5 text-sm font-medium transition-all duration-200 border-b-2 ${
             activeTab === 'recurrent'
               ? 'border-[#0F172A] text-[#0F172A]'
-              : 'border-transparent text-slate-500 hover:text-[#0F172A]'
+              : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -248,58 +254,64 @@ export default function MaintenanceList() {
       {activeTab === 'tickets' ? (
         <>
           {/* Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
-              <input
-                type="text"
-                placeholder={t('maintenance.searchTickets')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-sm border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
-              />
+          <Card padding="md">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B] pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder={t('maintenance.searchTickets')}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2.5 text-sm border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A] placeholder-[#94A3B8]"
+                />
+              </div>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-3 py-2.5 text-sm border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A]"
+              >
+                <option value="all">{t('maintenance.allStatuses')}</option>
+                <option value="open">Abierto</option>
+                <option value="in_progress">En Progreso</option>
+                <option value="done">Completado</option>
+              </select>
+              <select
+                value={priorityFilter}
+                onChange={(e) => setPriorityFilter(e.target.value)}
+                className="px-3 py-2.5 text-sm border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A]"
+              >
+                <option value="all">{t('maintenance.allPriorities')}</option>
+                {PRIORITIES.map(p => (
+                  <option key={p} value={p}>{PRIORITY_LABELS[p]}</option>
+                ))}
+              </select>
+              <select
+                value={roomFilter}
+                onChange={(e) => setRoomFilter(e.target.value)}
+                className="px-3 py-2.5 text-sm border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A]"
+              >
+                <option value="all">{t('maintenance.allRooms')}</option>
+                {ROOMS.map(room => (
+                  <option key={room} value={room}>{room}</option>
+                ))}
+              </select>
             </div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 text-sm border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
-            >
-              <option value="all">{t('maintenance.allStatuses')}</option>
-              <option value="open">Abierto</option>
-              <option value="in_progress">En Progreso</option>
-              <option value="done">Completado</option>
-            </select>
-            <select
-              value={priorityFilter}
-              onChange={(e) => setPriorityFilter(e.target.value)}
-              className="px-3 py-2 text-sm border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
-            >
-              <option value="all">{t('maintenance.allPriorities')}</option>
-              {PRIORITIES.map(p => (
-                <option key={p} value={p}>{PRIORITY_LABELS[p]}</option>
-              ))}
-            </select>
-            <select
-              value={roomFilter}
-              onChange={(e) => setRoomFilter(e.target.value)}
-              className="px-3 py-2 text-sm border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
-            >
-              <option value="all">{t('maintenance.allRooms')}</option>
-              {ROOMS.map(room => (
-                <option key={room} value={room}>{room}</option>
-              ))}
-            </select>
-          </div>
+          </Card>
 
           {/* Tickets List */}
           {filteredTickets.length === 0 ? (
-            <EmptyState
-              icon={<Wrench className="h-12 w-12" />}
-              title={t('maintenance.noTicketsFound')}
-              description={t('maintenance.noTicketsDescription')}
-            />
+            <Card padding="lg">
+              <EmptyState
+                icon={<Wrench className="h-14 w-14" />}
+                title={tickets.length === 0 ? t('maintenance.emptyTitle') : t('maintenance.noTicketsFound')}
+                description={tickets.length === 0 ? t('maintenance.emptyDescription') : t('maintenance.tryDifferentFilters')}
+                actionLabel={tickets.length === 0 ? t('maintenance.emptyAction') : undefined}
+                onAction={tickets.length === 0 ? () => setShowForm(true) : undefined}
+              />
+            </Card>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {filteredTickets.map(ticket => (
                 <TicketCard
                   key={ticket.id}
@@ -326,7 +338,7 @@ export default function MaintenanceList() {
           )}
         </>
       ) : (
-        <div className="text-center py-12 text-slate-500">
+        <div className="text-center py-12 text-[#64748B]">
           <p>Redirigiendo a mantenimientos recurrentes...</p>
         </div>
       )}

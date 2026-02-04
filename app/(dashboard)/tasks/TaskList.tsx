@@ -288,14 +288,16 @@ export default function TaskList() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A]">{t('tasks.title')}</h1>
-          <p className="text-sm text-slate-500 mt-1">{t('tasks.subtitle')}</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('tasks.title')}</h1>
+          <p className="text-sm text-[#64748B] mt-1.5">{t('tasks.subtitle')}</p>
         </div>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} variant="rectangular" height={100} />
+            <Card key={i} padding="md">
+              <Skeleton variant="rectangular" height={100} className="rounded-lg" />
+            </Card>
           ))}
         </div>
       </div>
@@ -304,31 +306,34 @@ export default function TaskList() {
 
   if (!hasProperty) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A]">{t('tasks.title')}</h1>
-          <p className="text-sm text-slate-500 mt-1">{t('tasks.subtitle')}</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('tasks.title')}</h1>
+          <p className="text-sm text-[#64748B] mt-1.5">{t('tasks.subtitle')}</p>
         </div>
-        <EmptyState
-          icon={<AlertCircle className="h-12 w-12" />}
-          title={t('tasks.noPropertySelected')}
-          description={t('tasks.selectOrCreatePropertyTasks')}
-        />
+        <Card padding="lg">
+          <EmptyState
+            icon={<AlertCircle className="h-14 w-14" />}
+            title={t('tasks.noPropertySelected')}
+            description={t('tasks.selectOrCreatePropertyTasks')}
+          />
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A]">{t('tasks.title')}</h1>
-          <p className="text-sm text-slate-500 mt-1">{t('tasks.subtitle')}</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('tasks.title')}</h1>
+          <p className="text-sm text-[#64748B] mt-1.5">{t('tasks.subtitle')}</p>
         </div>
         <Button 
           onClick={() => setShowForm(true)}
           disabled={!hasProperty}
+          size="sm"
         >
           <Plus className="h-4 w-4" />
           {t('tasks.createTask')}
@@ -336,15 +341,15 @@ export default function TaskList() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-2 border-b border-slate-200">
+      <div className="flex gap-1 border-b border-[#E2E8F0]">
         {(['today', 'week', 'overdue', 'all'] as FilterType[]).map((filterType) => (
           <button
             key={filterType}
             onClick={() => setFilter(filterType)}
-            className={`px-4 py-2 text-sm font-medium transition-colors duration-200 border-b-2 ${
+            className={`px-4 py-2.5 text-sm font-medium transition-all duration-200 border-b-2 ${
               filter === filterType
                 ? 'border-[#0F172A] text-[#0F172A]'
-                : 'border-transparent text-slate-500 hover:text-[#0F172A]'
+                : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
             }`}
           >
             {t(`tasks.filters.${filterType}`)}
@@ -354,39 +359,43 @@ export default function TaskList() {
 
       {/* Tasks List */}
       {filteredTasks.length === 0 ? (
-        <EmptyState
-          icon={<CheckSquare className="h-12 w-12" />}
-          title={t('tasks.noTasks')}
-          description={t('tasks.noTasksDescription')}
-        />
+        <Card padding="lg">
+          <EmptyState
+            icon={<CheckSquare className="h-14 w-14" />}
+            title={tasks.length === 0 ? t('tasks.emptyTitle') : t('tasks.noTasks')}
+            description={tasks.length === 0 ? t('tasks.emptyDescription') : t('tasks.tryDifferentFilters')}
+            actionLabel={tasks.length === 0 ? t('tasks.emptyAction') : undefined}
+            onAction={tasks.length === 0 ? () => setShowForm(true) : undefined}
+          />
+        </Card>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {filteredTasks.map(task => (
-            <Card key={task.id} padding="md" className="hover:shadow-md transition-all duration-200">
+            <Card key={task.id} padding="md" className="hover:shadow-md transition-all duration-200 group">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <h3 className="text-base font-semibold text-[#0F172A]">{task.title}</h3>
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${getPriorityColor(task.priority)}`}>
+                    <span className={`px-2 py-0.5 rounded-lg text-xs font-medium ${getPriorityColor(task.priority)}`}>
                       {PRIORITY_LABELS[task.priority]}
                     </span>
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(task.status)}`}>
+                    <span className={`px-2 py-0.5 rounded-lg text-xs font-medium ${getStatusColor(task.status)}`}>
                       {getStatusLabel(task.status)}
                     </span>
                   </div>
                   
                   {task.description && (
-                    <p className="text-sm text-slate-500 mb-2">{task.description}</p>
+                    <p className="text-sm text-[#64748B] mb-3 leading-relaxed">{task.description}</p>
                   )}
 
-                  <div className="flex items-center gap-4 text-sm text-slate-600">
+                  <div className="flex items-center gap-3 text-xs text-[#64748B]">
                     <div className="flex items-center gap-1.5">
-                      <Calendar className="h-4 w-4" />
+                      <Calendar className="h-3.5 w-3.5" />
                       <span className={isOverdue(task.next_due_date) && task.status !== 'done' ? 'text-[#EF4444] font-medium' : ''}>
                         {formatDate(task.next_due_date)}
                       </span>
                     </div>
-                    <span className="text-slate-400">•</span>
+                    <span className="text-[#CBD5E1]">•</span>
                     <span>{getCadenceLabel(task.cadence)}</span>
                   </div>
                 </div>
@@ -401,14 +410,14 @@ export default function TaskList() {
                       loading={completingTaskId === task.id}
                     >
                       <CheckSquare className="h-4 w-4" />
-                      {t('tasks.markDone')}
+                      {t('tasks.markCompleted')}
                     </Button>
                   )}
                   
                   <select
                     value={task.status}
                     onChange={(e) => handleStatusChange(task.id, e.target.value as TaskStatus)}
-                    className="px-2 py-1.5 text-xs border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+                    className="px-2.5 py-1.5 text-xs border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A]"
                   >
                     {(['pending', 'in_progress', 'done'] as TaskStatus[]).map((status) => (
                       <option key={status} value={status}>{getStatusLabel(status)}</option>

@@ -304,11 +304,11 @@ export default function RentalsPage() {
 
   return (
     <>
-      <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto space-y-8 px-4 sm:px-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('rentals.title')}</h1>
-          <p className="mt-1 text-sm text-gray-500">{t('rentals.subtitle')}</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('rentals.title')}</h1>
+          <p className="text-sm text-[#64748B] mt-1.5">{t('rentals.subtitle')}</p>
         </div>
         <Button 
           onClick={() => {
@@ -325,64 +325,64 @@ export default function RentalsPage() {
       {/* Monthly Stats */}
       {monthlyStats && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          <Card padding="sm">
+          <Card padding="md" className="hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-100 rounded-lg">
-                <DollarSign className="h-5 w-5 text-emerald-600" />
+              <div className="p-2.5 bg-[#10B981]/10 rounded-lg">
+                <DollarSign className="h-5 w-5 text-[#10B981]" />
               </div>
-              <div>
-                <p className="text-sm text-gray-700">{t('rentals.income')}</p>
-                <p className="text-xl font-bold text-gray-900">${monthlyStats.income.toFixed(0)}</p>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-[#64748B] uppercase tracking-wide mb-1">{t('rentals.income')}</p>
+                <p className="text-xl font-bold text-[#0F172A] truncate">${monthlyStats.income.toFixed(0)}</p>
               </div>
             </div>
           </Card>
 
-          <Card padding="sm">
+          <Card padding="md" className="hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <DollarSign className="h-5 w-5 text-red-600" />
+              <div className="p-2.5 bg-[#EF4444]/10 rounded-lg">
+                <DollarSign className="h-5 w-5 text-[#EF4444]" />
               </div>
-              <div>
-                <p className="text-sm text-gray-700">{t('rentals.expenses')}</p>
-                <p className="text-xl font-bold text-gray-900">${monthlyStats.expenses.toFixed(0)}</p>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-[#64748B] uppercase tracking-wide mb-1">{t('rentals.expenses')}</p>
+                <p className="text-xl font-bold text-[#0F172A] truncate">${monthlyStats.expenses.toFixed(0)}</p>
               </div>
             </div>
           </Card>
 
-          <Card padding="sm">
+          <Card padding="md" className="hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <TrendingUp className="h-5 w-5 text-blue-600" />
+              <div className={`p-2.5 rounded-lg ${monthlyStats.profit >= 0 ? 'bg-[#10B981]/10' : 'bg-[#EF4444]/10'}`}>
+                <TrendingUp className={`h-5 w-5 ${monthlyStats.profit >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`} />
               </div>
-              <div>
-                <p className="text-sm text-gray-700">{t('rentals.profit')}</p>
-                <p className={`text-xl font-bold ${monthlyStats.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  ${monthlyStats.profit.toFixed(0)}
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-[#64748B] uppercase tracking-wide mb-1">{t('rentals.profit')}</p>
+                <p className={`text-xl font-bold truncate ${monthlyStats.profit >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
+                  ${Math.abs(monthlyStats.profit).toFixed(0)}
                 </p>
               </div>
             </div>
           </Card>
 
-          <Card padding="sm">
+          <Card padding="md" className="hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <CalendarIcon className="h-5 w-5 text-purple-600" />
+              <div className="p-2.5 bg-[#8B5CF6]/10 rounded-lg">
+                <CalendarIcon className="h-5 w-5 text-[#8B5CF6]" />
               </div>
-              <div>
-                <p className="text-sm text-gray-600">{t('rentals.bookings')}</p>
-                <p className="text-xl font-bold text-gray-900">{monthlyStats.bookingCount}</p>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-[#64748B] uppercase tracking-wide mb-1">{t('rentals.bookings')}</p>
+                <p className="text-xl font-bold text-[#0F172A]">{monthlyStats.bookingCount}</p>
               </div>
             </div>
           </Card>
 
-          <Card padding="sm">
+          <Card padding="md" className="hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-100 rounded-lg">
-                <Percent className="h-5 w-5 text-amber-600" />
+              <div className="p-2.5 bg-[#F59E0B]/10 rounded-lg">
+                <Percent className="h-5 w-5 text-[#F59E0B]" />
               </div>
-              <div>
-                <p className="text-sm text-gray-700">{t('rentals.occupancyRate')}</p>
-                <p className="text-xl font-bold text-gray-900">{monthlyStats.occupancyRate.toFixed(0)}%</p>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-[#64748B] uppercase tracking-wide mb-1">{t('rentals.occupancyRate')}</p>
+                <p className="text-xl font-bold text-[#0F172A]">{monthlyStats.occupancyRate.toFixed(0)}%</p>
               </div>
             </div>
           </Card>
@@ -390,7 +390,7 @@ export default function RentalsPage() {
       )}
 
       {/* View Toggle */}
-      <Card padding="sm">
+      <Card padding="md">
         <div className="flex items-center gap-2">
           <Button
             size="sm"
@@ -419,8 +419,8 @@ export default function RentalsPage() {
 
       {/* Booking Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl border border-[#E2E8F0]">
             <BookingForm
               booking={editingBooking}
               onSave={handleSave}

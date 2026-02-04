@@ -13,6 +13,8 @@ import { getActivePropertyId } from '@/lib/utils/property-client'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
 import { t } from '@/lib/i18n/es'
 
 export default function InventoryList() {
@@ -56,13 +58,12 @@ export default function InventoryList() {
   useEffect(() => {
     fetchItems()
     
-    // Listen for property changes
     const handlePropertyChange = () => {
       fetchItems()
     }
     window.addEventListener('propertyChanged', handlePropertyChange)
     return () => window.removeEventListener('propertyChanged', handlePropertyChange)
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     filterItems()
@@ -147,7 +148,6 @@ export default function InventoryList() {
   }
 
   const handleExportCSV = async () => {
-    // Get active property name
     const propertyId = await getActivePropertyId()
     let propertyName: string | null = null
     if (propertyId) {
@@ -173,18 +173,20 @@ export default function InventoryList() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Inventario</h1>
-          <p className="text-gray-600 mt-1">Gestiona el inventario de tu propiedad</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('inventory.title')}</h1>
+          <p className="text-sm text-[#64748B] mt-1">{t('inventory.subtitle')}</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-lg shadow-sm border border-slate-200/60 p-4 space-y-3">
-              <Skeleton variant="rectangular" height={200} />
-              <Skeleton variant="text" width="70%" height={20} />
-              <Skeleton variant="text" width="50%" height={16} />
-            </div>
+            <Card key={i} padding="none">
+              <Skeleton variant="rectangular" height={200} className="rounded-t-xl" />
+              <div className="p-6 space-y-3">
+                <Skeleton variant="text" width="70%" height={20} />
+                <Skeleton variant="text" width="50%" height={16} />
+              </div>
+            </Card>
           ))}
         </div>
       </div>
@@ -193,133 +195,155 @@ export default function InventoryList() {
 
   if (!hasProperty) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Inventario</h1>
-          <p className="text-gray-600 mt-1">Gestiona el inventario de tu propiedad</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('inventory.title')}</h1>
+          <p className="text-sm text-[#64748B] mt-1">{t('inventory.subtitle')}</p>
         </div>
         <EmptyState
-          icon={<Package className="h-12 w-12" />}
+          icon={<Package className="h-14 w-14" />}
           title={t('inventory.noPropertySelected')}
-          description={t('inventory.noPropertyDescription')}
+          description={t('inventory.selectOrCreatePropertyInventory')}
         />
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('inventory.title')}</h1>
-          <p className="text-gray-600 mt-1">{items.length} artículos en total</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('inventory.title')}</h1>
+          <p className="text-sm text-[#64748B] mt-1.5">
+            {filteredItems.length === 0 
+              ? t('inventory.emptyTitle')
+              : t('inventory.totalItems', { count: filteredItems.length })}
+          </p>
         </div>
-        <div className="flex gap-2">
-          <button
+        <div className="flex items-center gap-3 flex-wrap">
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={() => setShowImport(true)}
-            className="flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
           >
-            <Upload className="h-5 w-5" />
+            <Upload className="h-4 w-4" />
             {t('inventory.importCSV')}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={handleExportCSV}
-            className="flex items-center justify-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
           >
-            <Download className="h-5 w-5" />
+            <Download className="h-4 w-4" />
             {t('inventory.exportCSV')}
-          </button>
-          <button
+          </Button>
+          <Button
+            size="sm"
             onClick={() => setShowForm(true)}
-            className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-4 w-4" />
             {t('inventory.addItem')}
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-4 space-y-4">
-        <div className="flex items-center gap-2">
-          <Search className="h-5 w-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder={t('inventory.search')}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 border-0 focus:ring-0 text-sm text-gray-900 placeholder-gray-400"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('inventory.category')}</label>
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900"
-            >
-              <option value="all">{t('inventory.allCategories')}</option>
-              {CATEGORIES.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
+      <Card padding="md">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 px-4 py-2.5 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0]">
+            <Search className="h-4 w-4 text-[#64748B] shrink-0" />
+            <input
+              type="text"
+              placeholder={t('inventory.searchItems')}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="flex-1 bg-transparent border-0 focus:ring-0 text-sm text-[#0F172A] placeholder-[#94A3B8]"
+            />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('inventory.room')}</label>
-            <select
-              value={roomFilter}
-              onChange={(e) => setRoomFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900"
-            >
-              <option value="all">{t('inventory.allRooms')}</option>
-              {ROOMS.map(room => (
-                <option key={room} value={room}>{room}</option>
-              ))}
-            </select>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-[#64748B] uppercase tracking-wide mb-2">
+                {t('inventory.category')}
+              </label>
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#0F172A] bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+              >
+                <option value="all">{t('inventory.allCategories')}</option>
+                {CATEGORIES.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-[#64748B] uppercase tracking-wide mb-2">
+                {t('inventory.room')}
+              </label>
+              <select
+                value={roomFilter}
+                onChange={(e) => setRoomFilter(e.target.value)}
+                className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#0F172A] bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+              >
+                <option value="all">{t('inventory.allRooms')}</option>
+                {ROOMS.map(room => (
+                  <option key={room} value={room}>{room}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Items List */}
       {filteredItems.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <Package className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-600">{t('inventory.itemNotFound')}</p>
-        </div>
+        <Card padding="lg">
+          <EmptyState
+            icon={<Package className="h-14 w-14" />}
+            title={items.length === 0 ? t('inventory.emptyTitle') : t('inventory.noItemsFound')}
+            description={items.length === 0 ? t('inventory.emptyDescription') : t('inventory.tryDifferentFilters')}
+            actionLabel={items.length === 0 ? t('inventory.emptyAction') : undefined}
+            onAction={items.length === 0 ? () => setShowForm(true) : undefined}
+          />
+        </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredItems.map(item => (
-            <div key={item.id} className="bg-white rounded-lg shadow hover:shadow-md transition">
+            <Card key={item.id} padding="none" className="overflow-hidden group">
               {item.photo_url && (
-                <img 
-                  src={item.photo_url} 
-                  alt={item.name} 
-                  className="w-full h-48 object-cover rounded-t-lg"
-                />
+                <div className="relative w-full h-48 overflow-hidden bg-[#F8FAFC]">
+                  <img 
+                    src={item.photo_url} 
+                    alt={item.name} 
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
               )}
-              <div className="p-5">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-slate-900 text-base mb-1">{item.name}</h3>
-                    <p className="text-sm text-slate-600 mb-0.5">{item.category}</p>
-                    <p className="text-xs text-slate-500">{item.location}</p>
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1 min-w-0 pr-3">
+                    <h3 className="font-semibold text-[#0F172A] text-base mb-1.5 truncate">{item.name}</h3>
+                    <div className="flex items-center gap-2 text-xs text-[#64748B]">
+                      <span>{item.category}</span>
+                      <span>•</span>
+                      <span>{item.location}</span>
+                    </div>
                   </div>
-                  <div className="flex gap-1 ml-2">
+                  <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={() => handleEdit(item)}
-                      className="p-1.5 text-slate-500 hover:text-[#2563EB] hover:bg-[#2563EB]/10 rounded transition-all duration-150"
-                      aria-label="Editar"
+                      className="p-1.5 text-[#64748B] hover:text-[#2563EB] hover:bg-[#2563EB]/10 rounded-lg transition-all duration-200"
+                      aria-label={t('common.edit')}
                     >
                       <Pencil className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteClick(item.id)}
-                      className="p-1.5 text-slate-500 hover:text-[#EF4444] hover:bg-[#EF4444]/10 rounded transition-all duration-150"
-                      aria-label="Eliminar"
+                      className="p-1.5 text-[#64748B] hover:text-[#EF4444] hover:bg-[#EF4444]/10 rounded-lg transition-all duration-200"
+                      aria-label={t('common.delete')}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -327,8 +351,8 @@ export default function InventoryList() {
                 </div>
 
                 {item.quantity <= item.min_threshold && (
-                  <div className="flex items-center gap-1.5 text-[#EF4444] text-xs font-medium mb-2 px-2 py-1 bg-[#EF4444]/10 rounded">
-                    <AlertCircle className="h-3.5 w-3.5" />
+                  <div className="flex items-center gap-2 text-[#EF4444] text-xs font-medium mb-4 px-3 py-1.5 bg-[#EF4444]/10 rounded-lg border border-[#EF4444]/20">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                     <span>{t('inventory.lowStock')}</span>
                   </div>
                 )}
@@ -339,10 +363,10 @@ export default function InventoryList() {
                 />
 
                 {item.notes && (
-                  <p className="text-sm text-slate-600 mt-3 pt-3 border-t border-[#E5E7EB]">{item.notes}</p>
+                  <p className="text-sm text-[#64748B] mt-4 pt-4 border-t border-[#E2E8F0] leading-relaxed">{item.notes}</p>
                 )}
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}
@@ -357,21 +381,23 @@ export default function InventoryList() {
 
       {/* Import Modal */}
       {showImport && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">{t('inventory.importCSV')}</h2>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl border border-[#E2E8F0]">
+            <div className="p-6 border-b border-[#E2E8F0] flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-[#0F172A]">{t('inventory.importCSV')}</h2>
               <button
                 onClick={() => {
                   setShowImport(false)
-                  fetchItems() // Refresh list after import
+                  fetchItems()
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-[#64748B] hover:text-[#0F172A] transition-colors p-1 rounded-lg hover:bg-[#F8FAFC]"
               >
                 ✕
               </button>
             </div>
-            <CSVImport />
+            <div className="p-6">
+              <CSVImport />
+            </div>
           </div>
         </div>
       )}
@@ -380,8 +406,8 @@ export default function InventoryList() {
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, itemId: null })}
         onConfirm={handleDelete}
-        title={t('inventory.editItem')}
-        message="¿Estás seguro de que quieres eliminar este artículo? Esta acción no se puede deshacer."
+        title={t('inventory.deleteItemTitle')}
+        message={t('inventory.deleteItemMessage')}
         confirmText={t('common.delete')}
         loading={deleting}
       />
