@@ -266,3 +266,4 @@ END $$;
 -- 3. Update all business table queries to filter by property_id
 -- ============================================================
 
+

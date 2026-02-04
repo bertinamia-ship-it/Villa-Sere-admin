@@ -192,3 +192,4 @@
 
 **Conclusión**: App estable y funcional. Issues pendientes son mejoras, no bugs bloqueantes.
 
+

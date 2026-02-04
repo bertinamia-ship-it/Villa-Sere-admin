@@ -119,7 +119,7 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
         description: formData.description.trim() || null,
         cadence: formData.cadence,
         due_date: formData.cadence === 'once' ? (formData.due_date?.split('T')[0] || null) : null,
-        next_due_date: nextDueDate.split('T')[0], // Ensure ISO format
+        next_due_date: nextDueDate.includes('T') ? nextDueDate.split('T')[0] : nextDueDate, // Ensure ISO format
         priority: formData.priority,
         status: formData.status,
       }
@@ -134,7 +134,21 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
         if (error) {
           const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
           logError('TaskForm.update', error)
-          showToast(getUserFriendlyError(error), 'error')
+          
+          // Check if table doesn't exist
+          if (error?.message?.includes('does not exist') || error?.message?.includes('Perhaps you meant')) {
+            console.error('[TaskForm] ERROR: La tabla "tasks" no existe en la base de datos.')
+            console.error('[TaskForm] Por favor ejecuta el SQL: supabase-automation-migration.sql')
+            console.error('[TaskForm] Error completo:', {
+              message: error.message,
+              details: error.details,
+              hint: error.hint,
+              code: error.code,
+            })
+            showToast('Error: La tabla "tasks" no existe. Ejecuta la migración SQL primero.', 'error')
+          } else {
+            showToast(getUserFriendlyError(error), 'error')
+          }
         } else {
           showToast(t('tasks.taskSaved'), 'success')
           onClose()
@@ -146,7 +160,21 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
         if (error) {
           const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
           logError('TaskForm.insert', error)
-          showToast(getUserFriendlyError(error), 'error')
+          
+          // Check if table doesn't exist
+          if (error?.message?.includes('does not exist') || error?.message?.includes('Perhaps you meant')) {
+            console.error('[TaskForm] ERROR: La tabla "tasks" no existe en la base de datos.')
+            console.error('[TaskForm] Por favor ejecuta el SQL: supabase-automation-migration.sql')
+            console.error('[TaskForm] Error completo:', {
+              message: error.message,
+              details: error.details,
+              hint: error.hint,
+              code: error.code,
+            })
+            showToast('Error: La tabla "tasks" no existe. Ejecuta la migración SQL primero.', 'error')
+          } else {
+            showToast(getUserFriendlyError(error), 'error')
+          }
         } else {
           showToast(t('tasks.taskSaved'), 'success')
           onClose()

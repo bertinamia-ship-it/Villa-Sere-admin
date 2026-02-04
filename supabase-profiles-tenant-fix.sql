@@ -189,3 +189,4 @@ LIMIT 10;
 -- 3. Verify preferred_property_id is set when property is created
 -- ============================================================
 
+

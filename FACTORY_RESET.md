@@ -328,3 +328,4 @@ Antes de ejecutar el reset:
 **Última actualización:** Enero 2025  
 **Versión:** 1.0.0
 
+

@@ -111,3 +111,4 @@ Agregar campos para:
 - La recurrencia se gestiona completamente en `/maintenance`
 - Mantener compatibilidad con tickets existentes (todos son "una vez" por defecto)
 
+

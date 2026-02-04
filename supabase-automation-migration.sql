@@ -362,3 +362,4 @@ BEGIN
   RAISE NOTICE 'All automation tables created successfully';
 END $$;
 
+

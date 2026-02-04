@@ -248,3 +248,4 @@ components/
 
 **Última actualización:** Enero 2025
 
+

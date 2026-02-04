@@ -26,3 +26,4 @@
 - Errores deben mostrar mensajes claros (no "{}")
 - Fechas deben estar en formato ISO (YYYY-MM-DD)
 
+

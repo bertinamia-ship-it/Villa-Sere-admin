@@ -163,3 +163,4 @@ El script detectará y eliminará **TODAS** las tablas que cumplan los criterios
 **Status:** ✅ Listo para ejecutar  
 **Última actualización:** Enero 2025
 
+

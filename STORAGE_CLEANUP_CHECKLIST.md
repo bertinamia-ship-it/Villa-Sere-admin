@@ -150,3 +150,4 @@ Pero por ahora, la limpieza manual es más segura y te da control total.
 
 **Última actualización:** Enero 2025
 
+

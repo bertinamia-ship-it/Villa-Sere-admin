@@ -87,3 +87,4 @@ export const layout = {
   card: 'bg-white rounded-xl border border-[#E2E8F0] shadow-sm',
 }
 
+

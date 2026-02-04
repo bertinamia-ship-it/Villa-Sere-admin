@@ -289,3 +289,4 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
   )
 }
 
+

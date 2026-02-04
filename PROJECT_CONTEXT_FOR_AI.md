@@ -440,3 +440,4 @@ npm run seed:data        # Seed de datos de ejemplo
 **Última actualización:** Febrero 2026
 **Versión:** 0.1.0 (CasaPilot)
 
+

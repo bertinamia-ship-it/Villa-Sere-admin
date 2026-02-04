@@ -228,3 +228,4 @@ SUPABASE_SERVICE_ROLE_KEY=tu-service-role-key  # ← Requerida
 
 **Última actualización:** Enero 2025
 
+

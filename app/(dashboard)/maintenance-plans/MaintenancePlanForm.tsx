@@ -86,7 +86,9 @@ export default function MaintenancePlanForm({ plan, template, vendors, onClose }
       }
 
       // Use next_run_date as start_date for calculation purposes
-      const startDate = formData.next_run_date
+      // Normalize dates to ISO format (YYYY-MM-DD)
+      const startDate = formData.next_run_date.split('T')[0]
+      const nextRunDate = formData.next_run_date.split('T')[0]
 
       // If recurrent, ensure we have valid frequency_unit and frequency_interval
       if (formData.is_recurrent && (!formData.frequency_unit || interval <= 0)) {
@@ -102,7 +104,7 @@ export default function MaintenancePlanForm({ plan, template, vendors, onClose }
         frequency_unit: formData.is_recurrent ? formData.frequency_unit : null,
         frequency_interval: formData.is_recurrent ? interval : null,
         start_date: startDate,
-        next_run_date: formData.next_run_date,
+        next_run_date: nextRunDate,
         vendor_id: formData.vendor_id || null,
         estimated_cost: null,
         priority: formData.priority,

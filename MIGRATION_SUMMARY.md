@@ -72,3 +72,4 @@ Ver `MIGRATION_AUDIT.md` para lista detallada de cada query y línea específica
 
 **Status:** Listo para empezar con Commit A (Helpers)
 
+

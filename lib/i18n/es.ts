@@ -339,6 +339,10 @@ export const es = {
     provider: 'Proveedor:',
     ticketPhoto: 'Foto del ticket',
     subtitle: 'Gestiona los tickets de mantenimiento de tu propiedad',
+    emptyTitle: 'Aún no hay tickets de mantenimiento',
+    emptyDescription: 'Crea tu primer ticket para llevar control de reparaciones y pendientes.',
+    emptyAction: 'Crear ticket',
+    tryDifferentFilters: 'Intenta ajustar los filtros para encontrar lo que buscas.',
   },
 
   // Maintenance Plans
@@ -666,6 +670,16 @@ export const es = {
     advanced: 'Avanzado',
     dangerousActions: 'Acciones Peligrosas',
     comingSoon: 'Más opciones de configuración próximamente',
+    installApp: 'Instalar App',
+    installAppDescription: 'Instala CasaPilot en tu dispositivo para acceso rápido',
+    installIOS: 'iPhone (Safari)',
+    installIOSSteps: '1. Abre Safari\n2. Toca el botón Compartir\n3. Selecciona "Añadir a pantalla de inicio"\n4. Toca "Añadir"',
+    installAndroid: 'Android (Chrome)',
+    installAndroidSteps: '1. Abre Chrome\n2. Toca el menú (3 puntos)\n3. Selecciona "Instalar app" o "Añadir a pantalla de inicio"',
+    installDesktop: 'Escritorio (Chrome/Edge)',
+    installDesktopSteps: '1. Busca el icono de instalación en la barra de direcciones\n2. Haz clic para instalar',
+    alreadyInstalled: 'La app ya está instalada',
+    notSupported: 'Tu navegador no soporta instalación de apps',
   },
 
   // Bank

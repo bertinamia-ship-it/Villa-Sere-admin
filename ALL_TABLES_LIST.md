@@ -175,3 +175,4 @@ Todas las tablas de negocio deben tener 0 registros.
 
 **Última actualización:** Enero 2025
 
+

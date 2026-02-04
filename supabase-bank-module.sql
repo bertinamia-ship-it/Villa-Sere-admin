@@ -205,3 +205,4 @@ CREATE TRIGGER trigger_initialize_account_balance
 -- 3. Probar crear una cuenta y un movimiento
 -- ============================================
 
+
