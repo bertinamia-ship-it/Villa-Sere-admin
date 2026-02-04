@@ -218,14 +218,13 @@ export default async function DashboardPage() {
       <div className="-mx-4 sm:-mx-6 lg:-mx-8 mb-6 sm:mb-8 relative overflow-hidden rounded-b-2xl lg:rounded-2xl shadow-xl">
         <div className="relative h-64 sm:h-80 lg:h-96 w-full bg-slate-900">
           <Image
-            src="/splash-screen.png?v=3"
+            src="/splash-screen.png"
             alt={propertyName}
             fill
             priority
             quality={85}
             className="object-cover"
             sizes="100vw"
-            unoptimized={false}
           />
           {/* Gradient overlay for better text readability */}
           <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/50 to-transparent" />
