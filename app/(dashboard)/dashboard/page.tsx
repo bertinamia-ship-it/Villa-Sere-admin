@@ -440,36 +440,6 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Quick Actions - Secondary */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#0F172A]">{t('dashboard.quickActions')}</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Link href="/rentals">
-            <Button variant="secondary" size="sm" className="w-full justify-start gap-2">
-              <Plus className="h-4 w-4" />
-              {t('dashboard.newBooking')}
-            </Button>
-          </Link>
-          <Link href="/tasks">
-            <Button variant="secondary" size="sm" className="w-full justify-start gap-2">
-              <Plus className="h-4 w-4" />
-              {t('dashboard.newTask')}
-            </Button>
-          </Link>
-          <Link href="/expenses">
-            <Button variant="secondary" size="sm" className="w-full justify-start gap-2">
-              <Plus className="h-4 w-4" />
-              {t('dashboard.addExpense')}
-            </Button>
-          </Link>
-          <Link href="/maintenance">
-            <Button variant="secondary" size="sm" className="w-full justify-start gap-2">
-              <Plus className="h-4 w-4" />
-              {t('dashboard.newTicket')}
-            </Button>
-          </Link>
-        </div>
-      </div>
     </div>
   )
 }

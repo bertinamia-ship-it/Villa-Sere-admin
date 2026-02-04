@@ -158,64 +158,55 @@ export default function MaintenancePlanList() {
       const today = new Date().toISOString().split('T')[0]
 
       // Check if plan is recurrent (has frequency)
-      const isRecurrent = plan.frequency_unit && plan.frequency_interval > 0
+      const isRecurrent = plan.frequency_unit && plan.frequency_interval && plan.frequency_interval > 0
 
       let nextRunDate: string
       let shouldDeactivate = false
 
       if (isRecurrent) {
-        // Calculate next_run_date using SQL function
-        const { data: nextDateResult, error: nextDateError } = await supabase
-          .rpc('calculate_next_run_date', {
-            p_start_date: plan.start_date,
-            p_frequency_unit: plan.frequency_unit,
-            p_frequency_interval: plan.frequency_interval,
-            p_last_completed_date: today
-          })
-
-        if (nextDateError) {
-          console.error('Error calculating next_run_date:', nextDateError)
-          showToast('Error al calcular próxima fecha', 'error')
-          setCompletingPlanId(null)
-          return
-        }
-
-        nextRunDate = nextDateResult || today
+        // Calculate next_run_date using centralized helper
+        const { calculateNextRunDate } = await import('@/lib/utils/date-calculations')
+        nextRunDate = calculateNextRunDate(
+          plan.frequency_unit,
+          plan.frequency_interval,
+          plan.start_date || plan.next_run_date,
+          today
+        )
       } else {
         // Not recurrent: deactivate
         nextRunDate = plan.next_run_date
         shouldDeactivate = true
       }
 
-      // Create run record
-      const { error: runError } = await supabase
-        .from('maintenance_plan_runs')
-        .insert({
-          tenant_id: profile.tenant_id,
-          property_id: propertyId,
-          plan_id: planId,
-          scheduled_date: plan.next_run_date,
-          status: 'completed',
-          completed_at: new Date().toISOString(),
-        })
+      // Use helpers for security (client-side)
+      const { insertWithPropertyClient, updateWithPropertyClient } = await import('@/lib/supabase/query-helpers-client')
+
+      // Create run record using helper
+      const { error: runError } = await insertWithPropertyClient('maintenance_plan_runs', {
+        plan_id: planId,
+        scheduled_date: plan.next_run_date,
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+      })
 
       if (runError) {
-        console.error('Error creating run:', runError)
+        console.error('Error creating run:', runError, {
+          message: (runError as any)?.message,
+          details: (runError as any)?.details,
+          hint: (runError as any)?.hint,
+          code: (runError as any)?.code,
+        })
         showToast(t('maintenancePlans.completeError'), 'error')
         setCompletingPlanId(null)
         return
       }
 
-      // Update plan
-      const { error: updateError } = await supabase
-        .from('maintenance_plans')
-        .update({
-          last_completed_date: today,
-          next_run_date: nextRunDate,
-          is_active: shouldDeactivate ? false : plan.is_active,
-        })
-        .eq('id', planId)
-        .eq('property_id', propertyId)
+      // Update plan using helper
+      const { error: updateError } = await updateWithPropertyClient('maintenance_plans', planId, {
+        last_completed_date: today,
+        next_run_date: nextRunDate,
+        is_active: shouldDeactivate ? false : plan.is_active,
+      })
 
       if (updateError) {
         console.error('Error updating plan:', updateError)

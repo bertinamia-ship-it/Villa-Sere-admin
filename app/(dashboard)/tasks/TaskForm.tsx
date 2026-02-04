@@ -87,33 +87,38 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
         return
       }
 
+      // Calculate next_due_date using centralized helper
+      const { calculateNextDueDate } = await import('@/lib/utils/date-calculations')
+      
       let nextDueDate: string
 
       if (formData.cadence === 'once') {
         // Once: use due_date
-        nextDueDate = formData.due_date
-      } else {
-        // Recurrent: calculate next_due_date using SQL function
-        const { data: nextDateResult, error: nextDateError } = await supabase
-          .rpc('calculate_next_due_date', {
-            p_cadence: formData.cadence,
-            p_last_completed_date: null,
-            p_current_due_date: formData.start_date
-          })
-
-        if (nextDateError) {
-          console.error('Error calculating next_due_date:', nextDateError)
-          showToast('Error al calcular próxima fecha', 'error')
+        if (!formData.due_date) {
+          showToast('La fecha de vencimiento es requerida para tareas de una vez', 'error')
           setLoading(false)
           return
         }
-
-        nextDueDate = nextDateResult || formData.start_date
+        nextDueDate = formData.due_date
+      } else {
+        // Recurrent: calculate using helper
+        if (!formData.start_date) {
+          showToast('La fecha de inicio es requerida para tareas recurrentes', 'error')
+          setLoading(false)
+          return
+        }
+        nextDueDate = calculateNextDueDate(formData.cadence, formData.start_date, null)
       }
 
+      // Validate interval/frequency for recurrent tasks
+      if (formData.cadence !== 'once' && !formData.start_date) {
+        showToast('La fecha de inicio es requerida para tareas recurrentes', 'error')
+        setLoading(false)
+        return
+      }
+
+      // Prepare data (helpers will add tenant_id and property_id)
       const dataToSave = {
-        tenant_id: profile.tenant_id,
-        property_id: propertyId,
         title: formData.title.trim(),
         description: formData.description.trim() || null,
         cadence: formData.cadence,
@@ -123,30 +128,41 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
         status: formData.status,
       }
 
+      // Use query helpers for security (client-side)
+      const { insertWithPropertyClient, updateWithPropertyClient } = await import('@/lib/supabase/query-helpers-client')
+
       if (task) {
-        // Update
-        const { error } = await supabase
-          .from('tasks')
-          .update(dataToSave)
-          .eq('id', task.id)
-          .eq('property_id', propertyId)
+        // Update using helper
+        const { error } = await updateWithPropertyClient('tasks', task.id, dataToSave)
 
         if (error) {
-          console.error('Error updating task:', error)
-          showToast(t('tasks.saveError'), 'error')
+          console.error('Error updating task:', error, {
+            message: (error as any)?.message,
+            details: (error as any)?.details,
+            hint: (error as any)?.hint,
+            code: (error as any)?.code,
+            status: (error as any)?.status
+          })
+          const errorMsg = (error as any)?.message || t('tasks.saveError')
+          showToast(errorMsg, 'error')
         } else {
           showToast(t('tasks.taskSaved'), 'success')
           onClose()
         }
       } else {
-        // Insert
-        const { error } = await supabase
-          .from('tasks')
-          .insert([dataToSave])
+        // Insert using helper
+        const { error } = await insertWithPropertyClient('tasks', dataToSave)
 
         if (error) {
-          console.error('Error creating task:', error)
-          showToast(t('tasks.saveError'), 'error')
+          console.error('Error creating task:', error, {
+            message: (error as any)?.message,
+            details: (error as any)?.details,
+            hint: (error as any)?.hint,
+            code: (error as any)?.code,
+            status: (error as any)?.status
+          })
+          const errorMsg = (error as any)?.message || t('tasks.saveError')
+          showToast(errorMsg, 'error')
         } else {
           showToast(t('tasks.taskSaved'), 'success')
           onClose()

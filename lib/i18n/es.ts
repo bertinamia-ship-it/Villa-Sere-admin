@@ -492,6 +492,7 @@ export const es = {
   // Vendors
   vendors: {
     title: 'Proveedores',
+    confirmDelete: '¿Estás seguro de que quieres eliminar este proveedor?',
     addVendor: 'Agregar Proveedor',
     editVendor: 'Editar Proveedor',
     search: 'Buscar proveedores...',

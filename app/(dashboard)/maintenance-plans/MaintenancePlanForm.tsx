@@ -88,9 +88,15 @@ export default function MaintenancePlanForm({ plan, template, vendors, onClose }
       // Use next_run_date as start_date for calculation purposes
       const startDate = formData.next_run_date
 
+      // If recurrent, ensure we have valid frequency_unit and frequency_interval
+      if (formData.is_recurrent && (!formData.frequency_unit || interval <= 0)) {
+        showToast('Para mantenimientos recurrentes, el intervalo debe ser mayor que 0', 'error')
+        setLoading(false)
+        return
+      }
+
+      // Prepare data (helpers will add tenant_id and property_id)
       const dataToSave = {
-        tenant_id: profile.tenant_id,
-        property_id: propertyId,
         title: formData.title.trim(),
         description: formData.notes.trim() || null,
         frequency_unit: formData.is_recurrent ? formData.frequency_unit : null,
@@ -103,30 +109,41 @@ export default function MaintenancePlanForm({ plan, template, vendors, onClose }
         is_active: true,
       }
 
+      // Use query helpers for security (client-side)
+      const { insertWithPropertyClient, updateWithPropertyClient } = await import('@/lib/supabase/query-helpers-client')
+
       if (plan) {
-        // Update
-        const { error } = await supabase
-          .from('maintenance_plans')
-          .update(dataToSave)
-          .eq('id', plan.id)
-          .eq('property_id', propertyId)
+        // Update using helper
+        const { error } = await updateWithPropertyClient('maintenance_plans', plan.id, dataToSave)
 
         if (error) {
-          console.error('Error updating plan:', error)
-          showToast(t('maintenancePlans.saveError'), 'error')
+          console.error('Error updating plan:', error, {
+            message: (error as any)?.message,
+            details: (error as any)?.details,
+            hint: (error as any)?.hint,
+            code: (error as any)?.code,
+            status: (error as any)?.status
+          })
+          const errorMsg = (error as any)?.message || t('maintenancePlans.saveError')
+          showToast(errorMsg, 'error')
         } else {
           showToast(t('maintenancePlans.planSaved'), 'success')
           onClose()
         }
       } else {
-        // Insert
-        const { error } = await supabase
-          .from('maintenance_plans')
-          .insert([dataToSave])
+        // Insert using helper
+        const { error } = await insertWithPropertyClient('maintenance_plans', dataToSave)
 
         if (error) {
-          console.error('Error creating plan:', error)
-          showToast(t('maintenancePlans.saveError'), 'error')
+          console.error('Error creating plan:', error, {
+            message: (error as any)?.message,
+            details: (error as any)?.details,
+            hint: (error as any)?.hint,
+            code: (error as any)?.code,
+            status: (error as any)?.status
+          })
+          const errorMsg = (error as any)?.message || t('maintenancePlans.saveError')
+          showToast(errorMsg, 'error')
         } else {
           showToast(t('maintenancePlans.planSaved'), 'success')
           onClose()

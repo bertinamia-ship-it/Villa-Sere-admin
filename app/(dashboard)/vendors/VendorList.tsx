@@ -91,7 +91,7 @@ export default function VendorList() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this vendor?')) return
+    if (!confirm(t('vendors.confirmDelete'))) return
 
     try {
       // Get tenant_id for security

@@ -158,32 +158,17 @@ export default function TaskList() {
           fetchData()
         }
       } else {
-        // Recurrent: calculate next_due_date
-        const { data: nextDateResult, error: nextDateError } = await supabase
-          .rpc('calculate_next_due_date', {
-            p_cadence: task.cadence,
-            p_last_completed_date: today,
-            p_current_due_date: task.next_due_date
-          })
+        // Recurrent: calculate next_due_date using centralized helper
+        const { calculateNextDueDate } = await import('@/lib/utils/date-calculations')
+        const nextDueDate = calculateNextDueDate(task.cadence, task.next_due_date, today)
 
-        if (nextDateError) {
-          console.error('Error calculating next_due_date:', nextDateError)
-          showToast('Error al calcular próxima fecha', 'error')
-          setCompletingTaskId(null)
-          return
-        }
-
-        const nextDueDate = nextDateResult || today
-
-        const { error } = await supabase
-          .from('tasks')
-          .update({
-            last_completed_date: today,
-            next_due_date: nextDueDate,
-            status: 'pending', // Reset to pending for next cycle
-          })
-          .eq('id', taskId)
-          .eq('property_id', propertyId)
+        // Use updateWithProperty helper for security (client-side)
+        const { updateWithPropertyClient } = await import('@/lib/supabase/query-helpers-client')
+        const { error } = await updateWithPropertyClient('tasks', taskId, {
+          last_completed_date: today,
+          next_due_date: nextDueDate,
+          status: 'pending', // Reset to pending for next cycle
+        })
 
         if (error) {
           console.error('Error updating task:', error)
