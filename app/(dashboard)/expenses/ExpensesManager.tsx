@@ -113,6 +113,19 @@ export default function ExpensesManager() {
       return
     }
 
+    // Delete associated transaction if exists
+    const { data: transaction } = await supabase
+      .from('account_transactions')
+      .select('id')
+      .eq('expense_id', deleteConfirm.expenseId)
+      .maybeSingle()
+
+    if (transaction) {
+      const { deleteWithPropertyClient } = await import('@/lib/supabase/query-helpers-client')
+      await deleteWithPropertyClient('account_transactions', transaction.id)
+    }
+
+    // Delete expense
     const { error } = await supabase
       .from('expenses')
       .delete()

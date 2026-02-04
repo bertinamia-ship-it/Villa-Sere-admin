@@ -169,6 +169,7 @@ export interface Database {
           category: string
           vendor_id: string | null
           ticket_id: string | null
+          account_id: string | null
           notes: string | null
           receipt_url: string | null
           created_at: string
@@ -182,6 +183,7 @@ export interface Database {
           category: string
           vendor_id?: string | null
           ticket_id?: string | null
+          account_id?: string | null
           notes?: string | null
           receipt_url?: string | null
           created_at?: string
@@ -195,6 +197,7 @@ export interface Database {
           category?: string
           vendor_id?: string | null
           ticket_id?: string | null
+          account_id?: string | null
           notes?: string | null
           receipt_url?: string | null
           created_at?: string
@@ -434,6 +437,94 @@ export interface Database {
           updated_at?: string
         }
       }
+      financial_accounts: {
+        Row: {
+          id: string
+          tenant_id: string
+          property_id: string | null
+          name: string
+          account_type: 'cash' | 'card' | 'bank'
+          currency: string
+          opening_balance: number
+          current_balance: number
+          is_active: boolean
+          notes: string | null
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          property_id?: string | null
+          name: string
+          account_type: 'cash' | 'card' | 'bank'
+          currency?: string
+          opening_balance?: number
+          current_balance?: number
+          is_active?: boolean
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          property_id?: string | null
+          name?: string
+          account_type?: 'cash' | 'card' | 'bank'
+          currency?: string
+          opening_balance?: number
+          current_balance?: number
+          is_active?: boolean
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+      }
+      account_transactions: {
+        Row: {
+          id: string
+          tenant_id: string
+          property_id: string | null
+          account_id: string
+          transaction_date: string
+          direction: 'in' | 'out'
+          amount: number
+          note: string | null
+          expense_id: string | null
+          created_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          property_id?: string | null
+          account_id: string
+          transaction_date: string
+          direction: 'in' | 'out'
+          amount: number
+          note?: string | null
+          expense_id?: string | null
+          created_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          property_id?: string | null
+          account_id?: string
+          transaction_date?: string
+          direction?: 'in' | 'out'
+          amount?: number
+          note?: string | null
+          expense_id?: string | null
+          created_at?: string
+          created_by?: string | null
+        }
+      }
     }
   }
 }
@@ -448,3 +539,5 @@ export type PurchaseItem = Database['public']['Tables']['purchase_items']['Row']
 export type MaintenancePlan = Database['public']['Tables']['maintenance_plans']['Row']
 export type MaintenancePlanRun = Database['public']['Tables']['maintenance_plan_runs']['Row']
 export type Task = Database['public']['Tables']['tasks']['Row']
+export type FinancialAccount = Database['public']['Tables']['financial_accounts']['Row']
+export type AccountTransaction = Database['public']['Tables']['account_transactions']['Row']

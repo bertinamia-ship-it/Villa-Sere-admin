@@ -19,7 +19,8 @@ import {
   CalendarCheck,
   Settings,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Wallet
 } from 'lucide-react'
 import { useState } from 'react'
 import Header from '@/components/Header'
@@ -47,6 +48,7 @@ const navigation: NavItem[] = [
     name: 'Finanzas',
     children: [
       { name: 'Movimientos', href: '/expenses', icon: DollarSign },
+      { name: 'Banco', href: '/bank', icon: Wallet },
       { name: 'Reportes', href: '/reports', icon: BarChart3 },
     ]
   },

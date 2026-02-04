@@ -1,13 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Expense, Vendor, MaintenanceTicket } from '@/lib/types/database'
+import { Expense, Vendor, MaintenanceTicket, FinancialAccount } from '@/lib/types/database'
 import { EXPENSE_CATEGORIES } from '@/lib/constants'
 import { X, Upload } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { useToast } from '@/components/ui/Toast'
 import { t } from '@/lib/i18n/es'
+import { insertWithPropertyClient, updateWithPropertyClient, deleteWithPropertyClient } from '@/lib/supabase/query-helpers-client'
+import { logError, getUserFriendlyError } from '@/lib/utils/error-handler'
 
 interface ExpenseFormProps {
   expense?: Expense | null
@@ -23,13 +25,65 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
     category: expense?.category || EXPENSE_CATEGORIES[0],
     vendor_id: expense?.vendor_id || '',
     ticket_id: expense?.ticket_id || '',
+    account_id: (expense as any)?.account_id || '',
     notes: expense?.notes || '',
   })
+  const [accounts, setAccounts] = useState<FinancialAccount[]>([])
+  const [loadingAccounts, setLoadingAccounts] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [receiptUrl, setReceiptUrl] = useState(expense?.receipt_url || '')
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
   const { showToast } = useToast()
+
+  useEffect(() => {
+    loadAccounts()
+  }, [])
+
+  const loadAccounts = async () => {
+    setLoadingAccounts(true)
+    try {
+      const propertyId = await getActivePropertyId()
+      if (!propertyId) {
+        setAccounts([])
+        setLoadingAccounts(false)
+        return
+      }
+
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setLoadingAccounts(false)
+        return
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      if (!profile?.tenant_id) {
+        setLoadingAccounts(false)
+        return
+      }
+
+      // Load accounts: property_id = current property OR property_id IS NULL (general accounts)
+      const { data, error } = await supabase
+        .from('financial_accounts')
+        .select('*')
+        .eq('tenant_id', profile.tenant_id)
+        .eq('is_active', true)
+        .or(`property_id.eq.${propertyId},property_id.is.null`)
+        .order('name')
+
+      if (error) throw error
+      setAccounts(data || [])
+    } catch (error) {
+      console.error('Error loading accounts:', error)
+    } finally {
+      setLoadingAccounts(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -68,39 +122,118 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
       amount: parseFloat(formData.amount),
       vendor_id: formData.vendor_id || null,
       ticket_id: formData.ticket_id || null,
+      account_id: formData.account_id || null,
       receipt_url: receiptUrl || null,
       created_by: user?.id,
       property_id: propertyId,
     }
 
     if (expense) {
-      // Update: filter by id + property_id for security
-      const { error } = await supabase
+      // Update expense
+      const { error: updateError, data: updatedExpense } = await supabase
         .from('expenses')
         .update(dataToSave)
         .eq('id', expense.id)
         .eq('property_id', propertyId)
+        .select()
+        .single()
 
-      if (error) {
-        const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
-        logError('ExpenseForm.update', error)
-        showToast(getUserFriendlyError(error), 'error')
-      } else {
-        onClose()
+      if (updateError) {
+        logError('ExpenseForm.update', updateError)
+        showToast(getUserFriendlyError(updateError), 'error')
+        setLoading(false)
+        return
       }
+
+      // Handle transaction update/creation/deletion
+      const oldAccountId = (expense as any)?.account_id
+      const newAccountId = formData.account_id || null
+      const expenseId = expense.id
+      const transactionDate = formData.date.split('T')[0]
+      const transactionAmount = parseFloat(formData.amount)
+
+      // Find existing transaction
+      const { data: existingTransaction } = await supabase
+        .from('account_transactions')
+        .select('id, account_id')
+        .eq('expense_id', expenseId)
+        .maybeSingle()
+
+      if (existingTransaction) {
+        // Transaction exists
+        if (newAccountId) {
+          // Update transaction
+          const { error: transactionError } = await updateWithPropertyClient('account_transactions', existingTransaction.id, {
+            account_id: newAccountId,
+            amount: transactionAmount,
+            transaction_date: transactionDate,
+            note: t('bank.transactionNoteExpense', { category: formData.category }),
+          })
+          if (transactionError) {
+            logError('ExpenseForm.updateTransaction', transactionError)
+            showToast(getUserFriendlyError(transactionError), 'error')
+          }
+        } else {
+          // Delete transaction (account removed)
+          const { error: deleteError } = await deleteWithPropertyClient('account_transactions', existingTransaction.id)
+          if (deleteError) {
+            logError('ExpenseForm.deleteTransaction', deleteError)
+            showToast(getUserFriendlyError(deleteError), 'error')
+          }
+        }
+      } else if (newAccountId) {
+        // Create new transaction (account added)
+        const { error: insertError } = await insertWithPropertyClient('account_transactions', {
+          account_id: newAccountId,
+          transaction_date: transactionDate,
+          direction: 'out',
+          amount: transactionAmount,
+          expense_id: expenseId,
+          note: t('bank.transactionNoteExpense', { category: formData.category }),
+        })
+        if (insertError) {
+          logError('ExpenseForm.createTransaction', insertError)
+          showToast(getUserFriendlyError(insertError), 'error')
+        }
+      }
+
+      onClose()
     } else {
-      // Insert: property_id included automatically
-      const { error } = await supabase
+      // Insert expense
+      const { error: insertError, data: newExpense } = await supabase
         .from('expenses')
         .insert([dataToSave])
+        .select()
+        .single()
 
-      if (error) {
-        const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
-        logError('ExpenseForm.insert', error)
-        showToast(getUserFriendlyError(error), 'error')
-      } else {
-        onClose()
+      if (insertError) {
+        logError('ExpenseForm.insert', insertError)
+        showToast(getUserFriendlyError(insertError), 'error')
+        setLoading(false)
+        return
       }
+
+      // Create transaction if account selected
+      if (formData.account_id && newExpense) {
+        const transactionDate = formData.date.split('T')[0]
+        const transactionAmount = parseFloat(formData.amount)
+        
+        const { error: transactionError } = await insertWithPropertyClient('account_transactions', {
+          account_id: formData.account_id,
+          transaction_date: transactionDate,
+          direction: 'out',
+          amount: transactionAmount,
+          expense_id: newExpense.id,
+          note: t('bank.transactionNoteExpense', { category: formData.category }),
+        })
+        
+        if (transactionError) {
+          logError('ExpenseForm.createTransaction', transactionError)
+          showToast(getUserFriendlyError(transactionError), 'error')
+        }
+      }
+
+      onClose()
     }
 
     setLoading(false)
@@ -220,6 +353,25 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
               {tickets.map(ticket => (
                 <option key={ticket.id} value={ticket.id}>
                   {ticket.title} - {ticket.room}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              {t('bank.paidWith')} ({t('common.optional')})
+            </label>
+            <select
+              value={formData.account_id}
+              onChange={(e) => setFormData({ ...formData, account_id: e.target.value })}
+              className="w-full border border-[#E5E7EB] rounded-lg px-3.5 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+              disabled={loadingAccounts}
+            >
+              <option value="">{t('bank.noAccount')}</option>
+              {accounts.map(account => (
+                <option key={account.id} value={account.id}>
+                  {account.name} ({account.account_type === 'cash' ? t('bank.accountTypeCash') : account.account_type === 'card' ? t('bank.accountTypeCard') : t('bank.accountTypeBank')})
                 </option>
               ))}
             </select>

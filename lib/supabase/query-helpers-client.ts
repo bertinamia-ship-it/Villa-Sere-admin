@@ -91,3 +91,28 @@ export async function updateWithPropertyClient<T = any>(
   return result
 }
 
+/**
+ * Delete with automatic tenant + property filtering (client-side)
+ */
+export async function deleteWithPropertyClient<T = any>(
+  table: string,
+  id: string
+): Promise<{ data: T | null; error: any }> {
+  const { client, tenantId, propertyId } = await getPropertyClientClient()
+  
+  if (!tenantId || !propertyId) {
+    return { data: null, error: { message: 'No tenant or property found' } }
+  }
+
+  const result = await client
+    .from(table)
+    .delete()
+    .eq('id', id)
+    .eq('tenant_id', tenantId)
+    .eq('property_id', propertyId)
+    .select()
+    .single()
+
+  return result
+}
+

@@ -10,8 +10,9 @@ import { Select } from '@/components/ui/Select'
 import { LoadingSpinner } from '@/components/ui/Loading'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/Toast'
-import { Download, BarChart3, TrendingUp, TrendingDown, DollarSign, Wrench, Package } from 'lucide-react'
+import { Download, BarChart3, TrendingUp, TrendingDown, DollarSign, Wrench, Package, Wallet } from 'lucide-react'
 import { t } from '@/lib/i18n/es'
+import { FinancialAccount } from '@/lib/types/database'
 
 interface MonthlyExpenseSummary {
   total: number
@@ -47,6 +48,7 @@ export default function ReportsPage() {
   const [maintenanceSummary, setMaintenanceSummary] = useState<MaintenanceCostSummary | null>(null)
   const [inventoryInsights, setInventoryInsights] = useState<InventoryInsights | null>(null)
   const [propertyName, setPropertyName] = useState<string>('CasaPilot')
+  const [accounts, setAccounts] = useState<FinancialAccount[]>([])
 
   useEffect(() => {
     loadPropertyName()
@@ -73,7 +75,8 @@ export default function ReportsPage() {
       await Promise.all([
         loadExpenseSummary(),
         loadMaintenanceSummary(),
-        loadInventoryInsights()
+        loadInventoryInsights(),
+        loadAccounts()
       ])
     } catch (error) {
       console.error('Error loading reports:', error)
@@ -81,6 +84,43 @@ export default function ReportsPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  async function loadAccounts() {
+    const propertyId = await getActivePropertyId()
+    if (!propertyId) {
+      setAccounts([])
+      return
+    }
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('tenant_id')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    if (!profile?.tenant_id) return
+
+    // Load active accounts: property_id = current property OR property_id IS NULL (general accounts)
+    // Order: property accounts first, then general accounts
+    const { data, error } = await supabase
+      .from('financial_accounts')
+      .select('*')
+      .eq('tenant_id', profile.tenant_id)
+      .eq('is_active', true)
+      .or(`property_id.eq.${propertyId},property_id.is.null`)
+      .order('property_id', { ascending: false, nullsFirst: false })
+      .order('name')
+
+    if (error) {
+      console.error('Error loading accounts:', error)
+      return
+    }
+
+    setAccounts(data || [])
   }
 
   async function loadExpenseSummary() {
@@ -300,6 +340,65 @@ export default function ReportsPage() {
           </Button>
         </div>
       </Card>
+
+      {/* Account Balances */}
+      {accounts.length > 0 && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Wallet className="h-5 w-5 text-[#2563EB]" />
+              <CardTitle>{t('bank.title')}</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {accounts.map(account => {
+                const getAccountTypeLabel = (type: string) => {
+                  switch (type) {
+                    case 'cash':
+                      return t('bank.accountTypeCash')
+                    case 'card':
+                      return t('bank.accountTypeCard')
+                    case 'bank':
+                      return t('bank.accountTypeBank')
+                    default:
+                      return type
+                  }
+                }
+
+                const formatCurrency = (amount: number) => {
+                  return new Intl.NumberFormat('es-ES', {
+                    style: 'currency',
+                    currency: account.currency || 'USD',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  }).format(amount)
+                }
+
+                const balance = account.current_balance ?? account.opening_balance ?? 0
+
+                return (
+                  <div
+                    key={account.id}
+                    className="bg-white border border-[#E2E8F0] rounded-lg p-4 hover:border-[#CBD5E1] transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-[#0F172A] text-base truncate">{account.name}</h3>
+                        <p className="text-xs text-[#64748B] mt-0.5">{getAccountTypeLabel(account.account_type)}</p>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <p className="text-2xl font-bold text-[#0F172A]">{formatCurrency(balance)}</p>
+                      <p className="text-xs text-[#64748B] mt-1">{account.currency || 'USD'}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Expense Summary */}
       <Card>
