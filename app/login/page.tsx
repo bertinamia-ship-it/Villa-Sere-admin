@@ -90,9 +90,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#F8FAFC]">
-      {/* Hero Image - Mobile: top, Desktop: left */}
-      <div className="relative w-full lg:w-1/2 h-48 sm:h-64 lg:h-screen bg-slate-900 overflow-hidden">
+    <div className="min-h-screen relative flex items-center justify-center px-4 py-8">
+      {/* Background Image - Full Screen */}
+      <div className="fixed inset-0 z-0">
         <Image
           src="https://res.cloudinary.com/dpmozdkfh/image/upload/v1770192156/homeapp_j2epyo.png"
           alt="CasaPilot"
@@ -100,13 +100,15 @@ export default function LoginPage() {
           priority
           quality={90}
           className="object-cover object-center"
-          sizes="(max-width: 1024px) 100vw, 50vw"
+          sizes="100vw"
         />
+        {/* Overlay for better readability */}
+        <div className="absolute inset-0 bg-black/40" />
       </div>
 
-      {/* Login Form */}
-      <div className="flex-1 flex items-center justify-center px-4 py-8 lg:py-0">
-        <div className="max-w-md w-full bg-white rounded-lg border border-[#E2E8F0] shadow-lg p-6 sm:p-8">
+      {/* Login Form - Centered */}
+      <div className="relative z-10 w-full max-w-md">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl border border-white/20 shadow-2xl p-6 sm:p-8">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-semibold text-[#0F172A] mb-1.5">CasaPilot</h1>
             <p className="text-sm text-[#64748B]">Sistema de Gestión de Propiedades</p>
