@@ -92,18 +92,19 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen relative flex items-center justify-center px-4 py-8">
       {/* Background Image - Full Screen */}
-      <div className="fixed inset-0 z-0">
+      <div className="fixed inset-0 z-0 bg-slate-900">
         <Image
           src="https://res.cloudinary.com/dpmozdkfh/image/upload/v1770192156/homeapp_j2epyo.png"
           alt="CasaPilot"
           fill
           priority
           quality={90}
-          className="object-contain object-center"
+          className="object-cover object-center"
           sizes="100vw"
+          style={{ objectPosition: 'center center' }}
         />
-        {/* Overlay for better readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/50" />
+        {/* Overlay for better readability - más sutil */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
       </div>
 
       {/* Login Form - Centered */}
