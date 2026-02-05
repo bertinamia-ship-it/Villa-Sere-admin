@@ -26,6 +26,7 @@ import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
 import PropertyHeader from '@/components/PropertyHeader'
 import PropertySelector from '@/components/PropertySelector'
+import MobilePropertySelector from '@/components/MobilePropertySelector'
 import BillingGuard from './BillingGuard'
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 
@@ -242,32 +243,43 @@ export default function DashboardLayout({
         </div>
       </div>
 
-      {/* Mobile top bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-slate-900 via-slate-850 to-slate-800 border-b border-slate-700/60 z-50 shadow-2xl backdrop-blur-xl safe-area-top">
-        <div className="flex items-center justify-between h-16 sm:h-18 px-5 safe-area-x">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-xl shadow-lg shadow-blue-500/30 ring-1 ring-blue-500/20">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
-            <h1 className="text-base sm:text-lg font-bold text-white tracking-tight">CasaPilot</h1>
-          </div>
+      {/* Mobile top bar - Compacto y funcional */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/60 z-[100] shadow-lg safe-area-top">
+        <div className="flex items-center gap-3 h-14 px-4 safe-area-x">
+          {/* Hamburger Menu Button - Siempre accesible */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-slate-300 hover:text-white transition-all duration-300 p-3 -mr-2 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-xl hover:bg-slate-700/60 hover:shadow-md"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-slate-700/60 active:bg-slate-700 transition-colors duration-200"
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6 text-white" />
+            ) : (
+              <Menu className="h-6 w-6 text-white" />
+            )}
           </button>
+
+          {/* Property Selector - Chip grande y prominente */}
+          <div className="flex-1 min-w-0">
+            <MobilePropertySelector />
+          </div>
         </div>
 
-        {/* Mobile menu overlay */}
+        {/* Mobile menu overlay - z-index correcto y funcional */}
         {mobileMenuOpen && (
           <>
             <div 
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[98] lg:hidden"
               onClick={() => setMobileMenuOpen(false)}
+              onTouchStart={(e) => {
+                e.preventDefault()
+                setMobileMenuOpen(false)
+              }}
             />
-            <div className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/60 z-50 shadow-2xl backdrop-blur-xl transform transition-transform duration-300 ease-out lg:hidden safe-area-left safe-area-y overflow-y-auto">
+            <div 
+              className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/60 z-[99] shadow-2xl backdrop-blur-xl transform transition-transform duration-300 ease-out lg:hidden safe-area-left safe-area-y overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
               {/* Branding in mobile drawer */}
               <div className="shrink-0 px-5 pt-7 pb-5 border-b border-slate-700/60">
                 <div className="flex items-center gap-3.5">
@@ -275,16 +287,6 @@ export default function DashboardLayout({
                     <Sparkles className="h-6 w-6 text-white" />
                   </div>
                   <h1 className="text-xl font-bold text-white tracking-tight">CasaPilot</h1>
-                </div>
-              </div>
-
-              {/* Property Selector - Mobile - First element, always accessible */}
-              <div className="px-5 py-4 border-b border-slate-700/60">
-                <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 px-1">
-                  Propiedad Activa
-                </div>
-                <div className="transform scale-[0.95] origin-left">
-                  <PropertySelector />
                 </div>
               </div>
 
@@ -407,8 +409,11 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className="lg:pl-72">
         <Header />
-        <PropertyHeader />
-        <main className="py-5 px-4 sm:py-7 sm:px-6 min-h-screen lg:pt-5 pt-16 safe-area-x safe-area-bottom">
+        {/* PropertyHeader solo en desktop (en móvil ya está en header) */}
+        <div className="hidden lg:block">
+          <PropertyHeader />
+        </div>
+        <main className="py-5 px-4 sm:py-7 sm:px-6 min-h-screen lg:pt-5 pt-14 safe-area-x safe-area-bottom">
           <div className="page-soft">
             {children}
           </div>

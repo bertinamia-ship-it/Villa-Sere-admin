@@ -10,7 +10,7 @@ interface ModalProps {
   onClose: () => void
   title?: string | ReactNode
   children: ReactNode
-  size?: 'sm' | 'md' | 'lg' | 'xl'
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
   showCloseButton?: boolean
   closeOnOverlayClick?: boolean
   className?: string
@@ -21,6 +21,7 @@ const sizes = {
   md: 'max-w-md',
   lg: 'max-w-lg',
   xl: 'max-w-2xl',
+  full: 'max-w-full',
 }
 
 export function Modal({
@@ -112,8 +113,8 @@ export function Modal({
           ref={modalRef}
           className={`
             bg-white rounded-t-2xl sm:rounded-xl shadow-2xl border-t sm:border border-slate-200/60
-            w-full ${sizes[size]}
-            h-[95vh] sm:h-auto sm:max-h-[90vh] overflow-hidden
+            w-full ${size === 'full' ? 'max-w-full' : sizes[size]}
+            ${size === 'full' ? 'h-[95vh]' : 'h-[95vh] sm:h-auto sm:max-h-[90vh]'} overflow-hidden
             transform transition-all duration-300 ease-out
             flex flex-col
             ${className}
