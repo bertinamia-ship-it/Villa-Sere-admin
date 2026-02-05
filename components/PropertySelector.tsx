@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Building2, Plus, Loader2, ChevronDown, Home, Building } from 'lucide-react'
+import { Building2, Plus, Loader2, ChevronDown, Home, Building, Trash2 } from 'lucide-react'
 import { Button } from './ui/Button'
 import { Input } from './ui/Input'
 import { Modal } from './ui/Modal'
+import { ConfirmModal } from './ui/ConfirmModal'
 import TenantError from './TenantError'
 import { useToast } from './ui/Toast'
 import { t } from '@/lib/i18n/es'
@@ -29,6 +30,8 @@ export default function PropertySelector() {
   const [newPropertyLocation, setNewPropertyLocation] = useState('')
   const [tenantError, setTenantError] = useState<string | null>(null)
   const [isChanging, setIsChanging] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; propertyId: string | null; propertyName: string }>({ isOpen: false, propertyId: null, propertyName: '' })
+  const [deleting, setDeleting] = useState(false)
 
   // Load properties and active property
   useEffect(() => {
@@ -285,6 +288,75 @@ export default function PropertySelector() {
     }
   }
 
+  async function handleDeleteProperty() {
+    if (!deleteConfirm.propertyId) return
+
+    setDeleting(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        showToast(t('propertySelector.errorDeletingProperty'), 'error')
+        setDeleting(false)
+        return
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      if (!profile?.tenant_id) {
+        showToast(t('propertySelector.errorDeletingProperty'), 'error')
+        setDeleting(false)
+        return
+      }
+
+      // Delete property
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', deleteConfirm.propertyId)
+        .eq('tenant_id', profile.tenant_id)
+
+      if (error) {
+        console.error('[PropertySelector] Error deleting property:', error)
+        showToast(t('propertySelector.errorDeletingProperty'), 'error')
+        setDeleting(false)
+        return
+      }
+
+      // If deleted property was active, switch to another or clear
+      if (deleteConfirm.propertyId === activePropertyId) {
+        const remainingProperties = properties.filter(p => p.id !== deleteConfirm.propertyId)
+        if (remainingProperties.length > 0) {
+          await handlePropertyChange(remainingProperties[0].id)
+        } else {
+          setActivePropertyId(null)
+          localStorage.removeItem('activePropertyId')
+          // Clear preferred_property_id
+          await supabase
+            .from('profiles')
+            .update({ preferred_property_id: null })
+            .eq('id', user.id)
+        }
+      }
+
+      // Reload properties
+      await loadProperties()
+      showToast(t('propertySelector.propertyDeleted'), 'success')
+      setDeleteConfirm({ isOpen: false, propertyId: null, propertyName: '' })
+      
+      // Trigger property change event
+      window.dispatchEvent(new CustomEvent('propertyChanged'))
+    } catch (error) {
+      console.error('Error deleting property:', error)
+      showToast(t('propertySelector.errorDeletingProperty'), 'error')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   if (tenantError) {
     return (
       <TenantError 
@@ -419,30 +491,55 @@ export default function PropertySelector() {
                   <div className="px-3 py-2.5 text-xs text-[#64748B] text-center">{t('propertySelector.noProperties')}</div>
                 ) : (
                   properties.map((property) => (
-                    <button
+                    <div
                       key={property.id}
-                      onClick={() => {
-                        handlePropertyChange(property.id)
-                        setShowDropdown(false)
-                      }}
-                      className={`w-full text-left px-3 py-2.5 text-sm hover:bg-gray-50 transition-all duration-200 ease-out flex items-center gap-2.5 ${
+                      className={`group flex items-center gap-2 ${
                         property.id === activePropertyId
-                          ? 'bg-[#0F172A] text-white font-medium'
-                          : 'text-[#0F172A]'
+                          ? 'bg-[#0F172A] text-white'
+                          : 'hover:bg-gray-50'
                       }`}
                     >
-                      <span className="shrink-0">
-                        {getPropertyIcon(property.name)}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <div className="truncate">{property.name}</div>
-                        {property.location && (
-                          <div className={`text-[10px] truncate mt-0.5 ${property.id === activePropertyId ? 'text-white/70' : 'text-[#64748B]'}`}>
-                            {property.location}
-                          </div>
-                        )}
-                      </div>
-                    </button>
+                      <button
+                        onClick={() => {
+                          handlePropertyChange(property.id)
+                          setShowDropdown(false)
+                        }}
+                        className={`flex-1 text-left px-3 py-2.5 text-sm transition-all duration-200 ease-out flex items-center gap-2.5 ${
+                          property.id === activePropertyId
+                            ? 'text-white font-medium'
+                            : 'text-[#0F172A]'
+                        }`}
+                      >
+                        <span className="shrink-0">
+                          {getPropertyIcon(property.name)}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="truncate">{property.name}</div>
+                          {property.location && (
+                            <div className={`text-[10px] truncate mt-0.5 ${property.id === activePropertyId ? 'text-white/70' : 'text-[#64748B]'}`}>
+                              {property.location}
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                      {properties.length > 1 && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setDeleteConfirm({ isOpen: true, propertyId: property.id, propertyName: property.name })
+                            setShowDropdown(false)
+                          }}
+                          className={`px-2 py-2.5 opacity-0 group-hover:opacity-100 transition-opacity ${
+                            property.id === activePropertyId
+                              ? 'text-white/70 hover:text-white hover:bg-red-500/20'
+                              : 'text-red-500 hover:text-red-700 hover:bg-red-50'
+                          }`}
+                          title="Eliminar propiedad"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
                   ))
                 )}
               </div>
@@ -508,6 +605,19 @@ export default function PropertySelector() {
           </div>
         </div>
       </Modal>
+
+      {/* Modal de confirmación para eliminar */}
+      <ConfirmModal
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, propertyId: null, propertyName: '' })}
+        onConfirm={handleDeleteProperty}
+        title={t('propertySelector.deleteProperty')}
+        message={t('propertySelector.confirmDeleteProperty', { name: deleteConfirm.propertyName })}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
+        variant="danger"
+        loading={deleting}
+      />
     </div>
   )
 }
