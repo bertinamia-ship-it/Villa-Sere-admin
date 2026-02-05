@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
+import { Sparkles } from 'lucide-react'
 import { t } from '@/lib/i18n/es'
 
 export default function LoginPage() {
@@ -90,112 +90,107 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center px-4 py-8">
-      {/* Background Image - Full Screen */}
-      <div className="fixed inset-0 z-0 bg-slate-900">
-        <Image
-          src="https://res.cloudinary.com/dpmozdkfh/image/upload/v1770192156/homeapp_j2epyo.png"
-          alt="CasaPilot"
-          fill
-          priority
-          quality={90}
-          className="object-cover object-center"
-          sizes="100vw"
-          style={{ objectPosition: 'center center' }}
-        />
-        {/* Overlay for better readability - más sutil */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Decorative background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-3xl" />
       </div>
 
       {/* Login Form - Centered */}
       <div className="relative z-10 w-full max-w-md">
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl border border-white/20 shadow-2xl p-6 sm:p-8">
+        <div className="bg-white/95 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl p-8 sm:p-10">
+          {/* Logo and Branding */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-semibold text-[#0F172A] mb-1.5">CasaPilot</h1>
-            <p className="text-sm text-[#64748B]">Sistema de Gestión de Propiedades</p>
+            <div className="inline-flex p-4 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-2xl shadow-xl shadow-blue-500/30 ring-2 ring-blue-500/20 mb-6">
+              <Sparkles className="h-8 w-8 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">CasaPilot</h1>
+            <p className="text-sm text-slate-600 font-medium">Sistema de Gestión de Propiedades</p>
           </div>
 
-        {success && (
-          <div className="mb-6 rounded-md border border-[#22C55E]/30 bg-[#22C55E]/10 px-4 py-3 text-xs text-[#22C55E]">
-            {success}
-          </div>
-        )}
-
-        <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-4">
-          {error && (
-            <div className="bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444] px-4 py-3 rounded-md text-xs">
-              {error}
+          {success && (
+            <div className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 font-medium">
+              {success}
             </div>
           )}
 
-          {isSignUp && (
+          <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-5">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium">
+                {error}
+              </div>
+            )}
+
+            {isSignUp && (
+              <div>
+                <label htmlFor="fullName" className="block text-sm font-semibold text-slate-900 mb-2">
+                  Nombre Completo {t('common.optional')}
+                </label>
+                <input
+                  id="fullName"
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 text-slate-900 placeholder-slate-400 bg-white font-medium"
+                  placeholder="Juan Pérez"
+                />
+              </div>
+            )}
+
             <div>
-              <label htmlFor="fullName" className="block text-xs font-medium text-[#0F172A] mb-1.5">
-                Nombre Completo {t('common.optional')}
+              <label htmlFor="email" className="block text-sm font-semibold text-slate-900 mb-2">
+                Email
               </label>
               <input
-                id="fullName"
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-3 py-2 border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all duration-150 text-[#0F172A] placeholder-[#64748B]"
-                placeholder="Juan Pérez"
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 text-slate-900 placeholder-slate-400 bg-white font-medium"
+                placeholder="tu@email.com"
               />
             </div>
-          )}
 
-          <div>
-            <label htmlFor="email" className="block text-xs font-medium text-[#0F172A] mb-1.5">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all duration-150 text-[#0F172A] placeholder-[#64748B]"
-              placeholder="tu@email.com"
-            />
+            <div>
+              <label htmlFor="password" className="block text-sm font-semibold text-slate-900 mb-2">
+                Contraseña {isSignUp && <span className="text-slate-500 font-normal text-xs">(mín. 6 caracteres)</span>}
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 text-slate-900 placeholder-slate-400 bg-white font-medium"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 text-white py-3.5 rounded-xl text-base font-semibold hover:from-blue-700 hover:via-indigo-700 hover:to-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ease-out shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              {loading ? (isSignUp ? 'Creando cuenta...' : 'Iniciando sesión...') : (isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión')}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <button
+              type="button"
+              onClick={() => {
+                setIsSignUp(!isSignUp)
+                setError(null)
+                setFullName('')
+              }}
+              className="text-sm text-blue-600 hover:text-blue-700 font-semibold transition-colors duration-200"
+            >
+              {isSignUp ? '¿Ya tienes una cuenta? Inicia sesión' : '¿No tienes una cuenta? Regístrate'}
+            </button>
           </div>
-
-          <div>
-            <label htmlFor="password" className="block text-xs font-medium text-[#0F172A] mb-1.5">
-              Contraseña {isSignUp && <span className="text-[#64748B] font-normal">(mín. 6 caracteres)</span>}
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all duration-150 text-[#0F172A] placeholder-[#64748B]"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#0F172A] text-white py-2.5 rounded-md text-sm font-medium hover:bg-[#1E293B] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 ease-out"
-          >
-            {loading ? (isSignUp ? 'Creando cuenta...' : 'Iniciando sesión...') : (isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión')}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <button
-            type="button"
-            onClick={() => {
-              setIsSignUp(!isSignUp)
-              setError(null)
-              setFullName('')
-            }}
-            className="text-xs text-[#2563EB] hover:text-[#1D4ED8] font-medium transition-colors duration-150"
-          >
-            {isSignUp ? '¿Ya tienes una cuenta? Inicia sesión' : '¿No tienes una cuenta? Regístrate'}
-          </button>
-        </div>
         </div>
       </div>
     </div>
