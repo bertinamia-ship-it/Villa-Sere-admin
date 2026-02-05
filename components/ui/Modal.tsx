@@ -103,7 +103,7 @@ export function Modal({
     <Portal>
       <div
         ref={overlayRef}
-        className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-200 ease-out safe-area-y"
+        className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-200 ease-out safe-area-y"
         onClick={handleOverlayClick}
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}

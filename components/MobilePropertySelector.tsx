@@ -155,14 +155,7 @@ export default function MobilePropertySelector() {
     <>
       {/* Chip grande y prominente en header móvil */}
       <button
-        onClick={(e) => {
-          e.stopPropagation()
-          setShowModal(true)
-        }}
-        onTouchEnd={(e) => {
-          e.stopPropagation()
-          setShowModal(true)
-        }}
+        onClick={() => setShowModal(true)}
         disabled={isChanging}
         className="flex items-center gap-2.5 px-4 py-2.5 bg-white/95 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200 min-h-[52px] flex-1 max-w-[calc(100vw-120px)]"
         type="button"
