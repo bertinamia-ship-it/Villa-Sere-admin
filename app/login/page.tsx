@@ -193,6 +193,7 @@ export default function LoginPage() {
             {isSignUp ? '¿Ya tienes una cuenta? Inicia sesión' : '¿No tienes una cuenta? Regístrate'}
           </button>
         </div>
+        </div>
       </div>
     </div>
   )
