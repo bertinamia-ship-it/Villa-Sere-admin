@@ -274,17 +274,17 @@ export default function DashboardLayout({
         </div>
       </div>
 
-        {/* Mobile menu overlay - z-index correcto y funcional */}
-        {mobileMenuOpen && (
-          <>
-            <div 
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
-              onClick={() => setMobileMenuOpen(false)}
-            />
-            <div 
-              className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/60 z-50 shadow-2xl backdrop-blur-xl transform transition-transform duration-300 ease-out lg:hidden safe-area-left safe-area-y overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
+      {/* Mobile menu overlay - z-index correcto y funcional */}
+      {mobileMenuOpen && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div 
+            className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/60 z-50 shadow-2xl backdrop-blur-xl transform transition-transform duration-300 ease-out lg:hidden safe-area-left safe-area-y overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
               {/* Branding in mobile drawer */}
               <div className="shrink-0 px-5 pt-7 pb-5 border-b border-slate-700/60">
                 <div className="flex items-center gap-3.5">
