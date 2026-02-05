@@ -134,6 +134,15 @@ export async function getSubscriptionLimits(): Promise<{
     return { maxProperties: 0, maxUsers: 0 }
   }
 
+  // Check if admin account (bypass limits)
+  const supabase = await import('@/lib/supabase/server').then(m => m.createClient())
+  const { data: { user } } = await supabase.auth.getUser()
+  const isAdminAccount = user?.email === 'condecorporation@gmail.com'
+  
+  if (isAdminAccount) {
+    return { maxProperties: Infinity, maxUsers: Infinity }
+  }
+
   // Free/trial: 1 property, 1 user
   if (tenant.subscription_plan === 'free' || tenant.subscription_status === 'trial') {
     return { maxProperties: 1, maxUsers: 1 }

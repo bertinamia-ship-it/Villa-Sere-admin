@@ -215,18 +215,23 @@ export default function PropertySelector() {
       }
 
       if (tenant) {
-        const isFreeOrTrial = tenant.subscription_plan === 'free' || tenant.subscription_status === 'trial'
-        if (isFreeOrTrial) {
-          // Check current property count
-          const { count } = await supabase
-            .from('properties')
-            .select('*', { count: 'exact', head: true })
-            .eq('tenant_id', profile.tenant_id)
+        // Bypass restrictions for admin/test accounts
+        const isAdminAccount = user.email === 'condecorporation@gmail.com'
+        
+        if (!isAdminAccount) {
+          const isFreeOrTrial = tenant.subscription_plan === 'free' || tenant.subscription_status === 'trial'
+          if (isFreeOrTrial) {
+            // Check current property count
+            const { count } = await supabase
+              .from('properties')
+              .select('*', { count: 'exact', head: true })
+              .eq('tenant_id', profile.tenant_id)
 
-          if ((count || 0) >= 1) {
-            alert(t('propertySelector.freeTrialLimit'))
-            setShowCreateModal(false)
-            return
+            if ((count || 0) >= 1) {
+              alert(t('propertySelector.freeTrialLimit'))
+              setShowCreateModal(false)
+              return
+            }
           }
         }
       }
