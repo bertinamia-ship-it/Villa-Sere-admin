@@ -99,11 +99,11 @@ export default function LoginPage() {
           fill
           priority
           quality={90}
-          className="object-cover object-center"
+          className="object-contain object-center"
           sizes="100vw"
         />
         {/* Overlay for better readability */}
-        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/50" />
       </div>
 
       {/* Login Form - Centered */}
