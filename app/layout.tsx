@@ -48,9 +48,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3" />
-        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=3" />
-        <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png?v=3" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=4" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=4" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png?v=4" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="CasaPilot" />

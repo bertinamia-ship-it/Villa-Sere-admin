@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { t } from '@/lib/i18n/es'
 
 export default function LoginPage() {
@@ -89,12 +90,27 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] px-4">
-      <div className="max-w-md w-full bg-white rounded-lg border border-[#E2E8F0] shadow-lg p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-semibold text-[#0F172A] mb-1.5">CasaPilot</h1>
-          <p className="text-sm text-[#64748B]">Sistema de Gestión de Propiedades</p>
-        </div>
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#F8FAFC]">
+      {/* Hero Image - Mobile: top, Desktop: left */}
+      <div className="relative w-full lg:w-1/2 h-48 sm:h-64 lg:h-screen bg-slate-900 overflow-hidden">
+        <Image
+          src="https://res.cloudinary.com/dpmozdkfh/image/upload/v1770192156/homeapp_j2epyo.png"
+          alt="CasaPilot"
+          fill
+          priority
+          quality={90}
+          className="object-cover object-center"
+          sizes="(max-width: 1024px) 100vw, 50vw"
+        />
+      </div>
+
+      {/* Login Form */}
+      <div className="flex-1 flex items-center justify-center px-4 py-8 lg:py-0">
+        <div className="max-w-md w-full bg-white rounded-lg border border-[#E2E8F0] shadow-lg p-6 sm:p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-semibold text-[#0F172A] mb-1.5">CasaPilot</h1>
+            <p className="text-sm text-[#64748B]">Sistema de Gestión de Propiedades</p>
+          </div>
 
         {success && (
           <div className="mb-6 rounded-md border border-[#22C55E]/30 bg-[#22C55E]/10 px-4 py-3 text-xs text-[#22C55E]">

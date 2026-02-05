@@ -19,8 +19,7 @@ import {
   LogIn,
   LogOut,
   CalendarCheck,
-  AlertCircle,
-  Sparkles
+  AlertCircle
 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -214,37 +213,18 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      {/* Hero Visual - Home Image */}
-      <div className="-mx-4 sm:-mx-6 lg:-mx-8 mb-6 sm:mb-8 relative overflow-hidden rounded-b-2xl lg:rounded-2xl shadow-xl">
+      {/* Hero Visual - Home Image - Clean, no overlay */}
+      <div className="-mx-4 sm:-mx-6 lg:-mx-8 mb-6 sm:mb-8 relative overflow-hidden rounded-b-2xl lg:rounded-2xl shadow-2xl">
         <div className="relative h-64 sm:h-80 lg:h-96 w-full bg-slate-900">
           <Image
             src="/splash-screen.png"
             alt={propertyName}
             fill
             priority
-            quality={85}
-            className="object-cover"
+            quality={90}
+            className="object-cover object-center"
             sizes="100vw"
           />
-          {/* Gradient overlay for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/50 to-transparent" />
-          
-          {/* Content overlay */}
-          <div className="absolute inset-0 flex items-end lg:items-center justify-center pb-6 lg:pb-0 px-4 sm:px-6 safe-area-bottom">
-            <div className="text-center space-y-3 max-w-2xl w-full">
-              <div className="inline-flex p-3 bg-white/10 backdrop-blur-md rounded-2xl shadow-xl border border-white/20">
-                <Sparkles className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 drop-shadow-lg">
-                  {propertyName}
-                </h1>
-                <p className="text-xs sm:text-sm lg:text-base text-white/90 drop-shadow-md">
-                  {t('dashboard.subtitleContext', { propertyName, month: currentMonth, year: currentYear })}
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
