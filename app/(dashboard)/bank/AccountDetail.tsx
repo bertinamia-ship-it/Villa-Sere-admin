@@ -13,6 +13,7 @@ import { getActivePropertyId } from '@/lib/utils/property-client'
 import { insertWithPropertyClient, deleteWithPropertyClient } from '@/lib/supabase/query-helpers-client'
 import { t } from '@/lib/i18n/es'
 import { logError, getUserFriendlyError } from '@/lib/utils/error-handler'
+import { formatDate, formatCurrency } from '@/lib/utils/formatters'
 import TransactionForm from './TransactionForm'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 

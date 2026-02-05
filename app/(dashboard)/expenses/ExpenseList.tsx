@@ -2,6 +2,7 @@
 
 import { Expense, Vendor, MaintenanceTicket } from '@/lib/types/database'
 import { Pencil, Trash2, Calendar, FileText, Image as ImageIcon } from 'lucide-react'
+import { formatDate } from '@/lib/utils/formatters'
 
 interface ExpenseListProps {
   expenses: Expense[]
@@ -81,7 +82,7 @@ export default function ExpenseList({
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-slate-500" />
-                        {new Date(expense.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {formatDate(expense.date)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
