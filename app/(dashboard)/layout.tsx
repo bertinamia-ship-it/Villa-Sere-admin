@@ -409,7 +409,6 @@ export default function DashboardLayout({
             </div>
           </>
         )}
-      </div>
 
       {/* Main content */}
       <div className="lg:pl-72">
