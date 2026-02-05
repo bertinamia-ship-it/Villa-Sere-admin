@@ -112,9 +112,9 @@ export default function DashboardLayout({
 
   return (
     <BillingGuard>
-    <ErrorBoundary moduleName="Dashboard">
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
-      {/* Desktop Sidebar */}
+      <ErrorBoundary moduleName="Dashboard">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+          {/* Desktop Sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col">
         <div className="flex grow flex-col overflow-y-auto bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/60 px-5 py-7 shadow-2xl backdrop-blur-xl">
           {/* Branding */}
@@ -424,8 +424,144 @@ export default function DashboardLayout({
           </div>
         </main>
       </div>
-    </div>
-    </ErrorBoundary>
+
+      {/* Mobile menu overlay - z-index correcto y funcional */}
+      {mobileMenuOpen && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div 
+            className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/60 z-50 shadow-2xl backdrop-blur-xl transform transition-transform duration-300 ease-out lg:hidden safe-area-left safe-area-y overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Branding in mobile drawer */}
+            <div className="shrink-0 px-5 pt-7 pb-5 border-b border-slate-700/60">
+              <div className="flex items-center gap-3.5">
+                <div className="p-3 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-2xl shadow-xl shadow-blue-500/30 ring-2 ring-blue-500/20">
+                  <Sparkles className="h-6 w-6 text-white" />
+                </div>
+                <h1 className="text-xl font-bold text-white tracking-tight">CasaPilot</h1>
+              </div>
+            </div>
+
+            <nav className="px-5 py-5 space-y-2 flex-1">
+              {navigation.map((item) => {
+                if ('href' in item) {
+                  const active = isActive(item.href)
+                  const iconColors: Record<string, string> = {
+                    '/dashboard': 'text-blue-400',
+                    '/calendario': 'text-purple-400',
+                    '/settings': 'text-slate-400',
+                  }
+                  const iconColor = iconColors[item.href] || 'text-slate-400'
+                  
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`group relative flex items-center gap-x-3.5 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 ease-out ${
+                        active
+                          ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 text-white shadow-xl shadow-blue-500/40 scale-[1.02] ring-1 ring-blue-400/30'
+                          : 'text-slate-300 hover:text-white hover:bg-slate-700/60 hover:scale-[1.01] hover:shadow-md'
+                      }`}
+                    >
+                      {active && (
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-9 bg-white rounded-r-full shadow-lg" />
+                      )}
+                      <item.icon className={`h-5 w-5 shrink-0 stroke-[1.5] transition-all duration-300 ${
+                        active ? 'text-white scale-110' : `${iconColor} group-hover:text-white group-hover:scale-110`
+                      }`} />
+                      <span className={active ? 'font-semibold tracking-wide' : 'tracking-wide'}>{item.name}</span>
+                    </Link>
+                  )
+                } else {
+                  const isExpanded = expandedSections.has(item.name)
+                  const hasActiveChild = item.children.some(child => isActive(child.href))
+                  const sectionColors: Record<string, { text: string; bg: string; icon: string }> = {
+                    'Operación': { text: 'text-emerald-300', bg: 'bg-emerald-500/10', icon: 'text-emerald-400' },
+                    'Finanzas': { text: 'text-amber-300', bg: 'bg-amber-500/10', icon: 'text-amber-400' },
+                  }
+                  const sectionColor = sectionColors[item.name] || { text: 'text-slate-300', bg: 'bg-slate-700/30', icon: 'text-slate-400' }
+                  
+                  return (
+                    <div key={item.name} className="space-y-2">
+                      <button
+                        onClick={() => toggleSection(item.name)}
+                        className={`w-full flex items-center justify-between gap-x-2 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+                          hasActiveChild
+                            ? `${sectionColor.text} ${sectionColor.bg} shadow-md`
+                            : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700/40 hover:shadow-sm'
+                        }`}
+                      >
+                        <span>{item.name}</span>
+                        <ArrowRight
+                          className={`h-4 w-4 transition-all duration-300 ${
+                            isExpanded ? 'rotate-90' : ''
+                          } ${hasActiveChild ? sectionColor.icon : 'text-slate-500'}`}
+                        />
+                      </button>
+                      {isExpanded && (
+                        <div className="ml-2 space-y-1.5 border-l-2 border-slate-700/60 pl-4">
+                          {item.children.map((child) => {
+                            const active = isActive(child.href)
+                            const childIconColors: Record<string, string> = {
+                              '/maintenance': 'text-orange-400',
+                              '/inventory': 'text-blue-400',
+                              '/to-buy': 'text-purple-400',
+                              '/vendors': 'text-cyan-400',
+                              '/expenses': 'text-green-400',
+                              '/bank': 'text-emerald-400',
+                              '/reports': 'text-indigo-400',
+                            }
+                            const childIconColor = childIconColors[child.href] || 'text-slate-400'
+                            
+                            return (
+                              <Link
+                                key={child.name}
+                                href={child.href}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className={`flex items-center gap-x-3.5 rounded-xl px-4 py-2.5 text-sm transition-all duration-300 ease-out ${
+                                  active
+                                    ? 'text-white bg-gradient-to-r from-slate-700 via-slate-650 to-slate-600 font-semibold shadow-lg scale-[1.02] ring-1 ring-slate-500/30'
+                                    : 'text-slate-300 hover:text-white hover:bg-slate-700/60 hover:scale-[1.01] hover:shadow-md'
+                                }`}
+                              >
+                                <child.icon className={`h-4.5 w-4.5 shrink-0 stroke-[1.5] transition-all duration-300 ${
+                                  active ? 'text-white scale-110' : `${childIconColor} group-hover:text-white group-hover:scale-110`
+                                }`} />
+                                <span className="tracking-wide">{child.name}</span>
+                              </Link>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )
+                }
+              })}
+            </nav>
+
+            {/* User Menu at bottom */}
+            <div className="mt-auto pt-6 px-5 pb-7 border-t border-slate-700/60 safe-area-bottom">
+              <button
+                onClick={() => {
+                  handleLogout()
+                  setMobileMenuOpen(false)
+                }}
+                className="flex w-full items-center gap-x-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 hover:shadow-md"
+              >
+                <LogOut className="h-4.5 w-4.5 stroke-[1.5] transition-all duration-300" />
+                <span className="tracking-wide">Cerrar Sesión</span>
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+        </div>
+      </ErrorBoundary>
     </BillingGuard>
   )
 }
