@@ -57,6 +57,9 @@ export default function MobilePropertySelector() {
         return
       }
 
+      // Try localStorage first for faster load
+      const cachedPropertyId = localStorage.getItem('activePropertyId')
+      
       const { data: props } = await supabase
         .from('properties')
         .select('id, name, location')
@@ -65,7 +68,7 @@ export default function MobilePropertySelector() {
 
       setProperties(props || [])
 
-      const activeId = profile.preferred_property_id || props?.[0]?.id || null
+      const activeId = cachedPropertyId || profile.preferred_property_id || props?.[0]?.id || null
       setActivePropertyId(activeId)
       setActiveProperty(props?.find(p => p.id === activeId) || null)
 
@@ -74,6 +77,11 @@ export default function MobilePropertySelector() {
       }
     } catch (error) {
       console.error('Error loading properties:', error)
+      // Fallback to localStorage if API fails
+      const cachedPropertyId = localStorage.getItem('activePropertyId')
+      if (cachedPropertyId) {
+        setActivePropertyId(cachedPropertyId)
+      }
     } finally {
       setLoading(false)
     }
@@ -86,23 +94,30 @@ export default function MobilePropertySelector() {
     }
     
     setIsChanging(true)
-    const newProperty = properties.find(p => p.id === propertyId)
-    
-    setActivePropertyId(propertyId)
-    setActiveProperty(newProperty || null)
-    localStorage.setItem('activePropertyId', propertyId)
+    try {
+      const newProperty = properties.find(p => p.id === propertyId)
+      
+      setActivePropertyId(propertyId)
+      setActiveProperty(newProperty || null)
+      localStorage.setItem('activePropertyId', propertyId)
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      await supabase
-        .from('profiles')
-        .update({ preferred_property_id: propertyId })
-        .eq('id', user.id)
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        await supabase
+          .from('profiles')
+          .update({ preferred_property_id: propertyId })
+          .eq('id', user.id)
+      }
+
+      window.dispatchEvent(new CustomEvent('propertyChanged'))
+      setShowModal(false)
+      showToast(t('propertySelector.propertyChanged'), 'success')
+    } catch (error) {
+      console.error('Error changing property:', error)
+      showToast(t('propertySelector.errorChangingProperty'), 'error')
+    } finally {
+      setIsChanging(false)
     }
-
-    window.dispatchEvent(new CustomEvent('propertyChanged'))
-    setShowModal(false)
-    setIsChanging(false)
   }
 
   const getPropertyIcon = (name: string) => {
@@ -115,7 +130,7 @@ export default function MobilePropertySelector() {
     return <Home className="h-5 w-5" />
   }
 
-  if (loading || !activeProperty) {
+  if (loading) {
     return (
       <div className="flex items-center gap-2 px-4 py-2.5 bg-white/90 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-sm min-h-[52px]">
         <div className="h-5 w-5 rounded bg-slate-200 animate-pulse" />
@@ -124,24 +139,44 @@ export default function MobilePropertySelector() {
     )
   }
 
+  // Si no hay propiedad activa pero hay propiedades, usar la primera
+  const displayProperty = activeProperty || properties[0] || null
+  
+  if (!displayProperty) {
+    return (
+      <div className="flex items-center gap-2 px-4 py-2.5 bg-white/90 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-sm min-h-[52px]">
+        <Home className="h-5 w-5 text-slate-400" />
+        <span className="text-sm text-slate-500">Sin propiedad</span>
+      </div>
+    )
+  }
+
   return (
     <>
       {/* Chip grande y prominente en header móvil */}
       <button
-        onClick={() => setShowModal(true)}
+        onClick={(e) => {
+          e.stopPropagation()
+          setShowModal(true)
+        }}
+        onTouchEnd={(e) => {
+          e.stopPropagation()
+          setShowModal(true)
+        }}
         disabled={isChanging}
         className="flex items-center gap-2.5 px-4 py-2.5 bg-white/95 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200 min-h-[52px] flex-1 max-w-[calc(100vw-120px)]"
+        type="button"
       >
         <div className="shrink-0 text-slate-600">
-          {getPropertyIcon(activeProperty.name)}
+          {getPropertyIcon(displayProperty.name)}
         </div>
         <div className="flex-1 min-w-0 text-left">
           <div className="text-sm font-bold text-slate-900 truncate">
-            {activeProperty.name}
+            {displayProperty.name}
           </div>
-          {activeProperty.location && (
+          {displayProperty.location && (
             <div className="text-xs text-slate-500 truncate">
-              {activeProperty.location}
+              {displayProperty.location}
             </div>
           )}
         </div>

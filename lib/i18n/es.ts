@@ -636,6 +636,8 @@ export const es = {
     confirmDeleteProperty: '¿Estás seguro de que deseas eliminar la propiedad "{name}"? Esta acción eliminará todos los datos asociados (reservas, gastos, inventario, etc.) y no se puede deshacer.',
     propertyDeleted: 'Propiedad eliminada correctamente',
     errorDeletingProperty: 'Error al eliminar la propiedad',
+    propertyChanged: 'Propiedad cambiada correctamente',
+    errorChangingProperty: 'Error al cambiar de propiedad',
     propertyNamePlaceholder: 'ej. Villa Serena',
     propertyLocationPlaceholder: 'ej. Tulum, México',
     freeTrialLimit: 'Los planes gratuitos/prueba están limitados a 1 propiedad. Por favor actualiza para agregar más propiedades.',

@@ -244,13 +244,21 @@ export default function DashboardLayout({
       </div>
 
       {/* Mobile top bar - Compacto y funcional */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/60 z-[100] shadow-lg safe-area-top">
-        <div className="flex items-center gap-3 h-14 px-4 safe-area-x">
+      <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/60 z-50 shadow-lg safe-area-top">
+        <div className="flex items-center gap-3 h-14 px-4 safe-area-x relative z-50">
           {/* Hamburger Menu Button - Siempre accesible */}
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-slate-700/60 active:bg-slate-700 transition-colors duration-200"
+            onClick={(e) => {
+              e.stopPropagation()
+              setMobileMenuOpen(!mobileMenuOpen)
+            }}
+            onTouchEnd={(e) => {
+              e.stopPropagation()
+              setMobileMenuOpen(!mobileMenuOpen)
+            }}
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-slate-700/60 active:bg-slate-700 transition-colors duration-200 relative z-50"
             aria-label="Toggle menu"
+            type="button"
           >
             {mobileMenuOpen ? (
               <X className="h-6 w-6 text-white" />
@@ -260,24 +268,21 @@ export default function DashboardLayout({
           </button>
 
           {/* Property Selector - Chip grande y prominente */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 relative z-50">
             <MobilePropertySelector />
           </div>
         </div>
+      </div>
 
         {/* Mobile menu overlay - z-index correcto y funcional */}
         {mobileMenuOpen && (
           <>
             <div 
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[98] lg:hidden"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
               onClick={() => setMobileMenuOpen(false)}
-              onTouchStart={(e) => {
-                e.preventDefault()
-                setMobileMenuOpen(false)
-              }}
             />
             <div 
-              className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/60 z-[99] shadow-2xl backdrop-blur-xl transform transition-transform duration-300 ease-out lg:hidden safe-area-left safe-area-y overflow-y-auto"
+              className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/60 z-50 shadow-2xl backdrop-blur-xl transform transition-transform duration-300 ease-out lg:hidden safe-area-left safe-area-y overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Branding in mobile drawer */}
