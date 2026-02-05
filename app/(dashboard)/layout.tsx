@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
+import PropertyHeader from '@/components/PropertyHeader'
 import PropertySelector from '@/components/PropertySelector'
 import BillingGuard from './BillingGuard'
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
@@ -406,7 +407,8 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className="lg:pl-72">
         <Header />
-        <main className="py-5 px-4 sm:py-7 sm:px-6 min-h-screen lg:pt-7 pt-16 safe-area-x safe-area-bottom">
+        <PropertyHeader />
+        <main className="py-5 px-4 sm:py-7 sm:px-6 min-h-screen lg:pt-5 pt-16 safe-area-x safe-area-bottom">
           <div className="page-soft">
             {children}
           </div>

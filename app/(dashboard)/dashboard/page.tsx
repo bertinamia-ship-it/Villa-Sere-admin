@@ -214,25 +214,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      {/* Property Header - Shows current property name */}
-      <div className="-mx-4 sm:-mx-6 lg:-mx-8 mb-6 sm:mb-8 relative overflow-hidden rounded-b-2xl lg:rounded-2xl shadow-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="relative px-6 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-16">
-          <div className="flex items-center gap-4 sm:gap-6">
-            <div className="p-3 sm:p-4 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-2xl shadow-xl shadow-blue-500/30 ring-2 ring-blue-500/20">
-              <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 tracking-tight">
-                {propertyName}
-              </h1>
-              <p className="text-sm sm:text-base text-white/80">
-                {t('dashboard.subtitleContext', { propertyName, month: currentMonth, year: currentYear })}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Key Metrics - Colorful and animated */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Ingresos */}
