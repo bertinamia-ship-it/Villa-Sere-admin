@@ -436,12 +436,12 @@ export default function DashboardLayout({
         {!mobileMenuOpen && (
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden fixed top-2 left-2 z-[90] w-9 h-9 bg-slate-900/80 backdrop-blur-md rounded-lg shadow-sm border border-slate-700/50 flex items-center justify-center hover:bg-slate-800/90 hover:border-slate-600/60 active:scale-95 transition-all duration-200 safe-area-top"
+            className="lg:hidden fixed top-2 left-2 z-[90] w-8 h-8 bg-white/70 backdrop-blur-sm rounded-lg shadow-sm border border-slate-200/40 flex items-center justify-center hover:bg-white/90 hover:border-slate-300/60 hover:shadow-md active:scale-95 transition-all duration-200 safe-area-top"
             aria-label="Abrir menú"
             type="button"
             style={{ marginTop: 'max(0.5rem, env(safe-area-inset-top))', marginLeft: 'max(0.5rem, env(safe-area-inset-left))' }}
           >
-            <Menu className="h-4.5 w-4.5 text-slate-300" />
+            <Menu className="h-4 w-4 text-slate-600" />
           </button>
         )}
         
