@@ -197,9 +197,9 @@ export default function MobilePropertyCard() {
     if (lowerName.includes('departamento') || lowerName.includes('apartamento') || 
         lowerName.includes('depto') || lowerName.includes('apto') ||
         lowerName.includes('apartment') || lowerName.includes('flat')) {
-      return <Building className="h-4 w-4" />
+      return <Building className="h-3 w-3 text-white" />
     }
-    return <Home className="h-4 w-4" />
+    return <Home className="h-3 w-3 text-white" />
   }
 
   if (loading) {
@@ -231,7 +231,7 @@ export default function MobilePropertyCard() {
         className="w-full flex items-center gap-1.5 px-2 py-1.5 bg-gradient-to-r from-white via-blue-50/30 to-indigo-50/20 backdrop-blur-sm rounded-lg border border-blue-200/60 shadow-sm hover:shadow-md hover:border-blue-300/80 active:scale-[0.98] transition-all duration-200 group"
         type="button"
       >
-        <div className="shrink-0 p-1 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-md shadow-sm ring-1 ring-blue-400/20">
+        <div className="shrink-0 p-0.5 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-md shadow-sm ring-1 ring-blue-400/20">
           {getPropertyIcon(activeProperty.name)}
         </div>
         <div className="flex-1 min-w-0 text-left">
