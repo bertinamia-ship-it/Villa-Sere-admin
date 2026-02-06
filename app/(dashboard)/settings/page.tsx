@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Settings, AlertTriangle, Trash2, Loader2, Download, Smartphone, Monitor, CheckCircle2 } from 'lucide-react'
 import { t } from '@/lib/i18n/es'
 import ResetDataButton from '@/app/(dashboard)/dashboard/ResetDataButton'
+import PropertyDeleteSection from '@/components/PropertyDeleteSection'
 
 export default function SettingsPage() {
   const [isAuthorized, setIsAuthorized] = useState(false)
@@ -227,6 +228,12 @@ export default function SettingsPage() {
             )}
           </CardContent>
         </Card>
+      </div>
+
+      {/* Propiedades Section */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-[#0F172A]">Propiedades</h2>
+        <PropertyDeleteSection />
       </div>
 
       {/* General Settings Placeholder */}

@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { getActivePropertyId } from '@/lib/utils/property-client'
-import { Home, Building, ChevronDown, Sparkles } from 'lucide-react'
+import { Home, Building, ChevronDown, Sparkles, Plus } from 'lucide-react'
 import { Modal } from './ui/Modal'
 import { Button } from './ui/Button'
 import { useToast } from './ui/Toast'
 import { t } from '@/lib/i18n/es'
+import PropertySelector from './PropertySelector'
 
 interface Property {
   id: string
@@ -233,6 +234,74 @@ export default function MobilePropertyCard() {
               </button>
             ))
           )}
+        </div>
+      </Modal>
+
+      {/* Modal para crear propiedad */}
+      <Modal
+        isOpen={showCreateModal}
+        onClose={() => {
+          setShowCreateModal(false)
+          setNewPropertyName('')
+          setNewPropertyLocation('')
+        }}
+        title={
+          <div className="flex items-center gap-2">
+            <Plus className="h-5 w-5 text-blue-500" />
+            <span className="font-semibold">Crear Nueva Propiedad</span>
+          </div>
+        }
+        size="full"
+      >
+        <div className="space-y-4 pb-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Nombre de la Propiedad *
+            </label>
+            <Input
+              type="text"
+              value={newPropertyName}
+              onChange={(e) => setNewPropertyName(e.target.value)}
+              placeholder="ej. Villa Serena"
+              required
+              autoFocus
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Ubicación
+            </label>
+            <Input
+              type="text"
+              value={newPropertyLocation}
+              onChange={(e) => setNewPropertyLocation(e.target.value)}
+              placeholder="ej. Los Cabos, Baja California"
+            />
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setShowCreateModal(false)
+                setNewPropertyName('')
+                setNewPropertyLocation('')
+              }}
+              className="flex-1"
+              disabled={creating}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleCreateProperty}
+              disabled={creating || !newPropertyName.trim()}
+              className="flex-1"
+            >
+              {creating ? 'Creando...' : 'Crear Propiedad'}
+            </Button>
+          </div>
         </div>
       </Modal>
     </>

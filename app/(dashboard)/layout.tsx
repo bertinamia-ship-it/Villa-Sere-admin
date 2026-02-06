@@ -245,7 +245,7 @@ export default function DashboardLayout({
         </div>
       </div>
 
-      {/* Mobile top bar - Minimalista y profesional */}
+      {/* Mobile top bar - Minimalista sin logo */}
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/50 z-[80] shadow-lg safe-area-top">
         <div className="flex items-center gap-3 h-14 px-4 safe-area-x relative z-[80]">
           {/* Hamburger Menu Button */}
@@ -262,13 +262,8 @@ export default function DashboardLayout({
             )}
           </button>
 
-          {/* Logo y título compacto */}
-          <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            <div className="p-1.5 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-md shadow-blue-500/20 shrink-0">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            <h1 className="text-base font-bold text-white tracking-tight truncate">CasaPilot</h1>
-          </div>
+          {/* Espacio flexible */}
+          <div className="flex-1"></div>
 
           {/* Settings Button - Discreto */}
           <button
