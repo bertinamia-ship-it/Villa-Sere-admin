@@ -392,17 +392,25 @@ export default function DashboardLayout({
                 })}
               </nav>
 
-              {/* User Menu at bottom */}
-              <div className="mt-auto pt-6 px-5 pb-7 border-t border-slate-700/60 safe-area-bottom">
+              {/* User Menu at bottom - Mejorado */}
+              <div className="mt-auto pt-4 px-4 pb-6 border-t border-slate-700/50 safe-area-bottom">
+                <Link
+                  href="/settings"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex w-full items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 mb-2"
+                >
+                  <Settings className="h-4 w-4" />
+                  <span>Configuración</span>
+                </Link>
                 <button
                   onClick={() => {
                     handleLogout()
                     setMobileMenuOpen(false)
                   }}
-                  className="flex w-full items-center gap-x-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 hover:shadow-md"
+                  className="flex w-full items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
                 >
-                  <LogOut className="h-4.5 w-4.5 stroke-[1.5] transition-all duration-300" />
-                  <span className="tracking-wide">Cerrar Sesión</span>
+                  <LogOut className="h-4 w-4 stroke-[1.5]" />
+                  <span>Cerrar Sesión</span>
                 </button>
               </div>
             </div>
