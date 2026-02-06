@@ -6,9 +6,9 @@ import { getActivePropertyId } from '@/lib/utils/property-client'
 import { Home, Building, ChevronDown, Sparkles, Plus } from 'lucide-react'
 import { Modal } from './ui/Modal'
 import { Button } from './ui/Button'
+import { Input } from './ui/Input'
 import { useToast } from './ui/Toast'
 import { t } from '@/lib/i18n/es'
-import PropertySelector from './PropertySelector'
 
 interface Property {
   id: string
@@ -25,6 +25,10 @@ export default function MobilePropertyCard() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [isChanging, setIsChanging] = useState(false)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [creating, setCreating] = useState(false)
+  const [newPropertyName, setNewPropertyName] = useState('')
+  const [newPropertyLocation, setNewPropertyLocation] = useState('')
 
   useEffect(() => {
     loadProperties()
@@ -105,6 +109,93 @@ export default function MobilePropertyCard() {
     setShowModal(false)
     setIsChanging(false)
     showToast(t('propertySelector.propertyChanged', { name: newProperty?.name || '' }), 'success')
+  }
+
+  async function handleCreateProperty() {
+    if (!newPropertyName.trim()) {
+      showToast('El nombre de la propiedad es requerido', 'error')
+      return
+    }
+
+    setCreating(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        showToast(t('errors.authRequired'), 'error')
+        setCreating(false)
+        return
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      if (!profile?.tenant_id) {
+        showToast('Error: No se encontró tenant_id', 'error')
+        setCreating(false)
+        return
+      }
+
+      // Bypass property limit for specific user
+      if (user.email === 'condecorporation@gmail.com') {
+        // Allow unlimited properties for this test account
+      } else {
+        // Check subscription limits
+        const { getSubscriptionLimits } = await import('@/lib/utils/tenant')
+        const limits = await getSubscriptionLimits()
+        
+        if (properties.length >= limits.maxProperties) {
+          showToast(`Has alcanzado el límite de ${limits.maxProperties} ${limits.maxProperties === 1 ? 'propiedad' : 'propiedades'}`, 'error')
+          setCreating(false)
+          return
+        }
+      }
+
+      const { data: newProperty, error } = await supabase
+        .from('properties')
+        .insert([{
+          name: newPropertyName.trim(),
+          location: newPropertyLocation.trim() || null,
+          tenant_id: profile.tenant_id,
+        }])
+        .select()
+        .single()
+
+      if (error || !newProperty) {
+        console.error('Error creating property:', error)
+        showToast('Error al crear la propiedad', 'error')
+        setCreating(false)
+        return
+      }
+
+      // Set as active property if it's the first one
+      if (properties.length === 0) {
+        setActivePropertyId(newProperty.id)
+        setActiveProperty(newProperty)
+        localStorage.setItem('activePropertyId', newProperty.id)
+        await supabase
+          .from('profiles')
+          .update({ preferred_property_id: newProperty.id })
+          .eq('id', user.id)
+      }
+
+      // Reload properties
+      await loadProperties()
+      showToast('Propiedad creada exitosamente', 'success')
+      setShowCreateModal(false)
+      setNewPropertyName('')
+      setNewPropertyLocation('')
+      
+      // Trigger property change event
+      window.dispatchEvent(new CustomEvent('propertyChanged'))
+    } catch (error) {
+      console.error('Error creating property:', error)
+      showToast('Error al crear la propiedad', 'error')
+    } finally {
+      setCreating(false)
+    }
   }
 
   const getPropertyIcon = (name: string) => {
