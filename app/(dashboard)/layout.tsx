@@ -277,14 +277,14 @@ export default function DashboardLayout({
             }}
           >
               {/* Branding Premium en mobile drawer - Logo completo y bonito */}
-              <div className="shrink-0 px-5 pt-7 pb-6 border-b border-slate-700/50 bg-gradient-to-r from-slate-800/50 to-slate-900/50">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-xl shadow-lg shadow-blue-500/30 ring-1 ring-blue-400/20 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="h-7 w-7 text-white" />
+              <div className="shrink-0 px-4 pt-6 pb-4 border-b border-slate-700/50 bg-gradient-to-r from-slate-800/50 to-slate-900/50">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-md shadow-blue-500/20 ring-1 ring-blue-400/20 flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="h-6 w-6 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h1 className="text-lg font-bold text-white tracking-tight">CasaPilot</h1>
-                    <p className="text-xs text-slate-300 mt-0.5 font-medium">Gestión de Propiedades</p>
+                    <h1 className="text-base font-bold text-white tracking-tight">CasaPilot</h1>
+                    <p className="text-[11px] text-slate-400 mt-0.5">Gestión de Propiedades</p>
                   </div>
                 </div>
                 
@@ -308,19 +308,19 @@ export default function DashboardLayout({
                         key={item.name}
                         href={item.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`group relative flex items-center gap-x-4 rounded-xl px-4 py-3.5 text-sm font-medium transition-all duration-200 ease-out ${
+                        className={`group relative flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-out ${
                           active
-                            ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 text-white shadow-lg shadow-blue-500/30'
-                            : 'text-slate-300 hover:text-white hover:bg-slate-700/50 hover:shadow-md'
+                            ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
                         }`}
                       >
                         {active && (
-                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-9 bg-white rounded-r-full" />
+                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-7 bg-white rounded-r-full" />
                         )}
-                        <item.icon className={`h-5 w-5 shrink-0 stroke-[1.5] transition-all duration-200 ${
+                        <item.icon className={`h-4.5 w-4.5 shrink-0 transition-all duration-200 ${
                           active ? 'text-white' : `${iconColor} group-hover:text-white`
                         }`} />
-                        <span className={active ? 'font-semibold tracking-wide' : 'tracking-wide'}>{item.name}</span>
+                        <span className={active ? 'font-semibold' : ''}>{item.name}</span>
                       </Link>
                     )
                   } else {
@@ -333,24 +333,24 @@ export default function DashboardLayout({
                     const sectionColor = sectionColors[item.name] || { text: 'text-slate-300', bg: 'bg-slate-700/30', icon: 'text-slate-400' }
                     
                     return (
-                      <div key={item.name} className="space-y-2">
+                      <div key={item.name} className="space-y-1">
                         <button
                           onClick={() => toggleSection(item.name)}
-                          className={`w-full flex items-center justify-between gap-x-2 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
+                          className={`w-full flex items-center justify-between gap-x-2 rounded-lg px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 ${
                             hasActiveChild
-                              ? `${sectionColor.text} ${sectionColor.bg} shadow-md`
-                              : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700/40 hover:shadow-sm'
+                              ? `${sectionColor.text} ${sectionColor.bg} shadow-sm`
+                              : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700/40'
                           }`}
                         >
                           <span>{item.name}</span>
                           <ArrowRight
-                            className={`h-4 w-4 transition-all duration-200 ${
+                            className={`h-3.5 w-3.5 transition-all duration-200 ${
                               isExpanded ? 'rotate-90' : ''
                             } ${hasActiveChild ? sectionColor.icon : 'text-slate-500'}`}
                           />
                         </button>
                         {isExpanded && (
-                          <div className="ml-3 space-y-2 border-l-2 border-slate-700/50 pl-3">
+                          <div className="ml-2 space-y-0.5 border-l-2 border-slate-700/50 pl-2.5">
                             {item.children.map((child) => {
                               const active = isActive(child.href)
                               const childIconColors: Record<string, string> = {
@@ -369,16 +369,16 @@ export default function DashboardLayout({
                                   key={child.name}
                                   href={child.href}
                                   onClick={() => setMobileMenuOpen(false)}
-                                  className={`flex items-center gap-x-4 rounded-xl px-4 py-3 text-sm transition-all duration-200 ease-out ${
+                                  className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
                                     active
-                                      ? 'text-white bg-slate-700/60 shadow-md'
-                                      : 'text-slate-300 hover:text-white hover:bg-slate-700/40 hover:shadow-sm'
+                                      ? 'text-white bg-slate-700/60 shadow-sm'
+                                      : 'text-slate-300 hover:text-white hover:bg-slate-700/40'
                                   }`}
                                 >
-                                  <child.icon className={`h-4.5 w-4.5 shrink-0 stroke-[1.5] transition-all duration-300 ${
-                                    active ? 'text-white scale-110' : `${childIconColor} group-hover:text-white group-hover:scale-110`
+                                  <child.icon className={`h-4 w-4 shrink-0 transition-all duration-200 ${
+                                    active ? 'text-white' : childIconColor
                                   }`} />
-                                  <span className="tracking-wide">{child.name}</span>
+                                  <span>{child.name}</span>
                                 </Link>
                               )
                             })}
@@ -391,13 +391,13 @@ export default function DashboardLayout({
               </nav>
 
               {/* User Menu at bottom - Settings y Logout */}
-              <div className="mt-auto pt-5 px-5 pb-7 border-t border-slate-700/50 safe-area-bottom space-y-2">
+              <div className="mt-auto pt-3 px-3 pb-4 border-t border-slate-700/50 safe-area-bottom space-y-1.5">
                 <Link
                   href="/settings"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex w-full items-center gap-x-3.5 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+                  className="flex w-full items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200"
                 >
-                  <Settings className="h-5 w-5" />
+                  <Settings className="h-4.5 w-4.5" />
                   <span>Configuración</span>
                 </Link>
                 <button
@@ -405,9 +405,9 @@ export default function DashboardLayout({
                     handleLogout()
                     setMobileMenuOpen(false)
                   }}
-                  className="flex w-full items-center gap-x-3.5 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
+                  className="flex w-full items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
                 >
-                  <LogOut className="h-5 w-5 stroke-[1.5]" />
+                  <LogOut className="h-4.5 w-4.5" />
                   <span>Cerrar Sesión</span>
                 </button>
               </div>

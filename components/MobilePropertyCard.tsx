@@ -228,28 +228,28 @@ export default function MobilePropertyCard() {
       <button
         onClick={() => setShowModal(true)}
         disabled={isChanging}
-        className="w-full flex items-center gap-3 px-4 py-3.5 bg-gradient-to-r from-white via-blue-50/30 to-indigo-50/20 backdrop-blur-sm rounded-xl border-2 border-blue-200/60 shadow-lg hover:shadow-xl hover:border-blue-300/80 active:scale-[0.98] transition-all duration-200 min-h-[56px] group"
+        className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-gradient-to-r from-white via-blue-50/30 to-indigo-50/20 backdrop-blur-sm rounded-lg border border-blue-200/60 shadow-md hover:shadow-lg hover:border-blue-300/80 active:scale-[0.98] transition-all duration-200 group"
         type="button"
       >
-        <div className="shrink-0 p-2 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-md shadow-blue-500/30 ring-1 ring-blue-400/20">
+        <div className="shrink-0 p-1.5 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-sm ring-1 ring-blue-400/20">
           {getPropertyIcon(activeProperty.name)}
         </div>
         <div className="flex-1 min-w-0 text-left">
-          <div className="flex items-center gap-2 mb-0.5">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Villa Activa</span>
-            <Sparkles className="h-3 w-3 text-blue-500" />
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Villa Activa</span>
+            <Sparkles className="h-2.5 w-2.5 text-blue-500" />
           </div>
-          <div className="text-base font-bold text-slate-900 truncate leading-tight">
+          <div className="text-sm font-bold text-slate-900 truncate leading-tight">
             {activeProperty.name}
           </div>
           {activeProperty.location && (
-            <div className="text-xs text-slate-600 truncate mt-0.5 leading-tight">
+            <div className="text-[11px] text-slate-600 truncate mt-0.5 leading-tight">
               {activeProperty.location}
             </div>
           )}
         </div>
-        <div className="shrink-0 p-1.5 bg-slate-100 rounded-lg group-hover:bg-slate-200 transition-colors">
-          <ChevronDown className="h-4 w-4 text-slate-600" />
+        <div className="shrink-0 p-1 bg-slate-100 rounded-lg group-hover:bg-slate-200 transition-colors">
+          <ChevronDown className="h-3.5 w-3.5 text-slate-600" />
         </div>
       </button>
 
