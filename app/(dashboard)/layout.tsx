@@ -301,6 +301,7 @@ export default function DashboardLayout({
                     const iconColors: Record<string, string> = {
                       '/dashboard': 'text-blue-400',
                       '/calendario': 'text-purple-400',
+                      '/billing': 'text-indigo-400',
                       '/settings': 'text-slate-400',
                     }
                     const iconColor = iconColors[item.href] || 'text-slate-400'
