@@ -4,10 +4,13 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Settings, AlertTriangle, Trash2, Loader2, Download, Smartphone, Monitor, CheckCircle2 } from 'lucide-react'
+import { Input } from '@/components/ui/Input'
+import { Modal } from '@/components/ui/Modal'
+import { Settings, AlertTriangle, Trash2, Loader2, Download, Smartphone, Monitor, CheckCircle2, ChevronDown, Lock } from 'lucide-react'
 import { t } from '@/lib/i18n/es'
 import ResetDataButton from '@/app/(dashboard)/dashboard/ResetDataButton'
 import PropertyDeleteSection from '@/components/PropertyDeleteSection'
+import { useToast } from '@/components/ui/Toast'
 
 export default function SettingsPage() {
   const [isAuthorized, setIsAuthorized] = useState(false)
