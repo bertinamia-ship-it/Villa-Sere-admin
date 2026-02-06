@@ -125,16 +125,16 @@ export default function MobilePropertySelector() {
     if (lowerName.includes('departamento') || lowerName.includes('apartamento') || 
         lowerName.includes('depto') || lowerName.includes('apto') ||
         lowerName.includes('apartment') || lowerName.includes('flat')) {
-      return <Building className="h-4 w-4" />
+      return <Building className="h-3.5 w-3.5" />
     }
-    return <Home className="h-4 w-4" />
+    return <Home className="h-3.5 w-3.5" />
   }
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 px-3 py-2 bg-white/90 backdrop-blur-sm rounded-lg border border-slate-200/60 shadow-sm min-h-[40px]">
-        <div className="h-4 w-4 rounded bg-slate-200 animate-pulse" />
-        <div className="h-3 flex-1 rounded bg-slate-200 animate-pulse" />
+      <div className="flex items-center gap-2 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-lg border border-white/20 shadow-md min-h-[36px]">
+        <div className="h-3.5 w-3.5 rounded bg-slate-300/50 animate-pulse" />
+        <div className="h-2.5 flex-1 rounded bg-slate-300/50 animate-pulse" />
       </div>
     )
   }
@@ -144,31 +144,31 @@ export default function MobilePropertySelector() {
   
   if (!displayProperty) {
     return (
-      <div className="flex items-center gap-2 px-3 py-2 bg-white/90 backdrop-blur-sm rounded-lg border border-slate-200/60 shadow-sm min-h-[40px]">
-        <Home className="h-4 w-4 text-slate-400" />
-        <span className="text-xs text-slate-500">Sin propiedad</span>
+      <div className="flex items-center gap-2 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-lg border border-white/20 shadow-md min-h-[36px]">
+        <Home className="h-3.5 w-3.5 text-white/70" />
+        <span className="text-xs font-medium text-white/80">Sin propiedad</span>
       </div>
     )
   }
 
   return (
     <>
-      {/* Chip más pequeño en header móvil */}
+      {/* Chip elegante y profesional en header móvil */}
       <button
         onClick={() => setShowModal(true)}
         disabled={isChanging}
-        className="flex items-center gap-2 px-3 py-2 bg-white/95 backdrop-blur-sm rounded-lg border border-slate-200/60 shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200 min-h-[40px] flex-1 max-w-[calc(100vw-140px)]"
+        className="flex items-center gap-2 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-lg border border-white/20 shadow-md hover:shadow-lg active:scale-[0.97] transition-all duration-200 min-h-[36px] flex-1 max-w-[calc(100vw-60px)]"
         type="button"
       >
-        <div className="shrink-0 text-slate-600">
+        <div className="shrink-0 text-slate-700">
           {getPropertyIcon(displayProperty.name)}
         </div>
         <div className="flex-1 min-w-0 text-left">
-          <div className="text-xs font-semibold text-slate-900 truncate">
+          <div className="text-xs font-bold text-slate-900 truncate leading-tight">
             {displayProperty.name}
           </div>
           {displayProperty.location && (
-            <div className="text-[10px] text-slate-500 truncate">
+            <div className="text-[10px] text-slate-600 truncate leading-tight mt-0.5">
               {displayProperty.location}
             </div>
           )}

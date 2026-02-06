@@ -244,40 +244,27 @@ export default function DashboardLayout({
         </div>
       </div>
 
-      {/* Mobile top bar - Compacto y funcional */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/60 z-[80] shadow-lg safe-area-top">
-        <div className="flex items-center gap-3 h-14 px-4 safe-area-x relative z-[80]">
-          {/* Hamburger Menu Button - Siempre accesible */}
+      {/* Mobile top bar - Rediseñado profesional */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/50 z-[80] shadow-lg safe-area-top">
+        <div className="flex items-center gap-2.5 h-12 px-3 safe-area-x relative z-[80]">
+          {/* Hamburger Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-slate-700/60 active:bg-slate-700 transition-colors duration-200 relative z-[80]"
+            className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg hover:bg-slate-700/50 active:bg-slate-700/70 transition-all duration-200 relative z-[80]"
             aria-label="Toggle menu"
             type="button"
           >
             {mobileMenuOpen ? (
-              <X className="h-6 w-6 text-white" />
+              <X className="h-5 w-5 text-white" />
             ) : (
-              <Menu className="h-6 w-6 text-white" />
+              <Menu className="h-5 w-5 text-white" />
             )}
           </button>
 
-          {/* Property Selector - Chip más pequeño */}
+          {/* Property Selector - Siempre visible, bien diseñado */}
           <div className="flex-1 min-w-0 relative z-[80]">
             <MobilePropertySelector />
           </div>
-
-          {/* Profile Button - Discreto y profesional */}
-          <button
-            onClick={() => router.push('/settings')}
-            className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg bg-slate-700/40 hover:bg-slate-700/60 active:bg-slate-700/80 border border-slate-600/30 hover:border-slate-500/50 transition-all duration-200 relative z-[80] backdrop-blur-sm"
-            aria-label="Configuración"
-            type="button"
-          >
-            <div className="relative">
-              <User className="h-4.5 w-4.5 text-slate-300" strokeWidth={2} />
-              <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-blue-400 rounded-full border border-slate-900/50 shadow-sm"></div>
-            </div>
-          </button>
         </div>
       </div>
 
@@ -323,10 +310,10 @@ export default function DashboardLayout({
                         key={item.name}
                         href={item.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`group relative flex items-center gap-x-3.5 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 ease-out ${
+                        className={`group relative flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-out ${
                           active
-                            ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 text-white shadow-xl shadow-blue-500/40 scale-[1.02] ring-1 ring-blue-400/30'
-                            : 'text-slate-300 hover:text-white hover:bg-slate-700/60 hover:scale-[1.01] hover:shadow-md'
+                            ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 text-white shadow-lg shadow-blue-500/30'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
                         }`}
                       >
                         {active && (
@@ -424,12 +411,12 @@ export default function DashboardLayout({
 
       {/* Main content */}
       <div className="lg:pl-72">
-        <Header />
-        {/* PropertyHeader solo en desktop (en móvil ya está en header) */}
+        {/* Header solo en desktop */}
         <div className="hidden lg:block">
+          <Header />
           <PropertyHeader />
         </div>
-        <main className="py-5 px-4 sm:py-7 sm:px-6 min-h-screen lg:pt-5 pt-14 safe-area-x safe-area-bottom">
+        <main className="py-4 px-4 sm:py-6 sm:px-6 min-h-screen lg:pt-5 pt-12 safe-area-x safe-area-bottom">
           <div className="page-soft">
             {children}
           </div>

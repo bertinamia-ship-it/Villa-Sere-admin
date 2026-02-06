@@ -77,13 +77,13 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-gray-200/60">
       <div className="flex items-center justify-between h-14 px-4 sm:px-6">
-        {/* Left: Section Name (no property name duplication) */}
+        {/* Left: Section Name */}
         <div className="min-w-0 flex-1">
           <h1 className="text-sm sm:text-base font-semibold text-[#0F172A] truncate">{sectionName}</h1>
         </div>
 
-        {/* Right: Property Selector + User Menu */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        {/* Right: Property Selector + User Menu (solo desktop) */}
+        <div className="hidden lg:flex items-center gap-2 sm:gap-3 shrink-0">
           <PropertySelector />
           
           {/* User Menu */}
