@@ -432,16 +432,21 @@ export default function DashboardLayout({
           <PropertyHeader />
         </div>
         
-        {/* Botón FAB para abrir menú móvil */}
+        {/* Botón discreto para abrir menú móvil - Top Left */}
         {!mobileMenuOpen && (
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden fixed bottom-6 right-6 z-[90] w-14 h-14 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-full shadow-2xl shadow-blue-500/50 flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200"
+            className="lg:hidden fixed top-4 left-4 z-[90] px-3 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-slate-200/60 flex items-center gap-2 hover:bg-white hover:shadow-xl active:scale-95 transition-all duration-200 safe-area-top"
             aria-label="Abrir menú"
             type="button"
-            style={{ marginBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+            style={{ marginTop: 'max(1rem, env(safe-area-inset-top))' }}
           >
-            <Menu className="h-6 w-6 text-white" />
+            <div className="w-5 h-5 flex flex-col justify-center gap-1">
+              <span className="w-full h-0.5 bg-slate-700 rounded-full transition-all"></span>
+              <span className="w-full h-0.5 bg-slate-700 rounded-full transition-all"></span>
+              <span className="w-full h-0.5 bg-slate-700 rounded-full transition-all"></span>
+            </div>
+            <span className="text-xs font-medium text-slate-700 hidden sm:inline">Menú</span>
           </button>
         )}
         
