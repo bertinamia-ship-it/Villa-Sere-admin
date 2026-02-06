@@ -132,34 +132,25 @@ export default function SettingsPage() {
         <p className="text-sm text-[#64748B] mt-1">{t('settings.subtitle')}</p>
       </div>
 
-      {/* Advanced Section */}
-      {isAuthorized && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-[#0F172A]">{t('settings.advanced')}</h2>
-          
-          <Card className="border-[#EF4444]/20 bg-[#FEF2F2]">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-[#991B1B]">
-                <AlertTriangle className="h-5 w-5" />
-                {t('settings.dangerousActions')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResetDataButton />
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Install App Section */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#0F172A]">{t('settings.installApp')}</h2>
-        <Card>
-          <CardContent className="py-6">
+      {/* SECCIÓN 1: Configuraciones Básicas */}
+      <div className="space-y-6">
+        <h2 className="text-lg font-semibold text-[#0F172A]">Configuraciones Básicas</h2>
+        
+        {/* Install App Section - Profesional */}
+        <Card className="border-slate-200/60 shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2.5 text-[#0F172A]">
+              <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg">
+                <Download className="h-5 w-5 text-white" />
+              </div>
+              <span>{t('settings.installApp')}</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
             {isInstalled ? (
-              <div className="flex items-center gap-3 text-[#10B981]">
-                <CheckCircle2 className="h-5 w-5" />
-                <p className="text-sm font-medium">{t('settings.alreadyInstalled')}</p>
+              <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
+                <CheckCircle2 className="h-5 w-5 text-green-600" />
+                <p className="text-sm font-medium text-green-800">{t('settings.alreadyInstalled')}</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -168,22 +159,24 @@ export default function SettingsPage() {
                 {deferredPrompt && getDeviceType() !== 'ios' ? (
                   <Button
                     onClick={handleInstallClick}
-                    className="w-full sm:w-auto"
+                    className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md"
                   >
                     <Download className="h-4 w-4 mr-2" />
                     {t('settings.installApp')}
                   </Button>
                 ) : (
-                  <div className="space-y-4 pt-2">
+                  <div className="space-y-3 pt-2">
                     {getDeviceType() === 'ios' && (
-                      <div className="border border-[#E2E8F0] rounded-lg p-4 bg-[#F8FAFC]">
-                        <div className="flex items-start gap-3 mb-2">
-                          <Smartphone className="h-5 w-5 text-[#2563EB] mt-0.5" />
+                      <div className="border border-blue-200 rounded-xl p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-blue-100 rounded-lg">
+                            <Smartphone className="h-5 w-5 text-blue-600" />
+                          </div>
                           <div className="flex-1">
-                            <h3 className="text-sm font-semibold text-[#0F172A] mb-1">
+                            <h3 className="text-sm font-semibold text-[#0F172A] mb-1.5">
                               {t('settings.installIOS')}
                             </h3>
-                            <p className="text-xs text-[#64748B] whitespace-pre-line">
+                            <p className="text-xs text-[#64748B] whitespace-pre-line leading-relaxed">
                               {t('settings.installIOSSteps')}
                             </p>
                           </div>
@@ -192,14 +185,16 @@ export default function SettingsPage() {
                     )}
                     
                     {getDeviceType() === 'android' && (
-                      <div className="border border-[#E2E8F0] rounded-lg p-4 bg-[#F8FAFC]">
-                        <div className="flex items-start gap-3 mb-2">
-                          <Smartphone className="h-5 w-5 text-[#2563EB] mt-0.5" />
+                      <div className="border border-blue-200 rounded-xl p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-blue-100 rounded-lg">
+                            <Smartphone className="h-5 w-5 text-blue-600" />
+                          </div>
                           <div className="flex-1">
-                            <h3 className="text-sm font-semibold text-[#0F172A] mb-1">
+                            <h3 className="text-sm font-semibold text-[#0F172A] mb-1.5">
                               {t('settings.installAndroid')}
                             </h3>
-                            <p className="text-xs text-[#64748B] whitespace-pre-line">
+                            <p className="text-xs text-[#64748B] whitespace-pre-line leading-relaxed">
                               {t('settings.installAndroidSteps')}
                             </p>
                           </div>
@@ -208,14 +203,16 @@ export default function SettingsPage() {
                     )}
                     
                     {getDeviceType() === 'desktop' && (
-                      <div className="border border-[#E2E8F0] rounded-lg p-4 bg-[#F8FAFC]">
-                        <div className="flex items-start gap-3 mb-2">
-                          <Monitor className="h-5 w-5 text-[#2563EB] mt-0.5" />
+                      <div className="border border-blue-200 rounded-xl p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-blue-100 rounded-lg">
+                            <Monitor className="h-5 w-5 text-blue-600" />
+                          </div>
                           <div className="flex-1">
-                            <h3 className="text-sm font-semibold text-[#0F172A] mb-1">
+                            <h3 className="text-sm font-semibold text-[#0F172A] mb-1.5">
                               {t('settings.installDesktop')}
                             </h3>
-                            <p className="text-xs text-[#64748B] whitespace-pre-line">
+                            <p className="text-xs text-[#64748B] whitespace-pre-line leading-relaxed">
                               {t('settings.installDesktopSteps')}
                             </p>
                           </div>
@@ -230,22 +227,47 @@ export default function SettingsPage() {
         </Card>
       </div>
 
-      {/* Propiedades Section */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#0F172A]">Propiedades</h2>
-        <PropertyDeleteSection />
-      </div>
+      {/* SECCIÓN 2: Zona Peligrosa - Eliminar/Resetear */}
+      {isAuthorized && (
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-lg font-semibold text-[#0F172A] mb-1">Zona Peligrosa</h2>
+            <p className="text-xs text-[#64748B]">Acciones que no se pueden deshacer</p>
+          </div>
+          
+          <div className="space-y-4">
+            {/* Eliminar Propiedades */}
+            <Card className="border-red-200/60 bg-red-50/30">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2.5 text-red-700">
+                  <div className="p-2 bg-red-100 rounded-lg">
+                    <Trash2 className="h-5 w-5 text-red-600" />
+                  </div>
+                  <span>Eliminar Propiedades</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <PropertyDeleteSection />
+              </CardContent>
+            </Card>
 
-      {/* General Settings Placeholder */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#0F172A]">{t('settings.general')}</h2>
-        <Card>
-          <CardContent className="py-8 text-center">
-            <Settings className="h-12 w-12 text-[#E2E8F0] mx-auto mb-3" />
-            <p className="text-sm text-[#64748B]">{t('settings.comingSoon')}</p>
-          </CardContent>
-        </Card>
-      </div>
+            {/* Resetear Datos */}
+            <Card className="border-[#EF4444]/20 bg-[#FEF2F2]">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2.5 text-[#991B1B]">
+                  <div className="p-2 bg-red-100 rounded-lg">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                  </div>
+                  <span>{t('settings.dangerousActions')}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <ResetDataButton />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

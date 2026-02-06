@@ -277,13 +277,13 @@ export default function DashboardLayout({
               e.stopPropagation()
             }}
           >
-              {/* Branding Premium en mobile drawer - Logo MUY visible */}
+              {/* Branding Premium en mobile drawer - Logo completo y bonito */}
               <div className="shrink-0 px-5 pt-7 pb-6 border-b border-slate-700/50 bg-gradient-to-r from-slate-800/50 to-slate-900/50">
                 <div className="flex items-center gap-3.5 mb-5">
-                  <div className="p-3.5 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-2xl shadow-xl shadow-blue-500/40 ring-2 ring-blue-400/30">
-                    <Sparkles className="h-7 w-7 text-white" />
+                  <div className="p-4 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-2xl shadow-xl shadow-blue-500/40 ring-2 ring-blue-400/30 flex items-center justify-center">
+                    <Sparkles className="h-8 w-8 text-white" />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <h1 className="text-xl font-bold text-white tracking-tight">CasaPilot</h1>
                     <p className="text-xs text-slate-300 mt-0.5 font-medium">Gestión de Propiedades</p>
                   </div>

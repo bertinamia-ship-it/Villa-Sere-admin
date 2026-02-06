@@ -244,8 +244,6 @@ export default function PropertyDeleteSection() {
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
 
       {/* Modal de confirmación con nombre */}
       <Modal
