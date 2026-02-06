@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { es } from '@/lib/i18n/es'
+import { es, t as esT } from '@/lib/i18n/es'
 import { t as enT } from '@/lib/i18n/en'
 
 type Language = 'es' | 'en'
@@ -40,7 +40,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     if (language === 'en') {
       return enT(key, params)
     }
-    return es.t(key, params)
+    return esT(key, params)
   }
 
   return (
