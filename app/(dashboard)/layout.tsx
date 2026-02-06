@@ -277,15 +277,15 @@ export default function DashboardLayout({
               e.stopPropagation()
             }}
           >
-              {/* Branding Premium en mobile drawer */}
-              <div className="shrink-0 px-5 pt-6 pb-5 border-b border-slate-700/50 bg-gradient-to-r from-slate-800/50 to-slate-900/50">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2.5 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-xl shadow-lg shadow-blue-500/30 ring-2 ring-blue-400/20">
-                    <Sparkles className="h-5 w-5 text-white" />
+              {/* Branding Premium en mobile drawer - Logo MUY visible */}
+              <div className="shrink-0 px-5 pt-7 pb-6 border-b border-slate-700/50 bg-gradient-to-r from-slate-800/50 to-slate-900/50">
+                <div className="flex items-center gap-3.5 mb-5">
+                  <div className="p-3.5 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-2xl shadow-xl shadow-blue-500/40 ring-2 ring-blue-400/30">
+                    <Sparkles className="h-7 w-7 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-lg font-bold text-white tracking-tight">CasaPilot</h1>
-                    <p className="text-xs text-slate-400 mt-0.5">Gestión de Propiedades</p>
+                    <h1 className="text-xl font-bold text-white tracking-tight">CasaPilot</h1>
+                    <p className="text-xs text-slate-300 mt-0.5 font-medium">Gestión de Propiedades</p>
                   </div>
                 </div>
                 
@@ -309,17 +309,17 @@ export default function DashboardLayout({
                         key={item.name}
                         href={item.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`group relative flex items-center gap-x-3.5 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ease-out ${
+                        className={`group relative flex items-center gap-x-4 rounded-xl px-4 py-3.5 text-sm font-medium transition-all duration-200 ease-out ${
                           active
                             ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 text-white shadow-lg shadow-blue-500/30'
                             : 'text-slate-300 hover:text-white hover:bg-slate-700/50 hover:shadow-md'
                         }`}
                       >
                         {active && (
-                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full" />
+                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-9 bg-white rounded-r-full" />
                         )}
-                        <item.icon className={`h-5 w-5 shrink-0 stroke-[1.5] transition-all duration-300 ${
-                          active ? 'text-white scale-110' : `${iconColor} group-hover:text-white group-hover:scale-110`
+                        <item.icon className={`h-5 w-5 shrink-0 stroke-[1.5] transition-all duration-200 ${
+                          active ? 'text-white' : `${iconColor} group-hover:text-white`
                         }`} />
                         <span className={active ? 'font-semibold tracking-wide' : 'tracking-wide'}>{item.name}</span>
                       </Link>
@@ -337,7 +337,7 @@ export default function DashboardLayout({
                       <div key={item.name} className="space-y-2">
                         <button
                           onClick={() => toggleSection(item.name)}
-                          className={`w-full flex items-center justify-between gap-x-2 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+                          className={`w-full flex items-center justify-between gap-x-2 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
                             hasActiveChild
                               ? `${sectionColor.text} ${sectionColor.bg} shadow-md`
                               : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700/40 hover:shadow-sm'
@@ -345,13 +345,13 @@ export default function DashboardLayout({
                         >
                           <span>{item.name}</span>
                           <ArrowRight
-                            className={`h-4 w-4 transition-all duration-300 ${
+                            className={`h-4 w-4 transition-all duration-200 ${
                               isExpanded ? 'rotate-90' : ''
                             } ${hasActiveChild ? sectionColor.icon : 'text-slate-500'}`}
                           />
                         </button>
                         {isExpanded && (
-                          <div className="ml-2 space-y-1.5 border-l-2 border-slate-700/60 pl-4">
+                          <div className="ml-3 space-y-2 border-l-2 border-slate-700/50 pl-3">
                             {item.children.map((child) => {
                               const active = isActive(child.href)
                               const childIconColors: Record<string, string> = {
@@ -391,16 +391,24 @@ export default function DashboardLayout({
                 })}
               </nav>
 
-              {/* User Menu at bottom - Solo Logout */}
-              <div className="mt-auto pt-4 px-4 pb-6 border-t border-slate-700/50 safe-area-bottom">
+              {/* User Menu at bottom - Settings y Logout */}
+              <div className="mt-auto pt-5 px-5 pb-7 border-t border-slate-700/50 safe-area-bottom space-y-2">
+                <Link
+                  href="/settings"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex w-full items-center gap-x-3.5 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+                >
+                  <Settings className="h-5 w-5" />
+                  <span>Configuración</span>
+                </Link>
                 <button
                   onClick={() => {
                     handleLogout()
                     setMobileMenuOpen(false)
                   }}
-                  className="flex w-full items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
+                  className="flex w-full items-center gap-x-3.5 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
                 >
-                  <LogOut className="h-4 w-4 stroke-[1.5]" />
+                  <LogOut className="h-5 w-5 stroke-[1.5]" />
                   <span>Cerrar Sesión</span>
                 </button>
               </div>
