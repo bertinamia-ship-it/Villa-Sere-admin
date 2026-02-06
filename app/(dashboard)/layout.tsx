@@ -245,13 +245,13 @@ export default function DashboardLayout({
         </div>
       </div>
 
-      {/* Mobile top bar - Rediseñado profesional */}
+      {/* Mobile top bar - Minimalista y profesional */}
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/50 z-[80] shadow-lg safe-area-top">
-        <div className="flex items-center gap-2.5 h-12 px-3 safe-area-x relative z-[80]">
+        <div className="flex items-center gap-3 h-14 px-4 safe-area-x relative z-[80]">
           {/* Hamburger Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg hover:bg-slate-700/50 active:bg-slate-700/70 transition-all duration-200 relative z-[80]"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-slate-700/50 active:bg-slate-700/70 transition-all duration-200 relative z-[80]"
             aria-label="Toggle menu"
             type="button"
           >
@@ -262,10 +262,26 @@ export default function DashboardLayout({
             )}
           </button>
 
-          {/* Property Selector - Siempre visible, bien diseñado */}
-          <div className="flex-1 min-w-0 relative z-[80]">
-            <MobilePropertySelector />
+          {/* Logo y título compacto */}
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
+            <div className="p-1.5 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-md shadow-blue-500/20 shrink-0">
+              <Sparkles className="h-4 w-4 text-white" />
+            </div>
+            <h1 className="text-base font-bold text-white tracking-tight truncate">CasaPilot</h1>
           </div>
+
+          {/* Settings Button - Discreto */}
+          <button
+            onClick={() => {
+              router.push('/settings')
+              setMobileMenuOpen(false)
+            }}
+            className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl bg-slate-700/30 hover:bg-slate-700/50 active:bg-slate-700/70 border border-slate-600/30 transition-all duration-200 relative z-[80]"
+            aria-label="Configuración"
+            type="button"
+          >
+            <Settings className="h-4.5 w-4.5 text-slate-300" />
+          </button>
         </div>
       </div>
 
