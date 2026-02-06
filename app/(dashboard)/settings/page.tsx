@@ -6,8 +6,8 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Modal } from '@/components/ui/Modal'
-import { Settings, AlertTriangle, Trash2, Loader2, Download, Smartphone, Monitor, CheckCircle2, ChevronDown, Lock } from 'lucide-react'
-import { t } from '@/lib/i18n/es'
+import { Settings, AlertTriangle, Trash2, Loader2, Download, Smartphone, Monitor, CheckCircle2, ChevronDown, Lock, Globe } from 'lucide-react'
+import { useI18n } from '@/lib/i18n'
 import ResetDataButton from '@/app/(dashboard)/dashboard/ResetDataButton'
 import PropertyDeleteSection from '@/components/PropertyDeleteSection'
 import { useToast } from '@/components/ui/Toast'
@@ -25,6 +25,7 @@ export default function SettingsPage() {
   const [passwordVerified, setPasswordVerified] = useState(false)
   const supabase = createClient()
   const { showToast } = useToast()
+  const { language, setLanguage, t } = useI18n()
 
   useEffect(() => {
     checkAuthorization()
@@ -162,7 +163,7 @@ export default function SettingsPage() {
     const isValid = await verifyPassword()
     
     if (!isValid) {
-      showToast('Contraseña incorrecta. Por favor, intenta de nuevo.', 'error')
+      showToast(language === 'en' ? 'Incorrect password. Please try again.' : 'Contraseña incorrecta. Por favor, intenta de nuevo.', 'error')
       setPassword('')
       return
     }
@@ -224,7 +225,46 @@ export default function SettingsPage() {
 
       {/* SECCIÓN 1: Configuraciones Básicas */}
       <div className="space-y-6">
-        <h2 className="text-lg font-semibold text-[#0F172A]">Configuraciones Básicas</h2>
+        <h2 className="text-lg font-semibold text-[#0F172A]">{t('settings.general')}</h2>
+        
+        {/* Language Selector */}
+        <Card className="border-slate-200/60 shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2.5 text-[#0F172A]">
+              <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg">
+                <Globe className="h-5 w-5 text-white" />
+              </div>
+              <span>{t('settings.language')}</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <p className="text-sm text-[#64748B] mb-4">{t('settings.languageDescription')}</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setLanguage('es')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all duration-200 ${
+                  language === 'es'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-500 shadow-md'
+                    : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                }`}
+              >
+                <span className="text-2xl">🇪🇸</span>
+                <span className="font-medium">{t('settings.spanish')}</span>
+              </button>
+              <button
+                onClick={() => setLanguage('en')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all duration-200 ${
+                  language === 'en'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-500 shadow-md'
+                    : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                }`}
+              >
+                <span className="text-2xl">🇺🇸</span>
+                <span className="font-medium">{t('settings.english')}</span>
+              </button>
+            </div>
+          </CardContent>
+        </Card>
         
         {/* Install App Section - Profesional */}
         <Card className="border-slate-200/60 shadow-sm hover:shadow-md transition-shadow">
@@ -347,8 +387,8 @@ export default function SettingsPage() {
                   <Trash2 className="h-4.5 w-4.5 text-red-600" />
                 </div>
                 <div className="flex-1 text-left">
-                  <div className="text-sm font-medium text-slate-900">Eliminar Propiedades</div>
-                  <div className="text-xs text-slate-500 mt-0.5">Elimina propiedades permanentemente</div>
+                  <div className="text-sm font-medium text-slate-900">{language === 'en' ? 'Delete Properties' : 'Eliminar Propiedades'}</div>
+                  <div className="text-xs text-slate-500 mt-0.5">{language === 'en' ? 'Permanently delete properties' : 'Elimina propiedades permanentemente'}</div>
                 </div>
                 <ChevronDown className="h-4 w-4 text-slate-400 rotate-[-90deg]" />
               </button>
@@ -362,8 +402,8 @@ export default function SettingsPage() {
                   <AlertTriangle className="h-4.5 w-4.5 text-red-600" />
                 </div>
                 <div className="flex-1 text-left">
-                  <div className="text-sm font-medium text-slate-900">Resetear Todos los Datos</div>
-                  <div className="text-xs text-slate-500 mt-0.5">Borra inventario, gastos y más</div>
+                  <div className="text-sm font-medium text-slate-900">{language === 'en' ? 'Reset All Data' : 'Resetear Todos los Datos'}</div>
+                  <div className="text-xs text-slate-500 mt-0.5">{language === 'en' ? 'Delete inventory, expenses and more' : 'Borra inventario, gastos y más'}</div>
                 </div>
                 <ChevronDown className="h-4 w-4 text-slate-400 rotate-[-90deg]" />
               </button>
@@ -377,12 +417,12 @@ export default function SettingsPage() {
                         <div className="p-2 bg-red-100 rounded-lg">
                           <Trash2 className="h-5 w-5 text-red-600" />
                         </div>
-                        <span>Eliminar Propiedades</span>
+                        <span>{language === 'en' ? 'Delete Properties' : 'Eliminar Propiedades'}</span>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
                       <p className="text-sm text-slate-600 mb-4">
-                        Elimina propiedades de forma permanente. Esta acción no se puede deshacer.
+                        {language === 'en' ? 'Permanently delete properties. This action cannot be undone.' : 'Elimina propiedades de forma permanente. Esta acción no se puede deshacer.'}
                       </p>
                       <PropertyDeleteSection />
                     </CardContent>
@@ -424,30 +464,32 @@ export default function SettingsPage() {
         title={
           <div className="flex items-center gap-2 text-red-600">
             <Lock className="h-5 w-5" />
-            <span className="font-semibold">Verificación Requerida</span>
+            <span className="font-semibold">{language === 'en' ? 'Verification Required' : 'Verificación Requerida'}</span>
           </div>
         }
       >
         <div className="space-y-4">
           <div className="p-4 bg-red-50 rounded-lg border border-red-200">
             <p className="text-sm font-medium text-red-900 mb-1">
-              Acción peligrosa detectada
+              {language === 'en' ? 'Dangerous action detected' : 'Acción peligrosa detectada'}
             </p>
             <p className="text-sm text-red-700">
-              Para {passwordAction === 'delete' ? 'eliminar propiedades' : 'resetear todos los datos'}, 
-              necesitas confirmar tu contraseña.
+              {language === 'en' 
+                ? `To ${passwordAction === 'delete' ? 'delete properties' : 'reset all data'}, you need to confirm your password.`
+                : `Para ${passwordAction === 'delete' ? 'eliminar propiedades' : 'resetear todos los datos'}, necesitas confirmar tu contraseña.`
+              }
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              Contraseña
+              {language === 'en' ? 'Password' : 'Contraseña'}
             </label>
             <Input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Ingresa tu contraseña"
+              placeholder={language === 'en' ? 'Enter your password' : 'Ingresa tu contraseña'}
               className="w-full"
               autoFocus
               onKeyDown={(e) => {
@@ -469,7 +511,7 @@ export default function SettingsPage() {
               className="flex-1"
               disabled={verifying}
             >
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button
               variant="primary"
@@ -477,7 +519,7 @@ export default function SettingsPage() {
               disabled={verifying || !password.trim()}
               className="flex-1 bg-red-600 hover:bg-red-700 text-white"
             >
-              {verifying ? 'Verificando...' : 'Confirmar'}
+              {verifying ? (language === 'en' ? 'Verifying...' : 'Verificando...') : t('common.confirm')}
             </Button>
           </div>
         </div>
