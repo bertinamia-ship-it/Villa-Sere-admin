@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Vendor } from '@/lib/types/database'
 import { X } from 'lucide-react'
 import { getCurrentTenantId } from '@/lib/utils/tenant'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 import { useToast } from '@/components/ui/Toast'
 
 interface VendorFormProps {
@@ -14,6 +14,7 @@ interface VendorFormProps {
 }
 
 export default function VendorForm({ vendor, onClose }: VendorFormProps) {
+  const { t } = useI18n()
   const [formData, setFormData] = useState({
     company_name: vendor?.company_name || '',
     specialty: vendor?.specialty || '',

@@ -11,7 +11,7 @@ import { useToast } from '@/components/ui/Toast'
 import { ArrowLeft, Plus, Minus, Edit, Trash2 } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { insertWithPropertyClient, deleteWithPropertyClient } from '@/lib/supabase/query-helpers-client'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 import { logError, getUserFriendlyError } from '@/lib/utils/error-handler'
 import { formatDate, formatCurrency } from '@/lib/utils/formatters'
 import TransactionForm from './TransactionForm'
@@ -26,6 +26,7 @@ interface AccountDetailProps {
 }
 
 export default function AccountDetail({ account, onBack, onEdit, onDelete, onRefresh }: AccountDetailProps) {
+  const { t } = useI18n()
   const supabase = createClient()
   const { showToast } = useToast()
   const [loading, setLoading] = useState(true)

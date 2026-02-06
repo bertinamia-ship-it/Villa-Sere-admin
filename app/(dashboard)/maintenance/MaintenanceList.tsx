@@ -12,13 +12,14 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 type TabType = 'tickets' | 'recurrent'
 
 export default function MaintenanceList() {
+  const { t } = useI18n()
   const [tickets, setTickets] = useState<MaintenanceTicket[]>([])
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [filteredTickets, setFilteredTickets] = useState<MaintenanceTicket[]>([])

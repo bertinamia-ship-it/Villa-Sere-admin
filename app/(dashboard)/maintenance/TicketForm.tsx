@@ -6,7 +6,7 @@ import { MaintenanceTicket, Vendor } from '@/lib/types/database'
 import { ROOMS, PRIORITIES, TICKET_STATUSES, PRIORITY_LABELS, STATUS_LABELS } from '@/lib/constants'
 import { X, Upload } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 import { useToast } from '@/components/ui/Toast'
 
 interface TicketFormProps {
@@ -16,6 +16,7 @@ interface TicketFormProps {
 }
 
 export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps) {
+  const { t } = useI18n()
   const [formData, setFormData] = useState({
     title: ticket?.title || '',
     room: ticket?.room || ROOMS[0],

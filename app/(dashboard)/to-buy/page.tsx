@@ -11,9 +11,10 @@ import { useToast } from '@/components/ui/Toast'
 import { Plus, ShoppingCart, Edit, Trash2, ExternalLink, Search } from 'lucide-react'
 import PurchaseItemForm from './PurchaseItemForm'
 import { getActivePropertyId } from '@/lib/utils/property-client'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 
 export default function ToBuyPage() {
+  const { t } = useI18n()
   const supabase = createClient()
   const { showToast } = useToast()
   const [loading, setLoading] = useState(true)

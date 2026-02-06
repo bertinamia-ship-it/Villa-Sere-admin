@@ -3,7 +3,7 @@
 import { MaintenanceTicket } from '@/lib/types/database'
 import { Pencil, Trash2, Calendar, DollarSign, Image as ImageIcon } from 'lucide-react'
 import { PRIORITY_LABELS, STATUS_LABELS } from '@/lib/constants'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 
 interface TicketCardProps {
   ticket: MaintenanceTicket
@@ -22,6 +22,7 @@ export default function TicketCard({
   getPriorityColor,
   getStatusColor
 }: TicketCardProps) {
+  const { t } = useI18n()
   return (
     <div className="bg-white rounded-lg border border-[#E5E7EB] shadow-sm hover:shadow-md hover:border-[#D1D5DB] transition-all duration-200 ease-out p-5">
       <div className="flex items-start justify-between mb-3">

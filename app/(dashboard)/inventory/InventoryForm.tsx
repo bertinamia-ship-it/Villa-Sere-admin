@@ -7,7 +7,7 @@ import { CATEGORIES, ROOMS } from '@/lib/constants'
 import { X, Upload } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { useToast } from '@/components/ui/Toast'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 
 interface InventoryFormProps {
   item?: InventoryItem | null
@@ -15,6 +15,7 @@ interface InventoryFormProps {
 }
 
 export default function InventoryForm({ item, onClose }: InventoryFormProps) {
+  const { t } = useI18n()
   const [formData, setFormData] = useState({
     name: item?.name || '',
     category: item?.category || CATEGORIES[0],

@@ -7,7 +7,7 @@ import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { Button } from '@/components/ui/Button'
 import { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 
 interface BookingFormProps {
   booking?: Booking | null
@@ -16,6 +16,7 @@ interface BookingFormProps {
 }
 
 export default function BookingForm({ booking, onSave, onCancel }: BookingFormProps) {
+  const { t } = useI18n()
   const [formData, setFormData] = useState({
     guest_name: booking?.guest_name || '',
     platform: booking?.platform || 'Airbnb',

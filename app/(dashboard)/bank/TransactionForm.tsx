@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/Input'
 import { useToast } from '@/components/ui/Toast'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { insertWithPropertyClient } from '@/lib/supabase/query-helpers-client'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 import { logError, getUserFriendlyError } from '@/lib/utils/error-handler'
 
 interface TransactionFormProps {
@@ -20,6 +20,7 @@ interface TransactionFormProps {
 }
 
 export default function TransactionForm({ account, direction, onClose, onSave }: TransactionFormProps) {
+  const { t } = useI18n()
   const [formData, setFormData] = useState({
     transaction_date: new Date().toISOString().split('T')[0],
     amount: '',

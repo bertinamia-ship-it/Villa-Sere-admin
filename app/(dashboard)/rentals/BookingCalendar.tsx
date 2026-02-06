@@ -5,7 +5,7 @@ import { Booking } from '@/lib/types/database'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { ChevronLeft, ChevronRight, Info } from 'lucide-react'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 
 interface BookingCalendarProps {
   bookings: Booking[]
@@ -13,6 +13,7 @@ interface BookingCalendarProps {
 }
 
 export default function BookingCalendar({ bookings, onEdit }: BookingCalendarProps) {
+  const { t } = useI18n()
   const [currentDate, setCurrentDate] = useState(new Date())
   const [tooltip, setTooltip] = useState<{ visible: boolean; x: number; y: number; booking?: Booking | null; dateLabel?: string }>({
     visible: false,

@@ -16,7 +16,7 @@ import BookingList from './BookingList'
 import BookingCalendar from './BookingCalendar'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 
 interface MonthlyStats {
   income: number
@@ -29,6 +29,7 @@ interface MonthlyStats {
 export default function RentalsPage() {
   const supabase = createClient()
   const { showToast } = useToast()
+  const { t } = useI18n()
   const [loading, setLoading] = useState(true)
   const [hasProperty, setHasProperty] = useState(true)
   const [bookings, setBookings] = useState<Booking[]>([])
@@ -146,7 +147,7 @@ export default function RentalsPage() {
 
       // Validation
       if (!booking.check_in || !booking.check_out) {
-        showToast(t('rentals.datesRequired'), 'error')
+        showToast(t('rentals.checkInRequired') + ' y ' + t('rentals.checkOutRequired'), 'error')
         return
       }
 
@@ -164,7 +165,7 @@ export default function RentalsPage() {
       }
 
       if (booking.total_amount && parseFloat(String(booking.total_amount)) < 0) {
-        showToast(t('rentals.amountCannotBeNegative'), 'error')
+        showToast(t('rentals.amountNotNegative'), 'error')
         return
       }
 
@@ -190,7 +191,7 @@ export default function RentalsPage() {
           })
           
           if (hasOverlap) {
-            showToast(t('rentals.overlappingDates'), 'error')
+            showToast(t('rentals.bookingOverlap'), 'error')
             return
           }
         }

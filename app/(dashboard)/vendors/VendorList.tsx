@@ -6,9 +6,10 @@ import { Vendor } from '@/lib/types/database'
 import { Plus, Search, Pencil, Trash2, Phone, Mail, MessageCircle } from 'lucide-react'
 import VendorForm from './VendorForm'
 import { getCurrentTenantId } from '@/lib/utils/tenant'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 
 export default function VendorList() {
+  const { t } = useI18n()
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [filteredVendors, setFilteredVendors] = useState<Vendor[]>([])
   const [loading, setLoading] = useState(true)
@@ -142,7 +143,7 @@ export default function VendorList() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{t('vendors.title')}</h1>
-          <p className="text-gray-600 mt-1">{t('vendors.totalVendors', { count: vendors.length })}</p>
+          <p className="text-gray-600 mt-1">{t('vendors.totalVendors', { count: String(vendors.length) })}</p>
         </div>
         <button
           onClick={() => setShowForm(true)}

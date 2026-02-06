@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Edit, Trash2, Calendar, DollarSign } from 'lucide-react'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 
 interface BookingListProps {
   bookings: Booking[]
@@ -14,13 +14,15 @@ interface BookingListProps {
 }
 
 export default function BookingList({ bookings, onEdit, onDelete }: BookingListProps) {
+  const { t } = useI18n()
+  
   if (bookings.length === 0) {
     return (
       <Card>
         <EmptyState
           icon={<Calendar className="h-12 w-12" />}
-          title="No hay reservas aún"
-          description="Agrega tu primera reserva para comenzar a rastrear ingresos por alquiler"
+          title={t('rentals.noBookings')}
+          description={t('rentals.noBookingsDescription')}
         />
       </Card>
     )
@@ -50,36 +52,36 @@ export default function BookingList({ bookings, onEdit, onDelete }: BookingListP
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="font-semibold text-slate-900 text-base">
-                    {booking.guest_name || 'Huésped'}
+                    {booking.guest_name || t('rentals.guest')}
                   </h3>
                   <p className="text-sm text-slate-500 mt-0.5">{booking.platform}</p>
                 </div>
                 <span className={`px-2.5 py-1 text-xs font-medium rounded-full border ${getStatusColor(booking.status)}`}>
-                  {booking.status === 'confirmed' ? 'Confirmada' : booking.status === 'completed' ? 'Completada' : booking.status === 'cancelled' ? 'Cancelada' : booking.status}
+                  {booking.status === 'confirmed' ? t('rentals.confirmed') : booking.status === 'completed' ? t('rentals.completed') : booking.status === 'cancelled' ? t('rentals.cancelled') : booking.status}
                 </span>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
-                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Entrada</p>
+                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">{t('rentals.checkIn')}</p>
                   <p className="font-medium text-slate-900">
                     {new Date(booking.check_in).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Salida</p>
+                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">{t('rentals.checkOut')}</p>
                   <p className="font-medium text-slate-900">
                     {new Date(booking.check_out).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Noches</p>
+                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">{t('rentals.nights')}</p>
                   <p className="font-medium text-slate-900">
                     {calculateNights(booking.check_in, booking.check_out)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Total</p>
+                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">{t('rentals.total')}</p>
                   <p className="font-medium text-slate-900">
                     ${(booking.total_amount + booking.cleaning_fee).toFixed(2)}
                   </p>

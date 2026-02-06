@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/Input'
 import { useToast } from '@/components/ui/Toast'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { insertWithPropertyClient, updateWithPropertyClient } from '@/lib/supabase/query-helpers-client'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 import { logError, getUserFriendlyError } from '@/lib/utils/error-handler'
 
 interface AccountFormProps {
@@ -19,6 +19,7 @@ interface AccountFormProps {
 }
 
 export default function AccountForm({ account, onClose, onSave }: AccountFormProps) {
+  const { t } = useI18n()
   const [formData, setFormData] = useState({
     name: account?.name || '',
     account_type: account?.account_type || ('cash' as 'cash' | 'card' | 'bank'),

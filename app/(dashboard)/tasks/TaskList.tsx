@@ -13,20 +13,21 @@ import { Button } from '@/components/ui/Button'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { useToast } from '@/components/ui/Toast'
 import TaskForm from './TaskForm'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 
 type FilterType = 'today' | 'week' | 'overdue' | 'all'
 type TaskStatus = 'pending' | 'in_progress' | 'done'
 
-const getStatusLabel = (status: TaskStatus): string => {
-  return t(`tasks.statusLabels.${status}`)
-}
-
-const getCadenceLabel = (cadence: string): string => {
-  return t(`tasks.cadence.${cadence}`) || cadence
-}
-
 export default function TaskList() {
+  const { t } = useI18n()
+  
+  const getStatusLabel = (status: TaskStatus): string => {
+    return t(`tasks.statusLabels.${status}`)
+  }
+
+  const getCadenceLabel = (cadence: string): string => {
+    return t(`tasks.cadence.${cadence}`) || cadence
+  }
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [hasProperty, setHasProperty] = useState(true)

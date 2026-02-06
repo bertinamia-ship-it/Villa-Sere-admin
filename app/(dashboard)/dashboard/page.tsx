@@ -24,7 +24,7 @@ import {
 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { t } from '@/lib/i18n/es'
+import { t } from '@/lib/i18n'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -50,17 +50,27 @@ export default async function DashboardPage() {
     })
   }
 
+  // Pre-load translations for early returns
+  const earlyTranslations = {
+    title: await t('dashboard.title'),
+    accountConfigError: await t('dashboard.accountConfigError'),
+    accountConfigMessage: await t('dashboard.accountConfigMessage', { email: user.email || '' }),
+    overview: await t('dashboard.overview'),
+    noPropertyTitle: await t('dashboard.noPropertyTitle'),
+    noPropertyDescription: await t('dashboard.noPropertyDescription'),
+  }
+
   // CRITICAL: Check for tenant_id
   if (!profile || !profile.tenant_id) {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A]">{t('dashboard.title')}</h1>
+          <h1 className="text-2xl font-semibold text-[#0F172A]">{earlyTranslations.title}</h1>
         </div>
         <div className="bg-red-50 border-2 border-red-200 rounded-xl p-8 text-center">
-          <h3 className="text-lg font-semibold text-red-900 mb-2">{t('dashboard.accountConfigError')}</h3>
+          <h3 className="text-lg font-semibold text-red-900 mb-2">{earlyTranslations.accountConfigError}</h3>
           <p className="text-red-700 mb-4">
-            {t('dashboard.accountConfigMessage', { email: user.email })}
+            {earlyTranslations.accountConfigMessage}
           </p>
         </div>
       </div>
@@ -77,13 +87,13 @@ export default async function DashboardPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A]">{t('dashboard.title')}</h1>
-          <p className="text-sm text-[#64748B] mt-1">{t('dashboard.overview')}</p>
+          <h1 className="text-2xl font-semibold text-[#0F172A]">{earlyTranslations.title}</h1>
+          <p className="text-sm text-[#64748B] mt-1">{earlyTranslations.overview}</p>
         </div>
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-8 text-center">
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">{t('dashboard.noPropertyTitle')}</h3>
+          <h3 className="text-lg font-semibold text-blue-900 mb-2">{earlyTranslations.noPropertyTitle}</h3>
           <p className="text-blue-700 mb-4">
-            {t('dashboard.noPropertyDescription')}
+            {earlyTranslations.noPropertyDescription}
           </p>
         </div>
       </div>
@@ -212,6 +222,28 @@ export default async function DashboardPage() {
   const currentMonth = monthNames[now.getMonth()]
   const currentYear = now.getFullYear()
 
+  // Pre-load all translations needed for this component
+  const translations = {
+    income: await t('dashboard.income'),
+    expenses: await t('dashboard.expenses'),
+    balance: await t('dashboard.balance'),
+    occupancy: await t('dashboard.occupancy'),
+    thisMonth: await t('dashboard.thisMonth'),
+    current: await t('dashboard.current'),
+    today: await t('dashboard.today'),
+    checkIn: await t('dashboard.checkIn'),
+    checkOut: await t('dashboard.checkOut'),
+    guest: await t('dashboard.guest'),
+    total: await t('dashboard.total'),
+    dueToday: await t('dashboard.dueToday'),
+    scheduledToday: await t('dashboard.scheduledToday'),
+    attention: await t('dashboard.attention'),
+    overdueTasks: await t('dashboard.overdueTasks', { count: String(overdueTasks.length) }),
+    urgentTickets: await t('dashboard.urgentTickets', { count: String(urgentTickets.length) }),
+    lowStockAlert: await t('dashboard.lowStockAlert', { count: String(lowStockItems.length) }),
+    viewAll: await t('dashboard.viewAll'),
+  }
+
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Key Metrics - Colorful and animated */}
@@ -220,7 +252,7 @@ export default async function DashboardPage() {
         <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200/50 rounded-xl p-4 sm:p-6 hover:shadow-lg hover:scale-[1.01] sm:hover:scale-[1.02] transition-all duration-300 ease-out">
           <div className="flex items-center justify-between mb-4">
             <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
-              {t('dashboard.income')}
+              {translations.income}
             </p>
             <div className="p-2.5 bg-gradient-to-br from-emerald-500 to-green-500 rounded-lg shadow-md">
               <ArrowUpRight className="h-5 w-5 text-white" />
@@ -229,14 +261,14 @@ export default async function DashboardPage() {
           <p className="text-2xl sm:text-3xl font-bold text-emerald-900 mb-1">
             {monthIncome > 0 ? `$${monthIncome.toFixed(0)}` : '—'}
           </p>
-          <p className="text-xs font-medium text-emerald-700/70">{t('dashboard.thisMonth')}</p>
+          <p className="text-xs font-medium text-emerald-700/70">{translations.thisMonth}</p>
         </div>
 
         {/* Gastos */}
         <div className="bg-gradient-to-br from-red-50 to-rose-50 border border-red-200/50 rounded-xl p-4 sm:p-6 hover:shadow-lg hover:scale-[1.01] sm:hover:scale-[1.02] transition-all duration-300 ease-out">
           <div className="flex items-center justify-between mb-4">
             <p className="text-[10px] font-bold text-red-700 uppercase tracking-wider">
-              {t('dashboard.expenses')}
+              {translations.expenses}
             </p>
             <div className="p-2.5 bg-gradient-to-br from-red-500 to-rose-500 rounded-lg shadow-md">
               <ArrowDownRight className="h-5 w-5 text-white" />
@@ -245,7 +277,7 @@ export default async function DashboardPage() {
           <p className="text-2xl sm:text-3xl font-bold text-red-900 mb-1">
             {monthTotal > 0 ? `$${monthTotal.toFixed(0)}` : '—'}
           </p>
-          <p className="text-xs font-medium text-red-700/70">{t('dashboard.thisMonth')}</p>
+          <p className="text-xs font-medium text-red-700/70">{translations.thisMonth}</p>
         </div>
 
         {/* Balance */}
@@ -258,7 +290,7 @@ export default async function DashboardPage() {
             <p className={`text-[10px] font-bold uppercase tracking-wider ${
               monthProfit >= 0 ? 'text-blue-700' : 'text-orange-700'
             }`}>
-              {t('dashboard.balance')}
+              {translations.balance}
             </p>
             <div className={`p-2.5 rounded-lg shadow-md ${
               monthProfit >= 0 
@@ -276,7 +308,7 @@ export default async function DashboardPage() {
           <p className={`text-xs font-medium ${
             monthProfit >= 0 ? 'text-blue-700/70' : 'text-orange-700/70'
           }`}>
-            {t('dashboard.thisMonth')}
+            {translations.thisMonth}
           </p>
         </div>
 
@@ -284,7 +316,7 @@ export default async function DashboardPage() {
         <div className="bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200/50 rounded-xl p-4 sm:p-6 hover:shadow-lg hover:scale-[1.01] sm:hover:scale-[1.02] transition-all duration-300 ease-out">
           <div className="flex items-center justify-between mb-4">
             <p className="text-[10px] font-bold text-purple-700 uppercase tracking-wider">
-              {t('dashboard.occupancy')}
+              {translations.occupancy}
             </p>
             <div className="p-2.5 bg-gradient-to-br from-purple-500 to-violet-500 rounded-lg shadow-md">
               <Calendar className="h-5 w-5 text-white" />
@@ -293,7 +325,7 @@ export default async function DashboardPage() {
           <p className="text-2xl sm:text-3xl font-bold text-purple-900 mb-1">
             {occupancyRate > 0 ? `${Math.round(occupancyRate)}%` : '0%'}
           </p>
-          <p className="text-xs font-medium text-purple-700/70">{t('dashboard.current')}</p>
+          <p className="text-xs font-medium text-purple-700/70">{translations.current}</p>
         </div>
       </div>
 
@@ -301,7 +333,7 @@ export default async function DashboardPage() {
       {(todayCheckIns.length > 0 || todayCheckOuts.length > 0 || todayTasks.length > 0 || todayMaintenance.length > 0) && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-[#0F172A]">{t('dashboard.today')}</h2>
+            <h2 className="text-lg font-semibold text-[#0F172A]">{translations.today}</h2>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-xl divide-y divide-slate-200/60 shadow-lg">
@@ -317,10 +349,10 @@ export default async function DashboardPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[#0F172A]">
-                    {t('dashboard.checkIn')}: {booking.guest_name || t('dashboard.guest')}
+                    {translations.checkIn}: {booking.guest_name || translations.guest}
                   </p>
                   <p className="text-xs text-[#64748B] mt-0.5">
-                    {t('dashboard.total')}: ${Number(booking.total_amount || 0).toFixed(0)}
+                    {translations.total}: ${Number(booking.total_amount || 0).toFixed(0)}
                   </p>
                 </div>
                 <ArrowRight className="h-4 w-4 text-[#64748B] group-hover:text-[#2563EB] transition-colors shrink-0" />
@@ -339,10 +371,10 @@ export default async function DashboardPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[#0F172A]">
-                    {t('dashboard.checkOut')}: {booking.guest_name || t('dashboard.guest')}
+                    {translations.checkOut}: {booking.guest_name || translations.guest}
                   </p>
                   <p className="text-xs text-[#64748B] mt-0.5">
-                    {t('dashboard.total')}: ${Number(booking.total_amount || 0).toFixed(0)}
+                    {translations.total}: ${Number(booking.total_amount || 0).toFixed(0)}
                   </p>
                 </div>
                 <ArrowRight className="h-4 w-4 text-[#64748B] group-hover:text-[#10B981] transition-colors shrink-0" />
@@ -361,7 +393,7 @@ export default async function DashboardPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[#0F172A]">{task.title}</p>
-                  <p className="text-xs text-[#64748B] mt-0.5">{t('dashboard.dueToday')}</p>
+                  <p className="text-xs text-[#64748B] mt-0.5">{translations.dueToday}</p>
                 </div>
                 <ArrowRight className="h-4 w-4 text-[#64748B] group-hover:text-[#8B5CF6] transition-colors shrink-0" />
               </Link>
@@ -379,7 +411,7 @@ export default async function DashboardPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[#0F172A]">{plan.title}</p>
-                  <p className="text-xs text-[#64748B] mt-0.5">{t('dashboard.scheduledToday')}</p>
+                  <p className="text-xs text-[#64748B] mt-0.5">{translations.scheduledToday}</p>
                 </div>
                 <ArrowRight className="h-4 w-4 text-[#64748B] group-hover:text-[#F59E0B] transition-colors shrink-0" />
               </Link>
@@ -391,7 +423,7 @@ export default async function DashboardPage() {
       {/* Alerts - Only if there are alerts */}
       {(overdueTasks.length > 0 || lowStockItems.length > 0 || urgentTickets.length > 0) && (
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-[#0F172A]">{t('dashboard.attention')}</h2>
+          <h2 className="text-lg font-semibold text-[#0F172A]">{translations.attention}</h2>
 
           <div className="space-y-2">
             {/* Overdue Tasks */}
@@ -401,10 +433,10 @@ export default async function DashboardPage() {
                   <AlertCircle className="h-5 w-5 text-[#F59E0B] shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[#92400E] mb-1">
-                      {t('dashboard.overdueTasks', { count: overdueTasks.length })}
+                      {translations.overdueTasks}
                     </p>
                     <Link href="/tasks" className="text-xs text-[#92400E] hover:underline">
-                      {t('dashboard.viewAll')} →
+                      {translations.viewAll} →
                     </Link>
                   </div>
                 </div>
@@ -418,10 +450,10 @@ export default async function DashboardPage() {
                   <Package className="h-5 w-5 text-[#EF4444] shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[#991B1B] mb-1">
-                      {t('dashboard.lowStockAlert', { count: lowStockItems.length })}
+                      {translations.lowStockAlert}
                     </p>
                     <Link href="/inventory" className="text-xs text-[#991B1B] hover:underline">
-                      {t('dashboard.viewAll')} →
+                      {translations.viewAll} →
                     </Link>
                   </div>
                 </div>
@@ -435,10 +467,10 @@ export default async function DashboardPage() {
                   <AlertTriangle className="h-5 w-5 text-[#EF4444] shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[#991B1B] mb-1">
-                      {t('dashboard.urgentTickets', { count: urgentTickets.length })}
+                      {translations.urgentTickets}
                     </p>
                     <Link href="/maintenance" className="text-xs text-[#991B1B] hover:underline">
-                      {t('dashboard.viewAll')} →
+                      {translations.viewAll} →
                     </Link>
                   </div>
                 </div>

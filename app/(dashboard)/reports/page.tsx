@@ -11,7 +11,7 @@ import { LoadingSpinner } from '@/components/ui/Loading'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/Toast'
 import { Download, BarChart3, TrendingUp, TrendingDown, DollarSign, Wrench, Package, Wallet } from 'lucide-react'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 import { FinancialAccount } from '@/lib/types/database'
 
 interface MonthlyExpenseSummary {
@@ -35,6 +35,7 @@ interface InventoryInsights {
 }
 
 export default function ReportsPage() {
+  const { t } = useI18n()
   const supabase = createClient()
   const { showToast } = useToast()
   const [loading, setLoading] = useState(true)

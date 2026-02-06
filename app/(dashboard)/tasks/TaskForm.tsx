@@ -9,19 +9,7 @@ import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useToast } from '@/components/ui/Toast'
-import { t } from '@/lib/i18n/es'
-
-const getStatusLabel = (status: string): string => {
-  return t(`tasks.statusLabels.${status}`)
-}
-
-const CADENCE_OPTIONS = [
-  { value: 'once', label: t('tasks.cadence.once') },
-  { value: 'daily', label: t('tasks.cadence.daily') },
-  { value: 'weekly', label: t('tasks.cadence.weekly') },
-  { value: 'monthly', label: t('tasks.cadence.monthly') },
-  { value: 'yearly', label: t('tasks.cadence.yearly') },
-]
+import { useI18n } from '@/components/I18nProvider'
 
 interface TaskFormProps {
   task: Task | null
@@ -29,6 +17,19 @@ interface TaskFormProps {
 }
 
 export default function TaskForm({ task, onClose }: TaskFormProps) {
+  const { t } = useI18n()
+  
+  const getStatusLabel = (status: string): string => {
+    return t(`tasks.statusLabels.${status}`)
+  }
+
+  const CADENCE_OPTIONS = [
+    { value: 'once', label: t('tasks.cadence.once') },
+    { value: 'daily', label: t('tasks.cadence.daily') },
+    { value: 'weekly', label: t('tasks.cadence.weekly') },
+    { value: 'monthly', label: t('tasks.cadence.monthly') },
+    { value: 'yearly', label: t('tasks.cadence.yearly') },
+  ]
   const [formData, setFormData] = useState({
     title: task?.title || '',
     description: task?.description || '',

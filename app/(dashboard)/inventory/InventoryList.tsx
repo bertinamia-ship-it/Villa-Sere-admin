@@ -15,9 +15,10 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 
 export default function InventoryList() {
+  const { t } = useI18n()
   const [items, setItems] = useState<InventoryItem[]>([])
   const [filteredItems, setFilteredItems] = useState<InventoryItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -216,9 +217,9 @@ export default function InventoryList() {
         <div>
           <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('inventory.title')}</h1>
           <p className="text-sm text-[#64748B] mt-1.5">
-            {filteredItems.length === 0 
-              ? t('inventory.emptyTitle')
-              : t('inventory.totalItems', { count: filteredItems.length })}
+              {filteredItems.length === 0 
+                ? t('inventory.emptyTitle')
+                : t('inventory.totalItems', { count: String(filteredItems.length) })}
           </p>
         </div>
         <div className="flex items-center gap-3 flex-wrap">

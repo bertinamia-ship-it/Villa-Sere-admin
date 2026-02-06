@@ -31,6 +31,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     setLanguageState(lang)
     if (typeof window !== 'undefined') {
       localStorage.setItem('app-language', lang)
+      // Set cookie for server components
+      document.cookie = `app-language=${lang}; path=/; max-age=31536000; SameSite=Lax`
       // Trigger a custom event to notify components of language change
       window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }))
     }

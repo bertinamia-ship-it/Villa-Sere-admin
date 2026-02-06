@@ -12,11 +12,12 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/Toast'
 import { Plus, Wallet, CreditCard, Building2, Coins } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 import AccountForm from './AccountForm'
 import AccountDetail from './AccountDetail'
 
 export default function BankPage() {
+  const { t } = useI18n()
   const supabase = createClient()
   const { showToast } = useToast()
   const [loading, setLoading] = useState(true)

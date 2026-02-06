@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 
 interface ImportResult {
   success: number
@@ -15,6 +15,7 @@ interface ImportResult {
 }
 
 export default function CSVImport() {
+  const { t } = useI18n()
   const supabase = createClient()
   const { showToast } = useToast()
   const [importing, setImporting] = useState(false)
@@ -107,10 +108,10 @@ export default function CSVImport() {
       setResult({ success, errors })
       
       if (success > 0) {
-        showToast(t('inventory.importSuccess', { success }), 'success')
+        showToast(t('inventory.importSuccess', { success: String(success) }), 'success')
       }
       if (errors.length > 0) {
-        showToast(t('inventory.importFailed', { count: errors.length }), 'warning')
+        showToast(t('inventory.importFailed', { count: String(errors.length) }), 'warning')
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : t('inventory.importError')
@@ -174,7 +175,7 @@ export default function CSVImport() {
                   <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-green-900">
-                      {t('inventory.importSuccess', { success: result.success })}
+                      {t('inventory.importSuccess', { success: String(result.success) })}
                     </p>
                   </div>
                 </div>
@@ -185,7 +186,7 @@ export default function CSVImport() {
                   <div className="flex items-start gap-3 mb-3">
                     <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
                     <p className="text-sm font-medium text-red-900">
-                      Ocurrieron {result.errors.length} errores:
+                      {t('inventory.importFailed', { count: String(result.errors.length) })}
                     </p>
                   </div>
                   <div className="ml-8 space-y-1 max-h-48 overflow-y-auto">

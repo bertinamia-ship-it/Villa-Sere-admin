@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Minus, Plus } from 'lucide-react'
 import { InventoryItem } from '@/lib/types/database'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 
 interface QuickAdjustProps {
   item: InventoryItem
@@ -11,6 +11,7 @@ interface QuickAdjustProps {
 }
 
 export default function QuickAdjust({ item, onQuantityChange }: QuickAdjustProps) {
+  const { t } = useI18n()
   const [quantity, setQuantity] = useState(item.quantity)
   const [customValue, setCustomValue] = useState('')
   const [showCustom, setShowCustom] = useState(false)

@@ -7,7 +7,7 @@ import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { Button } from '@/components/ui/Button'
 import { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 
 interface PurchaseItemFormProps {
   item?: PurchaseItem | null
@@ -17,6 +17,7 @@ interface PurchaseItemFormProps {
 }
 
 export default function PurchaseItemForm({ item, areas, onSave, onCancel }: PurchaseItemFormProps) {
+  const { t } = useI18n()
   const [formData, setFormData] = useState({
     area: item?.area || '',
     item: item?.item || '',
