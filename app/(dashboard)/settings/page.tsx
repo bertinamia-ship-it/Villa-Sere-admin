@@ -247,6 +247,9 @@ export default function SettingsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
+                <p className="text-sm text-slate-600 mb-4">
+                  Elimina propiedades de forma permanente. Esta acción no se puede deshacer.
+                </p>
                 <PropertyDeleteSection />
               </CardContent>
             </Card>
