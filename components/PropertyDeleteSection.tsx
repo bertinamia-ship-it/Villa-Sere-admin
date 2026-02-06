@@ -188,47 +188,34 @@ export default function PropertyDeleteSection() {
 
   return (
     <>
-      <Card className="border-red-200/50 bg-red-50/30">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-red-700">
-            <Trash2 className="h-5 w-5" />
-            Eliminar Propiedades
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-slate-600 mb-4">
-            Elimina propiedades de forma permanente. Esta acción no se puede deshacer.
-          </p>
-          <div className="space-y-2">
-            {properties.map((property) => (
-              <div
-                key={property.id}
-                className="flex items-center justify-between p-3 bg-white rounded-lg border border-red-200/50"
-              >
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="p-2 bg-slate-100 rounded-lg">
-                    {getPropertyIcon(property.name)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-slate-900 truncate">{property.name}</div>
-                    {property.location && (
-                      <div className="text-xs text-slate-500 truncate">{property.location}</div>
-                    )}
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDeleteClick(property)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+      <div className="space-y-2">
+        {properties.map((property) => (
+          <div
+            key={property.id}
+            className="flex items-center justify-between p-3 bg-white rounded-lg border border-red-200/50"
+          >
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="p-2 bg-slate-100 rounded-lg">
+                {getPropertyIcon(property.name)}
               </div>
-            ))}
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-slate-900 truncate">{property.name}</div>
+                {property.location && (
+                  <div className="text-xs text-slate-500 truncate">{property.location}</div>
+                )}
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleDeleteClick(property)}
+              className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-2"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </div>
-        </CardContent>
-      </Card>
+        ))}
+      </div>
 
       {/* Modal de confirmación con nombre */}
       <Modal
