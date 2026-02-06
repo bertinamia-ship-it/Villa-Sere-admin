@@ -273,10 +273,7 @@ export default function DashboardLayout({
         <>
           <div 
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
-            onClick={() => {
-              console.log('Overlay clicked, closing menu')
-              setMobileMenuOpen(false)
-            }}
+            onClick={() => setMobileMenuOpen(false)}
           />
           <div 
             className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/60 z-[70] shadow-2xl backdrop-blur-xl transform transition-transform duration-300 ease-out lg:hidden safe-area-left safe-area-y overflow-y-auto"
