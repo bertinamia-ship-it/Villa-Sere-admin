@@ -432,16 +432,16 @@ export default function DashboardLayout({
           <PropertyHeader />
         </div>
         
-        {/* Botón discreto para abrir menú móvil - Top Left */}
+        {/* Botón ultra discreto para abrir menú móvil - Top Left */}
         {!mobileMenuOpen && (
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden fixed top-3 left-3 z-[90] w-10 h-10 bg-white/95 backdrop-blur-md rounded-xl shadow-md border border-slate-200/80 flex items-center justify-center hover:bg-white hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 safe-area-top"
+            className="lg:hidden fixed top-2 left-2 z-[90] w-9 h-9 bg-slate-900/80 backdrop-blur-md rounded-lg shadow-sm border border-slate-700/50 flex items-center justify-center hover:bg-slate-800/90 hover:border-slate-600/60 active:scale-95 transition-all duration-200 safe-area-top"
             aria-label="Abrir menú"
             type="button"
-            style={{ marginTop: 'max(0.75rem, env(safe-area-inset-top))', marginLeft: 'max(0.75rem, env(safe-area-inset-left))' }}
+            style={{ marginTop: 'max(0.5rem, env(safe-area-inset-top))', marginLeft: 'max(0.5rem, env(safe-area-inset-left))' }}
           >
-            <Menu className="h-5 w-5 text-slate-700" />
+            <Menu className="h-4.5 w-4.5 text-slate-300" />
           </button>
         )}
         
