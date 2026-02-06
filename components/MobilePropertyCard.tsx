@@ -1,0 +1,241 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { getActivePropertyId } from '@/lib/utils/property-client'
+import { Home, Building, ChevronDown, Sparkles } from 'lucide-react'
+import { Modal } from './ui/Modal'
+import { Button } from './ui/Button'
+import { useToast } from './ui/Toast'
+import { t } from '@/lib/i18n/es'
+
+interface Property {
+  id: string
+  name: string
+  location: string | null
+}
+
+export default function MobilePropertyCard() {
+  const supabase = createClient()
+  const { showToast } = useToast()
+  const [properties, setProperties] = useState<Property[]>([])
+  const [activePropertyId, setActivePropertyId] = useState<string | null>(null)
+  const [activeProperty, setActiveProperty] = useState<Property | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+  const [isChanging, setIsChanging] = useState(false)
+
+  useEffect(() => {
+    loadProperties()
+  }, [])
+
+  useEffect(() => {
+    const handlePropertyChange = () => {
+      loadProperties()
+    }
+    window.addEventListener('propertyChanged', handlePropertyChange)
+    return () => window.removeEventListener('propertyChanged', handlePropertyChange)
+  }, [])
+
+  async function loadProperties() {
+    setLoading(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setLoading(false)
+        return
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('tenant_id, preferred_property_id')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      if (!profile?.tenant_id) {
+        setLoading(false)
+        return
+      }
+
+      const { data: props } = await supabase
+        .from('properties')
+        .select('id, name, location')
+        .eq('tenant_id', profile.tenant_id)
+        .order('name')
+
+      setProperties(props || [])
+
+      const activeId = profile.preferred_property_id || props?.[0]?.id || null
+      setActivePropertyId(activeId)
+      setActiveProperty(props?.find(p => p.id === activeId) || null)
+
+      if (activeId) {
+        localStorage.setItem('activePropertyId', activeId)
+      }
+    } catch (error) {
+      console.error('Error loading properties:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handlePropertyChange(propertyId: string) {
+    if (propertyId === activePropertyId) {
+      setShowModal(false)
+      return
+    }
+    
+    setIsChanging(true)
+    const newProperty = properties.find(p => p.id === propertyId)
+    
+    setActivePropertyId(propertyId)
+    setActiveProperty(newProperty || null)
+    localStorage.setItem('activePropertyId', propertyId)
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      await supabase
+        .from('profiles')
+        .update({ preferred_property_id: propertyId })
+        .eq('id', user.id)
+    }
+
+    window.dispatchEvent(new CustomEvent('propertyChanged'))
+    setShowModal(false)
+    setIsChanging(false)
+    showToast(t('propertySelector.propertyChanged', { name: newProperty?.name || '' }), 'success')
+  }
+
+  const getPropertyIcon = (name: string) => {
+    const lowerName = name.toLowerCase()
+    if (lowerName.includes('departamento') || lowerName.includes('apartamento') || 
+        lowerName.includes('depto') || lowerName.includes('apto') ||
+        lowerName.includes('apartment') || lowerName.includes('flat')) {
+      return <Building className="h-4 w-4" />
+    }
+    return <Home className="h-4 w-4" />
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-white to-slate-50/80 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-lg min-h-[56px]">
+        <div className="h-4 w-4 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 animate-pulse" />
+        <div className="h-3 flex-1 rounded bg-slate-200/60 animate-pulse" />
+      </div>
+    )
+  }
+
+  if (!activeProperty) {
+    return (
+      <div className="flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-slate-100 to-slate-50 rounded-xl border border-slate-200/60 shadow-sm min-h-[56px]">
+        <div className="p-1.5 bg-slate-200 rounded-lg">
+          <Home className="h-4 w-4 text-slate-400" />
+        </div>
+        <span className="text-sm font-medium text-slate-500">Sin propiedad</span>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      {/* Card Premium de Villa Activa */}
+      <button
+        onClick={() => setShowModal(true)}
+        disabled={isChanging}
+        className="w-full flex items-center gap-3 px-4 py-3.5 bg-gradient-to-r from-white via-blue-50/30 to-indigo-50/20 backdrop-blur-sm rounded-xl border-2 border-blue-200/60 shadow-lg hover:shadow-xl hover:border-blue-300/80 active:scale-[0.98] transition-all duration-200 min-h-[56px] group"
+        type="button"
+      >
+        <div className="shrink-0 p-2 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-md shadow-blue-500/30 ring-1 ring-blue-400/20">
+          {getPropertyIcon(activeProperty.name)}
+        </div>
+        <div className="flex-1 min-w-0 text-left">
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Villa Activa</span>
+            <Sparkles className="h-3 w-3 text-blue-500" />
+          </div>
+          <div className="text-base font-bold text-slate-900 truncate leading-tight">
+            {activeProperty.name}
+          </div>
+          {activeProperty.location && (
+            <div className="text-xs text-slate-600 truncate mt-0.5 leading-tight">
+              {activeProperty.location}
+            </div>
+          )}
+        </div>
+        <div className="shrink-0 p-1.5 bg-slate-100 rounded-lg group-hover:bg-slate-200 transition-colors">
+          <ChevronDown className="h-4 w-4 text-slate-600" />
+        </div>
+      </button>
+
+      {/* Modal para cambiar propiedad */}
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title={
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-blue-500" />
+            <span className="font-semibold">{t('propertySelector.selectProperty')}</span>
+            {properties.length > 0 && (
+              <span className="text-sm font-normal text-slate-500">
+                ({properties.length})
+              </span>
+            )}
+          </div>
+        }
+        size="full"
+      >
+        <div className="space-y-3 pb-4">
+          {properties.length === 0 ? (
+            <div className="text-center py-12 text-slate-500">
+              <Home className="h-12 w-12 mx-auto mb-3 text-slate-300" />
+              <p className="font-medium">{t('propertySelector.noProperties')}</p>
+            </div>
+          ) : (
+            properties.map((property) => (
+              <button
+                key={property.id}
+                onClick={() => handlePropertyChange(property.id)}
+                disabled={isChanging || property.id === activePropertyId}
+                className={`w-full text-left px-4 py-4 rounded-xl border-2 transition-all duration-200 ${
+                  property.id === activePropertyId
+                    ? 'bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-blue-500 shadow-lg scale-[1.02]'
+                    : 'bg-white border-slate-200 hover:border-blue-300 hover:bg-blue-50/50 active:scale-[0.98]'
+                } ${isChanging ? 'opacity-50 cursor-wait' : ''}`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`p-2.5 rounded-lg transition-all ${
+                    property.id === activePropertyId
+                      ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md'
+                      : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    {getPropertyIcon(property.name)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className={`font-bold text-base mb-0.5 ${
+                      property.id === activePropertyId ? 'text-blue-900' : 'text-slate-900'
+                    }`}>
+                      {property.name}
+                    </div>
+                    {property.location && (
+                      <div className={`text-sm ${
+                        property.id === activePropertyId ? 'text-blue-700' : 'text-slate-500'
+                      }`}>
+                        {property.location}
+                      </div>
+                    )}
+                  </div>
+                  {property.id === activePropertyId && (
+                    <div className="shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
+                      <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                    </div>
+                  )}
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+      </Modal>
+    </>
+  )
+}
+

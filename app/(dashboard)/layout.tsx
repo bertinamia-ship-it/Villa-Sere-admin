@@ -28,6 +28,7 @@ import Header from '@/components/Header'
 import PropertyHeader from '@/components/PropertyHeader'
 import PropertySelector from '@/components/PropertySelector'
 import MobilePropertySelector from '@/components/MobilePropertySelector'
+import MobilePropertyCard from '@/components/MobilePropertyCard'
 import BillingGuard from './BillingGuard'
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 
@@ -307,14 +308,14 @@ export default function DashboardLayout({
                         key={item.name}
                         href={item.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`group relative flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-out ${
+                        className={`group relative flex items-center gap-x-3.5 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ease-out ${
                           active
                             ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 text-white shadow-lg shadow-blue-500/30'
-                            : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-700/50 hover:shadow-md'
                         }`}
                       >
                         {active && (
-                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-9 bg-white rounded-r-full shadow-lg" />
+                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full" />
                         )}
                         <item.icon className={`h-5 w-5 shrink-0 stroke-[1.5] transition-all duration-300 ${
                           active ? 'text-white scale-110' : `${iconColor} group-hover:text-white group-hover:scale-110`
@@ -368,10 +369,10 @@ export default function DashboardLayout({
                                   key={child.name}
                                   href={child.href}
                                   onClick={() => setMobileMenuOpen(false)}
-                                  className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm transition-all duration-200 ease-out ${
+                                  className={`flex items-center gap-x-3.5 rounded-xl px-4 py-2.5 text-sm transition-all duration-200 ease-out ${
                                     active
-                                      ? 'text-white bg-slate-700/60'
-                                      : 'text-slate-300 hover:text-white hover:bg-slate-700/40'
+                                      ? 'text-white bg-slate-700/60 shadow-md'
+                                      : 'text-slate-300 hover:text-white hover:bg-slate-700/40 hover:shadow-sm'
                                   }`}
                                 >
                                   <child.icon className={`h-4.5 w-4.5 shrink-0 stroke-[1.5] transition-all duration-300 ${
@@ -389,16 +390,8 @@ export default function DashboardLayout({
                 })}
               </nav>
 
-              {/* User Menu at bottom - Mejorado */}
+              {/* User Menu at bottom - Solo Logout */}
               <div className="mt-auto pt-4 px-4 pb-6 border-t border-slate-700/50 safe-area-bottom">
-                <Link
-                  href="/settings"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex w-full items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 mb-2"
-                >
-                  <Settings className="h-4 w-4" />
-                  <span>Configuración</span>
-                </Link>
                 <button
                   onClick={() => {
                     handleLogout()
