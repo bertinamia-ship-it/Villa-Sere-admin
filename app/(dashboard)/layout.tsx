@@ -20,7 +20,8 @@ import {
   Settings,
   ArrowRight,
   Sparkles,
-  Wallet
+  Wallet,
+  User
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
