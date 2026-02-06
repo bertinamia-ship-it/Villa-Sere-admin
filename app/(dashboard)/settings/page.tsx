@@ -11,6 +11,7 @@ import { useI18n } from '@/components/I18nProvider'
 import ResetDataButton from '@/app/(dashboard)/dashboard/ResetDataButton'
 import PropertyDeleteSection from '@/components/PropertyDeleteSection'
 import { useToast } from '@/components/ui/Toast'
+import { LanguageSelector } from '@/components/ui/LanguageSelector'
 
 export default function SettingsPage() {
   const [isAuthorized, setIsAuthorized] = useState(false)
@@ -239,29 +240,8 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="pt-0">
             <p className="text-sm text-[#64748B] mb-4">{t('settings.languageDescription')}</p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setLanguage('es')}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all duration-200 ${
-                  language === 'es'
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-500 shadow-md'
-                    : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                }`}
-              >
-                <span className="text-2xl">🇪🇸</span>
-                <span className="font-medium">{t('settings.spanish')}</span>
-              </button>
-              <button
-                onClick={() => setLanguage('en')}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all duration-200 ${
-                  language === 'en'
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-500 shadow-md'
-                    : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                }`}
-              >
-                <span className="text-2xl">🇺🇸</span>
-                <span className="font-medium">{t('settings.english')}</span>
-              </button>
+            <div className="flex items-center justify-center">
+              <LanguageSelector />
             </div>
           </CardContent>
         </Card>

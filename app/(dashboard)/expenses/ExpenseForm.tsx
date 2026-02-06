@@ -7,7 +7,7 @@ import { EXPENSE_CATEGORIES } from '@/lib/constants'
 import { X, Upload } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { useToast } from '@/components/ui/Toast'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 import { insertWithPropertyClient, updateWithPropertyClient, deleteWithPropertyClient } from '@/lib/supabase/query-helpers-client'
 import { logError, getUserFriendlyError } from '@/lib/utils/error-handler'
 
@@ -35,6 +35,7 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
   const { showToast } = useToast()
+  const { t } = useI18n()
 
   useEffect(() => {
     loadAccounts()

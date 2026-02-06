@@ -127,7 +127,7 @@ export default function DashboardLayout({
     <BillingGuard>
       <ErrorBoundary moduleName="Dashboard">
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
-          {/* Desktop Sidebar */}
+      {/* Desktop Sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col">
         <div className="flex grow flex-col overflow-y-auto bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/60 px-5 py-7 shadow-2xl backdrop-blur-xl">
           {/* Branding */}
@@ -142,7 +142,7 @@ export default function DashboardLayout({
 
           {/* Navigation */}
           <nav className="flex flex-1 flex-col space-y-1.5">
-            {navigation.map((item) => {
+                  {navigation.map((item) => {
               if ('href' in item) {
                 // Single item
                 const active = isActive(item.href)
@@ -154,10 +154,10 @@ export default function DashboardLayout({
                 }
                 const iconColor = iconColors[item.href] || 'text-slate-400'
                 
-                return (
-                  <Link
+                    return (
+                        <Link
                     key={item.name}
-                    href={item.href}
+                          href={item.href}
                         className={`group relative flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-out ${
                           active
                             ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 text-white shadow-lg shadow-blue-500/30'
@@ -233,7 +233,7 @@ export default function DashboardLayout({
                                 active ? 'text-white scale-110' : `${childIconColor} group-hover:text-white group-hover:scale-110`
                               }`} />
                               <span className="tracking-wide">{child.name}</span>
-                            </Link>
+                        </Link>
                           )
                         })}
                       </div>
@@ -246,24 +246,32 @@ export default function DashboardLayout({
 
           {/* User Menu at bottom */}
           <div className="mt-auto pt-6 border-t border-slate-700/60">
-            <button
-              onClick={handleLogout}
+                <button
+                  onClick={handleLogout}
               className="flex w-full items-center gap-x-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 hover:scale-[1.01] hover:shadow-md"
-            >
+                >
               <LogOut className="h-4.5 w-4.5 stroke-[1.5] transition-all duration-300" />
               <span className="tracking-wide">{t('common.logout')}</span>
-            </button>
+                </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile top bar - Solo hamburger */}
+      {/* Mobile top bar - Branding + hamburger */}
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/50 z-[80] shadow-lg safe-area-top">
-        <div className="flex items-center h-14 px-4 safe-area-x relative z-[80]">
+        <div className="flex items-center justify-between h-12 px-3 gap-2 safe-area-x relative z-[80]">
+          {/* Branding pequeño */}
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <div className="w-7 h-7 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-sm shadow-blue-500/20 ring-1 ring-blue-400/20 flex items-center justify-center flex-shrink-0">
+              <Sparkles className="h-4 w-4 text-white" />
+            </div>
+            <span className="text-sm font-semibold text-white tracking-tight truncate">CasaPilot</span>
+          </div>
+          
           {/* Hamburger Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-slate-700/50 active:bg-slate-700/70 transition-all duration-200 relative z-[80]"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-slate-700/50 active:bg-slate-700/70 transition-all duration-200 relative z-[80] flex-shrink-0"
             aria-label="Toggle menu"
             type="button"
           >
@@ -274,10 +282,10 @@ export default function DashboardLayout({
             )}
           </button>
         </div>
-      </div>
+        </div>
 
       {/* Mobile menu overlay - z-index correcto y funcional */}
-      {mobileMenuOpen && (
+        {mobileMenuOpen && (
         <>
           <div 
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
@@ -289,24 +297,26 @@ export default function DashboardLayout({
               e.stopPropagation()
             }}
           >
-              {/* Branding Premium en mobile drawer - Logo completo y bonito */}
-              <div className="shrink-0 px-4 pt-6 pb-4 border-b border-slate-700/50 bg-gradient-to-r from-slate-800/50 to-slate-900/50">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-md shadow-blue-500/20 ring-1 ring-blue-400/20 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="h-6 w-6 text-white" />
+              {/* Branding Premium en mobile drawer - Logo completo y bonito con safe-area */}
+              <div className="shrink-0 px-4 pt-6 pb-4 border-b border-slate-700/50 bg-gradient-to-r from-slate-800/50 to-slate-900/50" style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top))' }}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-xl shadow-lg shadow-blue-500/20 ring-1 ring-blue-400/20 flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="h-7 w-7 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h1 className="text-base font-bold text-white tracking-tight">CasaPilot</h1>
-                    <p className="text-[11px] text-slate-400 mt-0.5">Gestión de Propiedades</p>
+                    <h1 className="text-lg font-bold text-white tracking-tight">CasaPilot</h1>
+                    <p className="text-xs text-slate-400 mt-0.5">{t('nav.operation')}</p>
                   </div>
                 </div>
                 
-                {/* Villa Activa - Card Premium */}
-                <MobilePropertyCard />
+                {/* Villa Activa - Card Premium más compacto */}
+                <div className="mt-2">
+                  <MobilePropertyCard />
+                </div>
               </div>
 
-              <nav className="px-5 py-6 space-y-2.5 flex-1 overflow-y-auto">
-                {navigation.map((item) => {
+              <nav className="px-4 py-4 space-y-2 flex-1 overflow-y-auto">
+              {navigation.map((item) => {
                   if ('href' in item) {
                     const active = isActive(item.href)
                     const iconColors: Record<string, string> = {
@@ -316,11 +326,11 @@ export default function DashboardLayout({
                     }
                     const iconColor = iconColors[item.href] || 'text-slate-400'
                     
-                    return (
-                      <Link
-                        key={item.name}
-                        href={item.href}
-                        onClick={() => setMobileMenuOpen(false)}
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
                         className={`group relative flex items-center gap-x-3.5 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200 ease-out ${
                           active
                             ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md'
@@ -394,9 +404,9 @@ export default function DashboardLayout({
                                     active ? 'text-white' : childIconColor
                                   }`} />
                                   <span>{child.name}</span>
-                                </Link>
-                              )
-                            })}
+                  </Link>
+                )
+              })}
                           </div>
                         )}
                       </div>
@@ -407,18 +417,18 @@ export default function DashboardLayout({
 
               {/* User Menu at bottom - Logout */}
               <div className="mt-auto pt-4 px-4 pb-5 border-t border-slate-700/50 safe-area-bottom">
-                <button
+              <button
                   onClick={() => {
                     handleLogout()
                     setMobileMenuOpen(false)
                   }}
                   className="flex w-full items-center gap-x-3.5 rounded-lg px-4 py-3 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
-                >
-                  <LogOut className="h-5 w-5" />
+              >
+                <LogOut className="h-5 w-5" />
                   <span>{t('common.logout')}</span>
-                </button>
+              </button>
               </div>
-            </div>
+          </div>
           </>
         )}
 
@@ -431,11 +441,11 @@ export default function DashboardLayout({
         </div>
         <main className="py-4 px-4 sm:py-6 sm:px-6 min-h-screen lg:pt-5 pt-14 safe-area-x safe-area-bottom">
           <div className="page-soft">
-            {children}
+          {children}
           </div>
         </main>
       </div>
-        </div>
+      </div>
       </ErrorBoundary>
     </BillingGuard>
   )
