@@ -316,11 +316,11 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">{t('reports.title')}</h1>
-          <p className="mt-1 text-sm text-gray-700">{t('reports.subtitle')}</p>
+    <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+        <div className="space-y-1.5">
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('reports.title')}</h1>
+          <p className="text-sm text-slate-600 leading-relaxed">{t('reports.subtitle')}</p>
         </div>
       </div>
 
