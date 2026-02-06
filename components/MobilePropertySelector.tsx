@@ -132,9 +132,9 @@ export default function MobilePropertySelector() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 px-4 py-2.5 bg-white/90 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-sm min-h-[52px]">
-        <div className="h-5 w-5 rounded bg-slate-200 animate-pulse" />
-        <div className="h-4 flex-1 rounded bg-slate-200 animate-pulse" />
+      <div className="flex items-center gap-2 px-3 py-2 bg-white/90 backdrop-blur-sm rounded-lg border border-slate-200/60 shadow-sm min-h-[40px]">
+        <div className="h-4 w-4 rounded bg-slate-200 animate-pulse" />
+        <div className="h-3 flex-1 rounded bg-slate-200 animate-pulse" />
       </div>
     )
   }
@@ -144,20 +144,20 @@ export default function MobilePropertySelector() {
   
   if (!displayProperty) {
     return (
-      <div className="flex items-center gap-2 px-4 py-2.5 bg-white/90 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-sm min-h-[52px]">
-        <Home className="h-5 w-5 text-slate-400" />
-        <span className="text-sm text-slate-500">Sin propiedad</span>
+      <div className="flex items-center gap-2 px-3 py-2 bg-white/90 backdrop-blur-sm rounded-lg border border-slate-200/60 shadow-sm min-h-[40px]">
+        <Home className="h-4 w-4 text-slate-400" />
+        <span className="text-xs text-slate-500">Sin propiedad</span>
       </div>
     )
   }
 
   return (
     <>
-      {/* Chip grande y prominente en header móvil */}
+      {/* Chip más pequeño en header móvil */}
       <button
         onClick={() => setShowModal(true)}
         disabled={isChanging}
-        className="flex items-center gap-2.5 px-4 py-2.5 bg-white/95 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200 min-h-[52px] flex-1 max-w-[calc(100vw-120px)]"
+        className="flex items-center gap-2 px-3 py-2 bg-white/95 backdrop-blur-sm rounded-lg border border-slate-200/60 shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200 min-h-[40px] flex-1 max-w-[calc(100vw-140px)]"
         type="button"
       >
         <div className="shrink-0 text-slate-600">
