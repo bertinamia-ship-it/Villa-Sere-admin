@@ -17,7 +17,14 @@ export default function SettingsPage() {
   const [checkingAuth, setCheckingAuth] = useState(true)
   const [isInstalled, setIsInstalled] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [dangerZoneOpen, setDangerZoneOpen] = useState(false)
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [passwordAction, setPasswordAction] = useState<'delete' | 'reset' | null>(null)
+  const [password, setPassword] = useState('')
+  const [verifying, setVerifying] = useState(false)
+  const [passwordVerified, setPasswordVerified] = useState(false)
   const supabase = createClient()
+  const { showToast } = useToast()
 
   useEffect(() => {
     checkAuthorization()
@@ -110,6 +117,86 @@ export default function SettingsPage() {
     } finally {
       setCheckingAuth(false)
     }
+  }
+
+  async function verifyPassword() {
+    if (!password.trim()) {
+      return false
+    }
+
+    setVerifying(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user || !user.email) {
+        return false
+      }
+
+      // Verify password by attempting to sign in
+      const { error } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: password,
+      })
+
+      if (error) {
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.error('Error verifying password:', error)
+      return false
+    } finally {
+      setVerifying(false)
+    }
+  }
+
+  async function handleDangerousAction(action: 'delete' | 'reset') {
+    // Reset password verified state
+    setPasswordVerified(false)
+    setPasswordAction(action)
+    setPassword('')
+    setShowPasswordModal(true)
+  }
+
+  async function handlePasswordConfirm() {
+    const isValid = await verifyPassword()
+    
+    if (!isValid) {
+      showToast('Contraseña incorrecta. Por favor, intenta de nuevo.', 'error')
+      setPassword('')
+      return
+    }
+
+    // Password verified - close modal and set flag
+    const action = passwordAction
+    setPasswordVerified(true)
+    setShowPasswordModal(false)
+    setPassword('')
+    
+    // Trigger the action after password verification
+    if (action === 'delete') {
+      // Keep danger zone open and show delete section
+      setDangerZoneOpen(true)
+      // Small delay to show the section
+      setTimeout(() => {
+        const deleteSection = document.getElementById('property-delete-section')
+        if (deleteSection) {
+          deleteSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 100)
+    } else if (action === 'reset') {
+      // Keep danger zone open and show reset section
+      setDangerZoneOpen(true)
+      // Small delay to show the section
+      setTimeout(() => {
+        const resetSection = document.getElementById('reset-data-section')
+        if (resetSection) {
+          resetSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 100)
+    }
+    
+    setPasswordAction(null)
   }
 
   if (checkingAuth) {
@@ -230,51 +317,171 @@ export default function SettingsPage() {
         </Card>
       </div>
 
-      {/* SECCIÓN 2: Zona Peligrosa - Eliminar/Resetear */}
+      {/* SECCIÓN 2: Zona Peligrosa - Expandible y discreta */}
       {isAuthorized && (
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-lg font-semibold text-[#0F172A] mb-1">Zona Peligrosa</h2>
-            <p className="text-xs text-[#64748B]">Acciones que no se pueden deshacer</p>
-          </div>
-          
-          <div className="space-y-4">
-            {/* Eliminar Propiedades */}
-            <Card className="border-red-200/60 bg-red-50/30">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2.5 text-red-700">
-                  <div className="p-2 bg-red-100 rounded-lg">
-                    <Trash2 className="h-5 w-5 text-red-600" />
-                  </div>
-                  <span>Eliminar Propiedades</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-sm text-slate-600 mb-4">
-                  Elimina propiedades de forma permanente. Esta acción no se puede deshacer.
-                </p>
-                <PropertyDeleteSection />
-              </CardContent>
-            </Card>
+        <div className="space-y-4">
+          <button
+            onClick={() => setDangerZoneOpen(!dangerZoneOpen)}
+            className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-200/60 rounded-xl hover:border-red-300/80 transition-all duration-200 group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
+              </div>
+              <div className="text-left">
+                <h2 className="text-base font-semibold text-red-700">Zona Peligrosa</h2>
+                <p className="text-xs text-red-600/70 mt-0.5">Acciones que no se pueden deshacer</p>
+              </div>
+            </div>
+            <ChevronDown className={`h-5 w-5 text-red-600 transition-transform duration-200 ${dangerZoneOpen ? 'rotate-180' : ''}`} />
+          </button>
 
-            {/* Resetear Datos */}
-            <Card className="border-[#EF4444]/20 bg-[#FEF2F2]">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2.5 text-[#991B1B]">
-                  <div className="p-2 bg-red-100 rounded-lg">
-                    <AlertTriangle className="h-5 w-5 text-red-600" />
-                  </div>
-                  <span>{t('settings.dangerousActions')}</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <ResetDataButton />
-              </CardContent>
-            </Card>
-          </div>
+          {dangerZoneOpen && (
+            <div className="space-y-4 pt-2">
+              {/* Eliminar Propiedades - Discreto y profesional */}
+              <button
+                onClick={() => handleDangerousAction('delete')}
+                className="w-full flex items-center gap-3 p-3.5 bg-white border border-red-200/50 rounded-lg hover:bg-red-50/50 hover:border-red-300/60 transition-all duration-200 group shadow-sm hover:shadow-md"
+              >
+                <div className="p-2 bg-red-50 rounded-lg group-hover:bg-red-100 transition-colors">
+                  <Trash2 className="h-4.5 w-4.5 text-red-600" />
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="text-sm font-medium text-slate-900">Eliminar Propiedades</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Elimina propiedades permanentemente</div>
+                </div>
+                <ChevronDown className="h-4 w-4 text-slate-400 rotate-[-90deg]" />
+              </button>
+
+              {/* Resetear Datos - Discreto y profesional */}
+              <button
+                onClick={() => handleDangerousAction('reset')}
+                className="w-full flex items-center gap-3 p-3.5 bg-white border border-red-200/50 rounded-lg hover:bg-red-50/50 hover:border-red-300/60 transition-all duration-200 group shadow-sm hover:shadow-md"
+              >
+                <div className="p-2 bg-red-50 rounded-lg group-hover:bg-red-100 transition-colors">
+                  <AlertTriangle className="h-4.5 w-4.5 text-red-600" />
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="text-sm font-medium text-slate-900">Resetear Todos los Datos</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Borra inventario, gastos y más</div>
+                </div>
+                <ChevronDown className="h-4 w-4 text-slate-400 rotate-[-90deg]" />
+              </button>
+
+              {/* Sección de eliminar propiedades - Solo visible después de verificar contraseña */}
+              {passwordVerified && passwordAction === 'delete' && (
+                <div id="property-delete-section" className="pt-2 border-t border-red-200/50">
+                  <Card className="border-red-200/60 bg-red-50/30">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center gap-2.5 text-red-700">
+                        <div className="p-2 bg-red-100 rounded-lg">
+                          <Trash2 className="h-5 w-5 text-red-600" />
+                        </div>
+                        <span>Eliminar Propiedades</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <p className="text-sm text-slate-600 mb-4">
+                        Elimina propiedades de forma permanente. Esta acción no se puede deshacer.
+                      </p>
+                      <PropertyDeleteSection />
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
+              {/* Sección de resetear datos - Solo visible después de verificar contraseña */}
+              {passwordVerified && passwordAction === 'reset' && (
+                <div id="reset-data-section" className="pt-2 border-t border-red-200/50">
+                  <Card className="border-[#EF4444]/20 bg-[#FEF2F2]">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center gap-2.5 text-[#991B1B]">
+                        <div className="p-2 bg-red-100 rounded-lg">
+                          <AlertTriangle className="h-5 w-5 text-red-600" />
+                        </div>
+                        <span>{t('settings.dangerousActions')}</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <ResetDataButton />
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
+
+      {/* Modal de verificación de contraseña */}
+      <Modal
+        isOpen={showPasswordModal}
+        onClose={() => {
+          setShowPasswordModal(false)
+          setPassword('')
+          setPasswordAction(null)
+        }}
+        title={
+          <div className="flex items-center gap-2 text-red-600">
+            <Lock className="h-5 w-5" />
+            <span className="font-semibold">Verificación Requerida</span>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="p-4 bg-red-50 rounded-lg border border-red-200">
+            <p className="text-sm font-medium text-red-900 mb-1">
+              Acción peligrosa detectada
+            </p>
+            <p className="text-sm text-red-700">
+              Para {passwordAction === 'delete' ? 'eliminar propiedades' : 'resetear todos los datos'}, 
+              necesitas confirmar tu contraseña.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Contraseña
+            </label>
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Ingresa tu contraseña"
+              className="w-full"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && password.trim() && !verifying) {
+                  handlePasswordConfirm()
+                }
+              }}
+            />
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setShowPasswordModal(false)
+                setPassword('')
+                setPasswordAction(null)
+              }}
+              className="flex-1"
+              disabled={verifying}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handlePasswordConfirm}
+              disabled={verifying || !password.trim()}
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+            >
+              {verifying ? 'Verificando...' : 'Confirmar'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
-
