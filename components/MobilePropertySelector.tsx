@@ -125,9 +125,9 @@ export default function MobilePropertySelector() {
     if (lowerName.includes('departamento') || lowerName.includes('apartamento') || 
         lowerName.includes('depto') || lowerName.includes('apto') ||
         lowerName.includes('apartment') || lowerName.includes('flat')) {
-      return <Building className="h-5 w-5" />
+      return <Building className="h-4 w-4" />
     }
-    return <Home className="h-5 w-5" />
+    return <Home className="h-4 w-4" />
   }
 
   if (loading) {
@@ -164,16 +164,16 @@ export default function MobilePropertySelector() {
           {getPropertyIcon(displayProperty.name)}
         </div>
         <div className="flex-1 min-w-0 text-left">
-          <div className="text-sm font-bold text-slate-900 truncate">
+          <div className="text-xs font-semibold text-slate-900 truncate">
             {displayProperty.name}
           </div>
           {displayProperty.location && (
-            <div className="text-xs text-slate-500 truncate">
+            <div className="text-[10px] text-slate-500 truncate">
               {displayProperty.location}
             </div>
           )}
         </div>
-        <ChevronDown className="h-4 w-4 text-slate-500 shrink-0" />
+        <ChevronDown className="h-3.5 w-3.5 text-slate-500 shrink-0" />
       </button>
 
       {/* Bottom Sheet Modal para cambiar propiedad */}

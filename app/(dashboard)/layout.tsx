@@ -260,10 +260,23 @@ export default function DashboardLayout({
             )}
           </button>
 
-          {/* Property Selector - Chip grande y prominente */}
+          {/* Property Selector - Chip más pequeño */}
           <div className="flex-1 min-w-0 relative z-[80]">
             <MobilePropertySelector />
           </div>
+
+          {/* Profile Button - Discreto y profesional */}
+          <button
+            onClick={() => router.push('/settings')}
+            className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg bg-slate-700/40 hover:bg-slate-700/60 active:bg-slate-700/80 border border-slate-600/30 hover:border-slate-500/50 transition-all duration-200 relative z-[80] backdrop-blur-sm"
+            aria-label="Configuración"
+            type="button"
+          >
+            <div className="relative">
+              <User className="h-4.5 w-4.5 text-slate-300" strokeWidth={2} />
+              <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-blue-400 rounded-full border border-slate-900/50 shadow-sm"></div>
+            </div>
+          </button>
         </div>
       </div>
 
