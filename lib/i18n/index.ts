@@ -38,7 +38,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const t = (key: string, params?: Record<string, string>): string => {
     if (language === 'en') {
-      return enModule.t(key, params)
+      return enT(key, params)
     }
     return es.t(key, params)
   }
@@ -68,7 +68,7 @@ export function t(key: string, params?: Record<string, string>): string {
   // Client-side: get from localStorage
   const savedLanguage = localStorage.getItem('app-language') as Language
   if (savedLanguage === 'en') {
-    return enModule.t(key, params)
+    return enT(key, params)
   }
   return es.t(key, params)
 }
