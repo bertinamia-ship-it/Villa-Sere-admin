@@ -146,15 +146,15 @@ export default function DashboardLayout({
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`group relative flex items-center gap-x-3.5 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 ease-out ${
-                      active
-                        ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 text-white shadow-xl shadow-blue-500/40 scale-[1.02] ring-1 ring-blue-400/30'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-700/60 hover:scale-[1.01] hover:shadow-md'
-                    }`}
-                  >
-                    {active && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-9 bg-white rounded-r-full shadow-lg" />
-                    )}
+                        className={`group relative flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-out ${
+                          active
+                            ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 text-white shadow-lg shadow-blue-500/30'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
+                        }`}
+                      >
+                        {active && (
+                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-7 bg-white rounded-r-full" />
+                        )}
                     <item.icon className={`h-5 w-5 shrink-0 stroke-[1.5] transition-all duration-300 ${
                       active ? 'text-white scale-110' : `${iconColor} group-hover:text-white group-hover:scale-110`
                     }`} />
@@ -371,10 +371,10 @@ export default function DashboardLayout({
                                   key={child.name}
                                   href={child.href}
                                   onClick={() => setMobileMenuOpen(false)}
-                                  className={`flex items-center gap-x-3.5 rounded-xl px-4 py-2.5 text-sm transition-all duration-300 ease-out ${
+                                  className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm transition-all duration-200 ease-out ${
                                     active
-                                      ? 'text-white bg-gradient-to-r from-slate-700 via-slate-650 to-slate-600 font-semibold shadow-lg scale-[1.02] ring-1 ring-slate-500/30'
-                                      : 'text-slate-300 hover:text-white hover:bg-slate-700/60 hover:scale-[1.01] hover:shadow-md'
+                                      ? 'text-white bg-slate-700/60'
+                                      : 'text-slate-300 hover:text-white hover:bg-slate-700/40'
                                   }`}
                                 >
                                   <child.icon className={`h-4.5 w-4.5 shrink-0 stroke-[1.5] transition-all duration-300 ${
