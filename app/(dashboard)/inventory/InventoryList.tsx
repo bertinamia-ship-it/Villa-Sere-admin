@@ -211,12 +211,12 @@ export default function InventoryList() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('inventory.title')}</h1>
-          <p className="text-sm text-[#64748B] mt-1.5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+        <div className="space-y-1.5">
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#0F172A] tracking-tight">{t('inventory.title')}</h1>
+          <p className="text-sm text-[#64748B] leading-relaxed">
               {filteredItems.length === 0 
                 ? t('inventory.emptyTitle')
                 : t('inventory.totalItems', { count: String(filteredItems.length) })}

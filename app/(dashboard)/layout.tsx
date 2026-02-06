@@ -297,22 +297,9 @@ export default function DashboardLayout({
               e.stopPropagation()
             }}
           >
-              {/* Branding Premium en mobile drawer - Logo completo y bonito con safe-area */}
-              <div className="shrink-0 px-4 pt-6 pb-4 border-b border-slate-700/50 bg-gradient-to-r from-slate-800/50 to-slate-900/50" style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top))' }}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-xl shadow-lg shadow-blue-500/20 ring-1 ring-blue-400/20 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="h-7 w-7 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h1 className="text-lg font-bold text-white tracking-tight">CasaPilot</h1>
-                    <p className="text-xs text-slate-400 mt-0.5">{t('nav.operation')}</p>
-                  </div>
-                </div>
-                
-                {/* Villa Activa - Card Premium más compacto */}
-                <div className="mt-2">
-                  <MobilePropertyCard />
-                </div>
+              {/* Villa Activa - Card Premium (sin branding duplicado) */}
+              <div className="shrink-0 px-4 pt-4 pb-4 border-b border-slate-700/50" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
+                <MobilePropertyCard />
               </div>
 
               <nav className="px-4 py-4 space-y-2 flex-1 overflow-y-auto">
@@ -444,8 +431,8 @@ export default function DashboardLayout({
           {children}
           </div>
         </main>
-        </div>
-        </div>
+      </div>
+      </div>
       </ErrorBoundary>
     </BillingGuard>
   )

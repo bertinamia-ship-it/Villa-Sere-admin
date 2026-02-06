@@ -218,6 +218,8 @@ export const es = {
     pending: 'Pendiente',
     toBuy: 'Por Comprar',
     purchased: 'Comprado',
+    ordered: 'Ordenado',
+    received: 'Recibido',
   },
 
   // Priority

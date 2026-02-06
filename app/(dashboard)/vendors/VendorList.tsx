@@ -138,12 +138,12 @@ export default function VendorList() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('vendors.title')}</h1>
-          <p className="text-gray-600 mt-1">{t('vendors.totalVendors', { count: String(vendors.length) })}</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+        <div className="space-y-1.5">
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('vendors.title')}</h1>
+          <p className="text-sm text-slate-600 leading-relaxed">{t('vendors.totalVendors', { count: String(vendors.length) })}</p>
         </div>
         <button
           onClick={() => setShowForm(true)}

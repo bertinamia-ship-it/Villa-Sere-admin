@@ -175,8 +175,8 @@ export default function ToBuyPage() {
 
   const statusLabels = {
     to_buy: t('status.toBuy'),
-    ordered: 'Ordenado',
-    received: 'Recibido',
+    ordered: t('status.ordered'),
+    received: t('status.received'),
   }
 
   if (loading) {

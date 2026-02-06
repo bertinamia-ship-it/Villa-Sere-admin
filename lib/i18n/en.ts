@@ -346,6 +346,8 @@ const enTranslations = {
     pending: 'Pending',
     toBuy: 'To Buy',
     purchased: 'Purchased',
+    ordered: 'Ordered',
+    received: 'Received',
   },
 
   // Errors

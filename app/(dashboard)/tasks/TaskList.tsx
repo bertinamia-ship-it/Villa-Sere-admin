@@ -317,12 +317,12 @@ export default function TaskList() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('tasks.title')}</h1>
-          <p className="text-sm text-[#64748B] mt-1.5">{t('tasks.subtitle')}</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+        <div className="space-y-1.5">
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#0F172A] tracking-tight">{t('tasks.title')}</h1>
+          <p className="text-sm text-[#64748B] leading-relaxed">{t('tasks.subtitle')}</p>
         </div>
         <Button 
           onClick={() => setShowForm(true)}

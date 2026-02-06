@@ -245,10 +245,10 @@ export default function ExpensesManager() {
 
   return (
     <>
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+        <div className="space-y-1.5">
           <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('expenses.title')}</h1>
           <p className="text-xs sm:text-sm text-slate-600 mt-1.5">
             {expenses.length === 0 
