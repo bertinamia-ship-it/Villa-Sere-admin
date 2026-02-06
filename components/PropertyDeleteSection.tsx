@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { Trash2, AlertTriangle, Home, Building } from 'lucide-react'
-import { Card, CardHeader, CardTitle, CardContent } from './ui/Card'
 import { Button } from './ui/Button'
 import { Input } from './ui/Input'
 import { Modal } from './ui/Modal'
@@ -173,33 +172,17 @@ export default function PropertyDeleteSection() {
 
   if (loading) {
     return (
-      <Card className="border-red-200/50 bg-red-50/30">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-red-700">
-            <Trash2 className="h-5 w-5" />
-            Eliminar Propiedades
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-slate-500">Cargando...</p>
-        </CardContent>
-      </Card>
+      <div className="space-y-2">
+        <p className="text-sm text-slate-500">Cargando...</p>
+      </div>
     )
   }
 
   if (properties.length === 0) {
     return (
-      <Card className="border-red-200/50 bg-red-50/30">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-red-700">
-            <Trash2 className="h-5 w-5" />
-            Eliminar Propiedades
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-slate-500">No hay propiedades para eliminar</p>
-        </CardContent>
-      </Card>
+      <div className="space-y-2">
+        <p className="text-sm text-slate-500">No hay propiedades para eliminar</p>
+      </div>
     )
   }
 
@@ -244,6 +227,8 @@ export default function PropertyDeleteSection() {
               </div>
             ))}
           </div>
+        </CardContent>
+      </Card>
 
       {/* Modal de confirmación con nombre */}
       <Modal
