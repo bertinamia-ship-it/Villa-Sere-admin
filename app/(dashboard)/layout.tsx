@@ -245,9 +245,9 @@ export default function DashboardLayout({
         </div>
       </div>
 
-      {/* Mobile top bar - Minimalista sin logo */}
+      {/* Mobile top bar - Solo hamburger */}
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/50 z-[80] shadow-lg safe-area-top">
-        <div className="flex items-center gap-3 h-14 px-4 safe-area-x relative z-[80]">
+        <div className="flex items-center h-14 px-4 safe-area-x relative z-[80]">
           {/* Hamburger Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -260,22 +260,6 @@ export default function DashboardLayout({
             ) : (
               <Menu className="h-5 w-5 text-white" />
             )}
-          </button>
-
-          {/* Espacio flexible */}
-          <div className="flex-1"></div>
-
-          {/* Settings Button - Discreto */}
-          <button
-            onClick={() => {
-              router.push('/settings')
-              setMobileMenuOpen(false)
-            }}
-            className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl bg-slate-700/30 hover:bg-slate-700/50 active:bg-slate-700/70 border border-slate-600/30 transition-all duration-200 relative z-[80]"
-            aria-label="Configuración"
-            type="button"
-          >
-            <Settings className="h-4.5 w-4.5 text-slate-300" />
           </button>
         </div>
       </div>
@@ -309,7 +293,7 @@ export default function DashboardLayout({
                 <MobilePropertyCard />
               </div>
 
-              <nav className="px-5 py-5 space-y-2 flex-1">
+              <nav className="px-5 py-6 space-y-2.5 flex-1 overflow-y-auto">
                 {navigation.map((item) => {
                   if ('href' in item) {
                     const active = isActive(item.href)
@@ -386,7 +370,7 @@ export default function DashboardLayout({
                                   key={child.name}
                                   href={child.href}
                                   onClick={() => setMobileMenuOpen(false)}
-                                  className={`flex items-center gap-x-3.5 rounded-xl px-4 py-2.5 text-sm transition-all duration-200 ease-out ${
+                                  className={`flex items-center gap-x-4 rounded-xl px-4 py-3 text-sm transition-all duration-200 ease-out ${
                                     active
                                       ? 'text-white bg-slate-700/60 shadow-md'
                                       : 'text-slate-300 hover:text-white hover:bg-slate-700/40 hover:shadow-sm'
