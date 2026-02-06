@@ -431,7 +431,7 @@ export default function DashboardLayout({
           <Header />
           <PropertyHeader />
         </div>
-        <main className="py-4 px-4 sm:py-6 sm:px-6 min-h-screen lg:pt-5 pt-12 safe-area-x safe-area-bottom">
+        <main className="py-4 px-4 sm:py-6 sm:px-6 min-h-screen lg:pt-5 pt-14 safe-area-x safe-area-bottom">
           <div className="page-soft">
             {children}
           </div>
