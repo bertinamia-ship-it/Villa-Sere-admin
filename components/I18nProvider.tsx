@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { es, t as esT } from '@/lib/i18n/es'
+import { t as esT } from '@/lib/i18n/es'
 import { t as enT } from '@/lib/i18n/en'
 
 type Language = 'es' | 'en'
