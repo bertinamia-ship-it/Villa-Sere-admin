@@ -1,5 +1,5 @@
 // English translations for CasaPilot
-export const en = {
+const enTranslations = {
   // Navigation
   nav: {
     dashboard: 'Dashboard',
@@ -265,28 +265,36 @@ export const en = {
   },
 }
 
-export function t(key: string, params?: Record<string, string>): string {
+// Helper function para acceder a traducciones con interpolación
+export function t(key: string, params?: Record<string, any>): string {
   const keys = key.split('.')
-  let value: any = en
+  let value: any = enTranslations
   
   for (const k of keys) {
-    if (value && typeof value === 'object' && k in value) {
-      value = value[k]
-    } else {
-      return key // Return key if translation not found
+    value = value?.[k]
+    if (value === undefined) {
+      console.warn(`Translation key not found: ${key}`)
+      return key
     }
   }
   
   if (typeof value !== 'string') {
+    console.warn(`Translation value is not a string: ${key}`)
     return key
   }
   
-  // Replace parameters
+  // Interpolación simple
   if (params) {
     return value.replace(/\{(\w+)\}/g, (match, paramKey) => {
-      return params[paramKey] || match
+      return params[paramKey] !== undefined ? String(params[paramKey]) : match
     })
   }
   
   return value
+}
+
+// Export default para uso directo
+export const en = {
+  ...enTranslations,
+  t,
 }

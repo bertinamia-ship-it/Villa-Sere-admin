@@ -38,9 +38,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const t = (key: string, params?: Record<string, string>): string => {
     if (language === 'en') {
-      return enTranslations.t(key, params)
+      return enModule.t(key, params)
     }
-    return esTranslations.t(key, params)
+    return es.t(key, params)
   }
 
   return (
@@ -62,13 +62,13 @@ export function useI18n() {
 export function t(key: string, params?: Record<string, string>): string {
   if (typeof window === 'undefined') {
     // Server-side: default to Spanish
-    return esTranslations.t(key, params)
+    return es.t(key, params)
   }
   
   // Client-side: get from localStorage
   const savedLanguage = localStorage.getItem('app-language') as Language
   if (savedLanguage === 'en') {
-    return enTranslations.t(key, params)
+    return enModule.t(key, params)
   }
-  return esTranslations.t(key, params)
+  return es.t(key, params)
 }
