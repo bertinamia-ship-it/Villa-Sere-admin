@@ -59,6 +59,7 @@ const getNavigation = (t: (key: string) => string): NavItem[] => [
       { name: t('nav.reports'), href: '/reports', icon: BarChart3 },
     ]
   },
+  { name: t('nav.billing'), href: '/billing', icon: CreditCard },
 ]
 
 export default function DashboardLayout({
@@ -149,6 +150,7 @@ export default function DashboardLayout({
                 const iconColors: Record<string, string> = {
                   '/dashboard': 'text-blue-400',
                   '/calendario': 'text-purple-400',
+                  '/billing': 'text-indigo-400',
                   '/settings': 'text-slate-400',
                 }
                 const iconColor = iconColors[item.href] || 'text-slate-400'
@@ -256,33 +258,6 @@ export default function DashboardLayout({
         </div>
       </div>
 
-      {/* Mobile top bar - Branding + hamburger */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/50 z-[80] shadow-lg safe-area-top">
-        <div className="flex items-center justify-between h-12 px-3 gap-2 safe-area-x relative z-[80]">
-          {/* Branding pequeño */}
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <div className="w-7 h-7 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-sm shadow-blue-500/20 ring-1 ring-blue-400/20 flex items-center justify-center flex-shrink-0">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-sm font-semibold text-white tracking-tight truncate">CasaPilot</span>
-          </div>
-          
-          {/* Hamburger Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-slate-700/50 active:bg-slate-700/70 transition-all duration-200 relative z-[80] flex-shrink-0"
-            aria-label="Toggle menu"
-            type="button"
-          >
-            {mobileMenuOpen ? (
-              <X className="h-5 w-5 text-white" />
-            ) : (
-              <Menu className="h-5 w-5 text-white" />
-            )}
-          </button>
-        </div>
-        </div>
-
       {/* Mobile menu overlay - z-index correcto y funcional */}
         {mobileMenuOpen && (
         <>
@@ -296,10 +271,27 @@ export default function DashboardLayout({
               e.stopPropagation()
             }}
           >
-              {/* Header con Property Card */}
+              {/* Header con Logo, Property Card y Botón Cerrar */}
               <div className="shrink-0 px-4 pt-4 pb-3 border-b border-slate-700/50" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
+                {/* Logo y Botón Cerrar */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-md shadow-blue-500/20 ring-1 ring-blue-400/20 flex items-center justify-center">
+                      <Sparkles className="h-4.5 w-4.5 text-white" />
+                    </div>
+                    <span className="text-base font-bold text-white tracking-tight">CasaPilot</span>
+                  </div>
+                  <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-slate-700/50 active:bg-slate-700/70 transition-all duration-200"
+                    aria-label="Cerrar menú"
+                    type="button"
+                  >
+                    <X className="h-5 w-5 text-white" />
+          </button>
+                </div>
                 <MobilePropertyCard />
-              </div>
+        </div>
 
               {/* Navigation - Scrollable */}
               <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
@@ -416,16 +408,16 @@ export default function DashboardLayout({
                   <Settings className={`h-5 w-5 shrink-0 ${isActive('/settings') ? 'text-white' : 'text-slate-400'}`} />
                   <span className={isActive('/settings') ? 'font-semibold' : ''}>{t('nav.settings')}</span>
                 </Link>
-                <button
+              <button
                   onClick={() => {
                     handleLogout()
                     setMobileMenuOpen(false)
                   }}
                   className="flex w-full items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
-                >
-                  <LogOut className="h-5 w-5" />
+              >
+                <LogOut className="h-5 w-5" />
                   <span>{t('common.logout')}</span>
-                </button>
+              </button>
               </div>
           </div>
           </>
@@ -438,7 +430,21 @@ export default function DashboardLayout({
           <Header />
           <PropertyHeader />
         </div>
-        <main className="py-4 px-4 sm:py-6 sm:px-6 min-h-screen lg:pt-5 pt-14 safe-area-x safe-area-bottom">
+        
+        {/* Botón FAB para abrir menú móvil */}
+        {!mobileMenuOpen && (
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="lg:hidden fixed bottom-6 right-6 z-[90] w-14 h-14 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-full shadow-2xl shadow-blue-500/50 flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200"
+            aria-label="Abrir menú"
+            type="button"
+            style={{ marginBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+          >
+            <Menu className="h-6 w-6 text-white" />
+          </button>
+        )}
+        
+        <main className="py-4 px-4 sm:py-6 sm:px-6 min-h-screen lg:pt-5 pt-4 safe-area-x safe-area-bottom">
           <div className="page-soft">
           {children}
           </div>
