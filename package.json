@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:all": "bash scripts/dev-mobile-desktop.sh",
+    "dev:mobile": "bash scripts/open-mobile-view.sh",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
