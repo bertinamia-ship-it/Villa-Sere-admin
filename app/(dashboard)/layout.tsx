@@ -282,14 +282,20 @@ export default function DashboardLayout({
               e.stopPropagation()
             }}
           >
-              {/* Branding in mobile drawer - Mejorado */}
-              <div className="shrink-0 px-4 pt-6 pb-4 border-b border-slate-700/50">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-xl shadow-lg shadow-blue-500/20 ring-1 ring-blue-400/30">
+              {/* Branding Premium en mobile drawer */}
+              <div className="shrink-0 px-5 pt-6 pb-5 border-b border-slate-700/50 bg-gradient-to-r from-slate-800/50 to-slate-900/50">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2.5 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-xl shadow-lg shadow-blue-500/30 ring-2 ring-blue-400/20">
                     <Sparkles className="h-5 w-5 text-white" />
                   </div>
-                  <h1 className="text-lg font-bold text-white tracking-tight">CasaPilot</h1>
+                  <div>
+                    <h1 className="text-lg font-bold text-white tracking-tight">CasaPilot</h1>
+                    <p className="text-xs text-slate-400 mt-0.5">Gestión de Propiedades</p>
+                  </div>
                 </div>
+                
+                {/* Villa Activa - Card Premium */}
+                <MobilePropertyCard />
               </div>
 
               <nav className="px-5 py-5 space-y-2 flex-1">
