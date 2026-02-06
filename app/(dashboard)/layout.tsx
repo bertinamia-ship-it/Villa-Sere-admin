@@ -59,7 +59,6 @@ const getNavigation = (t: (key: string) => string): NavItem[] => [
       { name: t('nav.reports'), href: '/reports', icon: BarChart3 },
     ]
   },
-  { name: t('nav.settings'), href: '/settings', icon: Settings },
 ]
 
 export default function DashboardLayout({
@@ -292,17 +291,18 @@ export default function DashboardLayout({
             onClick={() => setMobileMenuOpen(false)}
           />
           <div 
-            className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/60 z-[70] shadow-2xl backdrop-blur-xl transform transition-transform duration-300 ease-out lg:hidden safe-area-left safe-area-y overflow-y-auto"
+            className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/60 z-[70] shadow-2xl backdrop-blur-xl transform transition-transform duration-300 ease-out lg:hidden safe-area-left safe-area-y flex flex-col"
             onClick={(e) => {
               e.stopPropagation()
             }}
           >
-              {/* Villa Activa - Card Premium (sin branding duplicado) */}
-              <div className="shrink-0 px-3 pt-3 pb-2.5 border-b border-slate-700/50" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}>
+              {/* Header con Property Card */}
+              <div className="shrink-0 px-4 pt-4 pb-3 border-b border-slate-700/50" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
                 <MobilePropertyCard />
               </div>
 
-              <nav className="px-3 py-2.5 space-y-1.5 flex-1 overflow-y-auto">
+              {/* Navigation - Scrollable */}
+              <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
               {navigation.map((item) => {
                   if ('href' in item) {
                     const active = isActive(item.href)
@@ -318,16 +318,16 @@ export default function DashboardLayout({
                     key={item.name}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                        className={`group relative flex items-center gap-x-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-out ${
+                        className={`group relative flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
                           active
                             ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md'
                             : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
                         }`}
                       >
                         {active && (
-                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-r-full" />
+                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-7 bg-white rounded-r-full" />
                         )}
-                        <item.icon className={`h-4.5 w-4.5 shrink-0 transition-all duration-200 ${
+                        <item.icon className={`h-5 w-5 shrink-0 transition-all duration-200 ${
                           active ? 'text-white' : `${iconColor} group-hover:text-white`
                         }`} />
                         <span className={active ? 'font-semibold' : ''}>{item.name}</span>
@@ -356,13 +356,13 @@ export default function DashboardLayout({
                         >
                           <span>{item.name}</span>
                           <ArrowRight
-                            className={`h-3.5 w-3.5 transition-all duration-200 ${
+                            className={`h-4 w-4 transition-all duration-200 ${
                               isExpanded ? 'rotate-90' : ''
                             } ${hasActiveChild ? sectionColor.icon : 'text-slate-500'}`}
                           />
                         </button>
                         {isExpanded && (
-                          <div className="ml-2.5 space-y-0.5 border-l-2 border-slate-700/50 pl-2.5">
+                          <div className="ml-3 space-y-0.5 border-l-2 border-slate-700/50 pl-3">
                             {item.children.map((child) => {
                               const active = isActive(child.href)
                               const childIconColors: Record<string, string> = {
@@ -381,13 +381,13 @@ export default function DashboardLayout({
                                   key={child.name}
                                   href={child.href}
                                   onClick={() => setMobileMenuOpen(false)}
-                                  className={`flex items-center gap-x-2.5 rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
+                                  className={`flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 ${
                                     active
                                       ? 'text-white bg-slate-700/60 shadow-sm'
                                       : 'text-slate-300 hover:text-white hover:bg-slate-700/40'
                                   }`}
                                 >
-                                  <child.icon className={`h-4 w-4 shrink-0 transition-all duration-200 ${
+                                  <child.icon className={`h-4.5 w-4.5 shrink-0 transition-all duration-200 ${
                                     active ? 'text-white' : childIconColor
                                   }`} />
                                   <span>{child.name}</span>
@@ -402,18 +402,30 @@ export default function DashboardLayout({
                 })}
               </nav>
 
-              {/* User Menu at bottom - Logout */}
-              <div className="mt-auto pt-3 px-3 pb-4 border-t border-slate-700/50 safe-area-bottom">
-              <button
+              {/* Bottom Menu - Settings y Logout */}
+              <div className="shrink-0 mt-auto pt-3 px-3 pb-4 border-t border-slate-700/50 safe-area-bottom space-y-1">
+                <Link
+                  href="/settings"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                    isActive('/settings')
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
+                  }`}
+                >
+                  <Settings className={`h-5 w-5 shrink-0 ${isActive('/settings') ? 'text-white' : 'text-slate-400'}`} />
+                  <span className={isActive('/settings') ? 'font-semibold' : ''}>{t('nav.settings')}</span>
+                </Link>
+                <button
                   onClick={() => {
                     handleLogout()
                     setMobileMenuOpen(false)
                   }}
-                  className="flex w-full items-center gap-x-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
-              >
-                <LogOut className="h-4.5 w-4.5" />
+                  className="flex w-full items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
+                >
+                  <LogOut className="h-5 w-5" />
                   <span>{t('common.logout')}</span>
-              </button>
+                </button>
               </div>
           </div>
           </>

@@ -197,27 +197,27 @@ export default function MobilePropertyCard() {
     if (lowerName.includes('departamento') || lowerName.includes('apartamento') || 
         lowerName.includes('depto') || lowerName.includes('apto') ||
         lowerName.includes('apartment') || lowerName.includes('flat')) {
-      return <Building className="h-3 w-3 text-white" />
+      return <Building className="h-4 w-4 text-white" />
     }
-    return <Home className="h-3 w-3 text-white" />
+    return <Home className="h-4 w-4 text-white" />
   }
 
   if (loading) {
     return (
-      <div className="flex items-center gap-1.5 px-2 py-1.5 bg-gradient-to-r from-white to-slate-50/80 backdrop-blur-sm rounded-lg border border-slate-200/60 shadow-sm">
-        <div className="h-3 w-3 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 animate-pulse" />
-        <div className="h-2.5 flex-1 rounded bg-slate-200/60 animate-pulse" />
+      <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gradient-to-r from-white to-slate-50/80 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-md">
+        <div className="h-4 w-4 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 animate-pulse" />
+        <div className="h-3 flex-1 rounded bg-slate-200/60 animate-pulse" />
       </div>
     )
   }
 
   if (!activeProperty) {
     return (
-      <div className="flex items-center gap-1.5 px-2 py-1.5 bg-gradient-to-r from-slate-100 to-slate-50 rounded-lg border border-slate-200/60 shadow-sm">
-        <div className="p-1 bg-slate-200 rounded-md">
-          <Home className="h-3 w-3 text-slate-400" />
+      <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gradient-to-r from-slate-100 to-slate-50 rounded-xl border border-slate-200/60 shadow-md">
+        <div className="p-2 bg-slate-200 rounded-lg">
+          <Home className="h-4 w-4 text-slate-400" />
         </div>
-        <span className="text-xs font-medium text-slate-500">Sin propiedad</span>
+        <span className="text-sm font-medium text-slate-500">Sin propiedad</span>
       </div>
     )
   }
@@ -228,24 +228,24 @@ export default function MobilePropertyCard() {
       <button
         onClick={() => setShowModal(true)}
         disabled={isChanging}
-        className="w-full flex items-center gap-1.5 px-2 py-1.5 bg-gradient-to-r from-white via-blue-50/30 to-indigo-50/20 backdrop-blur-sm rounded-lg border border-blue-200/60 shadow-sm hover:shadow-md hover:border-blue-300/80 active:scale-[0.98] transition-all duration-200 group"
+        className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-gradient-to-r from-white via-blue-50/30 to-indigo-50/20 backdrop-blur-sm rounded-xl border border-blue-200/60 shadow-md hover:shadow-lg hover:border-blue-300/80 active:scale-[0.98] transition-all duration-200 group"
         type="button"
       >
-        <div className="shrink-0 p-0.5 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-md shadow-sm ring-1 ring-blue-400/20">
+        <div className="shrink-0 p-2 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-md ring-1 ring-blue-400/20">
           {getPropertyIcon(activeProperty.name)}
         </div>
         <div className="flex-1 min-w-0 text-left">
-          <div className="text-xs font-bold text-slate-900 truncate leading-tight">
+          <div className="text-sm font-bold text-slate-900 truncate leading-tight">
             {activeProperty.name}
           </div>
           {activeProperty.location && (
-            <div className="text-[10px] text-slate-600 truncate mt-0.5 leading-tight">
+            <div className="text-xs text-slate-600 truncate mt-0.5 leading-tight">
               {activeProperty.location}
             </div>
           )}
         </div>
-        <div className="shrink-0 p-0.5 bg-slate-100 rounded-md group-hover:bg-slate-200 transition-colors">
-          <ChevronDown className="h-3 w-3 text-slate-600" />
+        <div className="shrink-0 p-1.5 bg-slate-100 rounded-lg group-hover:bg-slate-200 transition-colors">
+          <ChevronDown className="h-4 w-4 text-slate-600" />
         </div>
       </button>
 
