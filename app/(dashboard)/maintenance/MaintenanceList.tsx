@@ -202,10 +202,10 @@ export default function MaintenanceList() {
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+        <div className="space-y-1">
           <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('maintenance.title')}</h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1.5">{t('maintenance.subtitle')}</p>
+          <p className="text-sm text-slate-600">{t('maintenance.subtitle')}</p>
         </div>
         {activeTab === 'tickets' && (
           <Button
@@ -223,7 +223,7 @@ export default function MaintenanceList() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-[#E2E8F0]">
+      <div className="flex gap-2 border-b border-[#E2E8F0] -mb-px">
         <Link
           href="/maintenance"
           className={`px-4 py-2.5 text-sm font-medium transition-all duration-200 border-b-2 ${
@@ -234,7 +234,7 @@ export default function MaintenanceList() {
         >
           <div className="flex items-center gap-2">
             <Wrench className="h-4 w-4" />
-            <span>Tickets</span>
+            <span>{t('maintenance.tickets')}</span>
           </div>
         </Link>
         <Link
@@ -247,7 +247,7 @@ export default function MaintenanceList() {
         >
           <div className="flex items-center gap-2">
             <CalendarCheck className="h-4 w-4" />
-            <span>Recurrentes</span>
+            <span>{t('maintenancePlans.title')}</span>
           </div>
         </Link>
       </div>
@@ -257,12 +257,12 @@ export default function MaintenanceList() {
         <>
           {/* Filters */}
           <Card padding="md">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-5 space-y-0">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B] pointer-events-none" />
                 <input
                   type="text"
-                  placeholder={t('maintenance.searchTickets')}
+                  placeholder={t('maintenance.search')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-9 pr-3 py-2.5 text-sm border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A] placeholder-[#94A3B8]"
@@ -274,9 +274,9 @@ export default function MaintenanceList() {
                 className="px-3 py-2.5 text-sm border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A]"
               >
                 <option value="all">{t('maintenance.allStatuses')}</option>
-                <option value="open">Abierto</option>
-                <option value="in_progress">En Progreso</option>
-                <option value="done">Completado</option>
+                <option value="open">{t('status.open')}</option>
+                <option value="in_progress">{t('status.inProgress')}</option>
+                <option value="done">{t('status.done')}</option>
               </select>
               <select
                 value={priorityFilter}

@@ -204,6 +204,7 @@ export const es = {
     next: 'Siguiente',
     previous: 'Anterior',
     finish: 'Finalizar',
+    logout: 'Cerrar Sesión',
   },
 
   // Status
@@ -301,6 +302,7 @@ export const es = {
   // Maintenance
   maintenance: {
     title: 'Mantenimiento',
+    tickets: 'Tickets',
     addTicket: 'Agregar Ticket',
     newTicket: 'Nuevo Ticket',
     newMaintenanceTicket: 'Nuevo Ticket de Mantenimiento',

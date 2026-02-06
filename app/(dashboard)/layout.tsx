@@ -444,8 +444,8 @@ export default function DashboardLayout({
           {children}
           </div>
         </main>
-      </div>
-      </div>
+        </div>
+        </div>
       </ErrorBoundary>
     </BillingGuard>
   )
