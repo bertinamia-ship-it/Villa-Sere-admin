@@ -57,7 +57,6 @@ const navigation: NavItem[] = [
       { name: 'Reportes', href: '/reports', icon: BarChart3 },
     ]
   },
-  { name: 'Configuración', href: '/settings', icon: Settings },
 ]
 
 export default function DashboardLayout({
