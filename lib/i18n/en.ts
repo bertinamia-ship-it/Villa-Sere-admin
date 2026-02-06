@@ -2,16 +2,20 @@
 const enTranslations = {
   // Navigation
   nav: {
-    dashboard: 'Dashboard',
+    dashboard: 'Home',
     inventory: 'Inventory',
     purchases: 'Purchases',
     maintenance: 'Maintenance',
-    expenses: 'Expenses',
+    expenses: 'Movements',
     vendors: 'Vendors',
     reports: 'Reports',
     billing: 'Billing',
-    rentals: 'Bookings',
+    rentals: 'Calendar',
     account: 'Account',
+    operation: 'Operation',
+    finances: 'Finances',
+    bank: 'Bank',
+    settings: 'Settings',
   },
 
   // Dashboard
@@ -199,6 +203,7 @@ const enTranslations = {
     back: 'Back',
     next: 'Next',
     previous: 'Previous',
+    logout: 'Log Out',
   },
 
   // Settings
@@ -217,6 +222,7 @@ const enTranslations = {
     general: 'General',
     advanced: 'Advanced',
     dangerousActions: 'Dangerous Actions',
+    dangerousActionsDescription: 'Actions that cannot be undone',
     comingSoon: 'Coming soon',
     language: 'Language',
     languageDescription: 'Change the application language',

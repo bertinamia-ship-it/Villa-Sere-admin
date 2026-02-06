@@ -369,8 +369,8 @@ export default function SettingsPage() {
                 <AlertTriangle className="h-5 w-5 text-red-600" />
               </div>
               <div className="text-left">
-                <h2 className="text-base font-semibold text-red-700">Zona Peligrosa</h2>
-                <p className="text-xs text-red-600/70 mt-0.5">Acciones que no se pueden deshacer</p>
+                <h2 className="text-base font-semibold text-red-700">{t('settings.dangerousActions')}</h2>
+                <p className="text-xs text-red-600/70 mt-0.5">{t('settings.dangerousActionsDescription')}</p>
               </div>
             </div>
             <ChevronDown className={`h-5 w-5 text-red-600 transition-transform duration-200 ${dangerZoneOpen ? 'rotate-180' : ''}`} />

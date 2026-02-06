@@ -31,32 +31,35 @@ import MobilePropertySelector from '@/components/MobilePropertySelector'
 import MobilePropertyCard from '@/components/MobilePropertyCard'
 import BillingGuard from './BillingGuard'
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
+import { useI18n } from '@/components/I18nProvider'
 
 // Navigation structure: compact and organized
 type NavItem = 
   | { name: string; href: string; icon: React.ComponentType<{ className?: string }> }
   | { name: string; children: Array<{ name: string; href: string; icon: React.ComponentType<{ className?: string }> }> }
 
-const navigation: NavItem[] = [
-  { name: 'Inicio', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Calendario', href: '/calendario', icon: Calendar },
+// Navigation structure - will be translated using i18n
+const getNavigation = (t: (key: string) => string): NavItem[] => [
+  { name: t('nav.dashboard'), href: '/dashboard', icon: LayoutDashboard },
+  { name: t('nav.rentals'), href: '/calendario', icon: Calendar },
   {
-    name: 'Operación',
+    name: t('nav.operation'),
     children: [
-      { name: 'Mantenimiento', href: '/maintenance', icon: Wrench },
-      { name: 'Inventario', href: '/inventory', icon: Package },
-      { name: 'Compras', href: '/to-buy', icon: ShoppingCart },
-      { name: 'Proveedores', href: '/vendors', icon: Users },
+      { name: t('nav.maintenance'), href: '/maintenance', icon: Wrench },
+      { name: t('nav.inventory'), href: '/inventory', icon: Package },
+      { name: t('nav.purchases'), href: '/to-buy', icon: ShoppingCart },
+      { name: t('nav.vendors'), href: '/vendors', icon: Users },
     ]
   },
   {
-    name: 'Finanzas',
+    name: t('nav.finances'),
     children: [
-      { name: 'Movimientos', href: '/expenses', icon: DollarSign },
-      { name: 'Banco', href: '/bank', icon: Wallet },
-      { name: 'Reportes', href: '/reports', icon: BarChart3 },
+      { name: t('nav.expenses'), href: '/expenses', icon: DollarSign },
+      { name: t('nav.bank'), href: '/bank', icon: Wallet },
+      { name: t('nav.reports'), href: '/reports', icon: BarChart3 },
     ]
   },
+  { name: t('nav.settings'), href: '/settings', icon: Settings },
 ]
 
 export default function DashboardLayout({
@@ -67,8 +70,17 @@ export default function DashboardLayout({
   const router = useRouter()
   const pathname = usePathname()
   const supabase = createClient()
+  const { t, language } = useI18n()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['Operación', 'Finanzas']))
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set([t('nav.operation'), t('nav.finances')]))
+  
+  // Get translated navigation
+  const navigation = getNavigation(t)
+  
+  // Update expanded sections when language changes
+  useEffect(() => {
+    setExpandedSections(new Set([t('nav.operation'), t('nav.finances')]))
+  }, [language, t])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -166,12 +178,13 @@ export default function DashboardLayout({
                 const isExpanded = expandedSections.has(item.name)
                 const hasActiveChild = item.children.some(child => isActive(child.href))
                 
-                // Color mapping for sections
+                // Color mapping for sections - use translation keys for consistency
+                const sectionKey = item.name === t('nav.operation') ? 'operation' : item.name === t('nav.finances') ? 'finances' : ''
                 const sectionColors: Record<string, { text: string; bg: string; icon: string }> = {
-                  'Operación': { text: 'text-emerald-300', bg: 'bg-emerald-500/10', icon: 'text-emerald-400' },
-                  'Finanzas': { text: 'text-amber-300', bg: 'bg-amber-500/10', icon: 'text-amber-400' },
+                  'operation': { text: 'text-emerald-300', bg: 'bg-emerald-500/10', icon: 'text-emerald-400' },
+                  'finances': { text: 'text-amber-300', bg: 'bg-amber-500/10', icon: 'text-amber-400' },
                 }
-                const sectionColor = sectionColors[item.name] || { text: 'text-slate-300', bg: 'bg-slate-700/30', icon: 'text-slate-400' }
+                const sectionColor = sectionColors[sectionKey] || { text: 'text-slate-300', bg: 'bg-slate-700/30', icon: 'text-slate-400' }
                 
                 return (
                   <div key={item.name} className="space-y-1.5">
@@ -238,7 +251,7 @@ export default function DashboardLayout({
               className="flex w-full items-center gap-x-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 hover:scale-[1.01] hover:shadow-md"
             >
               <LogOut className="h-4.5 w-4.5 stroke-[1.5] transition-all duration-300" />
-              <span className="tracking-wide">Cerrar Sesión</span>
+              <span className="tracking-wide">{t('common.logout')}</span>
             </button>
           </div>
         </div>
@@ -308,16 +321,16 @@ export default function DashboardLayout({
                         key={item.name}
                         href={item.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`group relative flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-out ${
+                        className={`group relative flex items-center gap-x-3.5 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200 ease-out ${
                           active
                             ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md'
                             : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
                         }`}
                       >
                         {active && (
-                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-7 bg-white rounded-r-full" />
+                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full" />
                         )}
-                        <item.icon className={`h-4.5 w-4.5 shrink-0 transition-all duration-200 ${
+                        <item.icon className={`h-5 w-5 shrink-0 transition-all duration-200 ${
                           active ? 'text-white' : `${iconColor} group-hover:text-white`
                         }`} />
                         <span className={active ? 'font-semibold' : ''}>{item.name}</span>
@@ -326,17 +339,19 @@ export default function DashboardLayout({
                   } else {
                     const isExpanded = expandedSections.has(item.name)
                     const hasActiveChild = item.children.some(child => isActive(child.href))
+                    // Color mapping for sections - use translation keys for consistency
+                    const sectionKey = item.name === t('nav.operation') ? 'operation' : item.name === t('nav.finances') ? 'finances' : ''
                     const sectionColors: Record<string, { text: string; bg: string; icon: string }> = {
-                      'Operación': { text: 'text-emerald-300', bg: 'bg-emerald-500/10', icon: 'text-emerald-400' },
-                      'Finanzas': { text: 'text-amber-300', bg: 'bg-amber-500/10', icon: 'text-amber-400' },
+                      'operation': { text: 'text-emerald-300', bg: 'bg-emerald-500/10', icon: 'text-emerald-400' },
+                      'finances': { text: 'text-amber-300', bg: 'bg-amber-500/10', icon: 'text-amber-400' },
                     }
-                    const sectionColor = sectionColors[item.name] || { text: 'text-slate-300', bg: 'bg-slate-700/30', icon: 'text-slate-400' }
+                    const sectionColor = sectionColors[sectionKey] || { text: 'text-slate-300', bg: 'bg-slate-700/30', icon: 'text-slate-400' }
                     
                     return (
-                      <div key={item.name} className="space-y-1">
+                      <div key={item.name} className="space-y-1.5">
                         <button
                           onClick={() => toggleSection(item.name)}
-                          className={`w-full flex items-center justify-between gap-x-2 rounded-lg px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 ${
+                          className={`w-full flex items-center justify-between gap-x-2 rounded-lg px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
                             hasActiveChild
                               ? `${sectionColor.text} ${sectionColor.bg} shadow-sm`
                               : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700/40'
@@ -344,13 +359,13 @@ export default function DashboardLayout({
                         >
                           <span>{item.name}</span>
                           <ArrowRight
-                            className={`h-3.5 w-3.5 transition-all duration-200 ${
+                            className={`h-4 w-4 transition-all duration-200 ${
                               isExpanded ? 'rotate-90' : ''
                             } ${hasActiveChild ? sectionColor.icon : 'text-slate-500'}`}
                           />
                         </button>
                         {isExpanded && (
-                          <div className="ml-2 space-y-0.5 border-l-2 border-slate-700/50 pl-2.5">
+                          <div className="ml-3 space-y-1 border-l-2 border-slate-700/50 pl-3">
                             {item.children.map((child) => {
                               const active = isActive(child.href)
                               const childIconColors: Record<string, string> = {
@@ -369,13 +384,13 @@ export default function DashboardLayout({
                                   key={child.name}
                                   href={child.href}
                                   onClick={() => setMobileMenuOpen(false)}
-                                  className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
+                                  className={`flex items-center gap-x-3.5 rounded-lg px-4 py-2.5 text-sm transition-all duration-200 ${
                                     active
                                       ? 'text-white bg-slate-700/60 shadow-sm'
                                       : 'text-slate-300 hover:text-white hover:bg-slate-700/40'
                                   }`}
                                 >
-                                  <child.icon className={`h-4 w-4 shrink-0 transition-all duration-200 ${
+                                  <child.icon className={`h-4.5 w-4.5 shrink-0 transition-all duration-200 ${
                                     active ? 'text-white' : childIconColor
                                   }`} />
                                   <span>{child.name}</span>
@@ -390,25 +405,17 @@ export default function DashboardLayout({
                 })}
               </nav>
 
-              {/* User Menu at bottom - Settings y Logout */}
-              <div className="mt-auto pt-3 px-3 pb-4 border-t border-slate-700/50 safe-area-bottom space-y-1.5">
-                <Link
-                  href="/settings"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex w-full items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200"
-                >
-                  <Settings className="h-4.5 w-4.5" />
-                  <span>Configuración</span>
-                </Link>
+              {/* User Menu at bottom - Logout */}
+              <div className="mt-auto pt-4 px-4 pb-5 border-t border-slate-700/50 safe-area-bottom">
                 <button
                   onClick={() => {
                     handleLogout()
                     setMobileMenuOpen(false)
                   }}
-                  className="flex w-full items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
+                  className="flex w-full items-center gap-x-3.5 rounded-lg px-4 py-3 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
                 >
-                  <LogOut className="h-4.5 w-4.5" />
-                  <span>Cerrar Sesión</span>
+                  <LogOut className="h-5 w-5" />
+                  <span>{t('common.logout')}</span>
                 </button>
               </div>
             </div>

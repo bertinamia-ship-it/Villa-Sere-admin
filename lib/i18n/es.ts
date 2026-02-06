@@ -2,16 +2,20 @@
 export const es = {
   // Navegación
   nav: {
-    dashboard: 'Dashboard',
+    dashboard: 'Inicio',
     inventory: 'Inventario',
     purchases: 'Compras',
     maintenance: 'Mantenimiento',
-    expenses: 'Gastos',
+    expenses: 'Movimientos',
     vendors: 'Proveedores',
     reports: 'Reportes',
     billing: 'Facturación',
-    rentals: 'Reservas',
+    rentals: 'Calendario',
     account: 'Cuenta',
+    operation: 'Operación',
+    finances: 'Finanzas',
+    bank: 'Banco',
+    settings: 'Configuración',
   },
 
   // Dashboard
@@ -675,6 +679,7 @@ export const es = {
     general: 'General',
     advanced: 'Avanzado',
     dangerousActions: 'Acciones Peligrosas',
+    dangerousActionsDescription: 'Acciones que no se pueden deshacer',
     comingSoon: 'Más opciones de configuración próximamente',
     installApp: 'Instalar App',
     installAppDescription: 'Instala CasaPilot en tu dispositivo para acceso rápido',
