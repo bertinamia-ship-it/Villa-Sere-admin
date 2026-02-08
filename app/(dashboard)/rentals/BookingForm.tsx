@@ -47,111 +47,113 @@ export default function BookingForm({ booking, onSave, onCancel }: BookingFormPr
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-6">
-      <CardHeader>
-        <CardTitle>{booking ? t('rentals.editBooking') : t('rentals.newBooking')}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label={t('rentals.guestName')}
-              placeholder={t('common.optional')}
-              value={formData.guest_name}
-              onChange={(e) => setFormData({ ...formData, guest_name: e.target.value })}
-            />
-            
+    <form onSubmit={handleSubmit} className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4">
+        <CardHeader className="px-0 pt-0">
+          <CardTitle>{booking ? t('rentals.editBooking') : t('rentals.newBooking')}</CardTitle>
+        </CardHeader>
+        <CardContent className="px-0">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label={t('rentals.guestName')}
+                placeholder={t('common.optional')}
+                value={formData.guest_name}
+                onChange={(e) => setFormData({ ...formData, guest_name: e.target.value })}
+              />
+              
+              <Select
+                label={t('rentals.platform')}
+                value={formData.platform}
+                onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
+                options={[
+                  { value: 'Airbnb', label: 'Airbnb' },
+                  { value: 'Booking.com', label: 'Booking.com' },
+                  { value: 'VRBO', label: 'VRBO' },
+                  { value: 'Direct', label: 'Direct' },
+                  { value: 'Other', label: 'Other' },
+                ]}
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                type="date"
+                label={t('rentals.checkIn')}
+                value={formData.check_in}
+                onChange={(e) => setFormData({ ...formData, check_in: e.target.value })}
+                required
+              />
+              
+              <Input
+                type="date"
+                label={t('rentals.checkOut')}
+                value={formData.check_out}
+                onChange={(e) => setFormData({ ...formData, check_out: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Input
+                type="number"
+                step="0.01"
+                label={t('rentals.nightlyRate')}
+                placeholder={t('common.optional')}
+                value={formData.nightly_rate}
+                onChange={(e) => setFormData({ ...formData, nightly_rate: e.target.value })}
+              />
+              
+              <Input
+                type="number"
+                step="0.01"
+                label={t('rentals.total')}
+                value={formData.total_amount}
+                onChange={(e) => setFormData({ ...formData, total_amount: e.target.value })}
+                required
+              />
+
+              <Input
+                type="number"
+                step="0.01"
+                label={t('rentals.cleaningFee')}
+                value={formData.cleaning_fee}
+                onChange={(e) => setFormData({ ...formData, cleaning_fee: e.target.value })}
+              />
+            </div>
+
             <Select
-              label={t('rentals.platform')}
-              value={formData.platform}
-              onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
+              label={t('rentals.status')}
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value as 'confirmed' | 'cancelled' | 'completed' })}
               options={[
-                { value: 'Airbnb', label: 'Airbnb' },
-                { value: 'Booking.com', label: 'Booking.com' },
-                { value: 'VRBO', label: 'VRBO' },
-                { value: 'Direct', label: 'Direct' },
-                { value: 'Other', label: 'Other' },
+                { value: 'confirmed', label: t('rentals.confirmed') },
+                { value: 'completed', label: t('rentals.completed') },
+                { value: 'cancelled', label: t('rentals.cancelled') },
               ]}
               required
             />
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              type="date"
-              label={t('rentals.checkIn')}
-              value={formData.check_in}
-              onChange={(e) => setFormData({ ...formData, check_in: e.target.value })}
-              required
-            />
-            
-            <Input
-              type="date"
-              label={t('rentals.checkOut')}
-              value={formData.check_out}
-              onChange={(e) => setFormData({ ...formData, check_out: e.target.value })}
-              required
+            <Textarea
+              label={t('rentals.notes')}
+              rows={3}
+              placeholder="Información adicional..."
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
             />
           </div>
+        </CardContent>
+      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Input
-              type="number"
-              step="0.01"
-              label={t('rentals.nightlyRate')}
-              placeholder={t('common.optional')}
-              value={formData.nightly_rate}
-              onChange={(e) => setFormData({ ...formData, nightly_rate: e.target.value })}
-            />
-            
-            <Input
-              type="number"
-              step="0.01"
-              label={t('rentals.total')}
-              value={formData.total_amount}
-              onChange={(e) => setFormData({ ...formData, total_amount: e.target.value })}
-              required
-            />
-
-            <Input
-              type="number"
-              step="0.01"
-              label={t('rentals.cleaningFee')}
-              value={formData.cleaning_fee}
-              onChange={(e) => setFormData({ ...formData, cleaning_fee: e.target.value })}
-            />
-          </div>
-
-          <Select
-            label={t('rentals.status')}
-            value={formData.status}
-            onChange={(e) => setFormData({ ...formData, status: e.target.value as 'confirmed' | 'cancelled' | 'completed' })}
-            options={[
-              { value: 'confirmed', label: t('rentals.confirmed') },
-              { value: 'completed', label: t('rentals.completed') },
-              { value: 'cancelled', label: t('rentals.cancelled') },
-            ]}
-            required
-          />
-
-          <Textarea
-            label={t('rentals.notes')}
-            rows={3}
-            placeholder="Información adicional..."
-            value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-          />
-
-          <div className="flex gap-3 justify-end pt-4">
-            <Button type="button" variant="secondary" onClick={onCancel}>
-              {t('common.cancel')}
-            </Button>
-            <Button type="submit">
-              {booking ? t('rentals.updateBooking') : t('rentals.createBooking')}
-            </Button>
-          </div>
-        </div>
-      </CardContent>
+      <div className="sticky bottom-0 bg-white border-t border-slate-200/60 px-4 sm:px-6 py-4 flex flex-col sm:flex-row gap-3 sm:justify-end safe-area-bottom">
+        <Button type="button" variant="secondary" onClick={onCancel} className="w-full sm:w-auto min-h-[44px] justify-center">
+          {t('common.cancel')}
+        </Button>
+        <Button type="submit" className="w-full sm:w-auto min-h-[44px] justify-center">
+          {booking ? t('rentals.updateBooking') : t('rentals.createBooking')}
+        </Button>
+      </div>
     </form>
   )
 }

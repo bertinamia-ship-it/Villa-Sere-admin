@@ -3,8 +3,8 @@
 import dynamic from 'next/dynamic'
 import { LoadingSpinner } from '@/components/ui/Loading'
 
-// Lazy load BankPageContent component
-const BankPageContent = dynamic(() => import('./BankPageContent'), {
+// Lazy load ExpensesManager component
+const ExpensesManager = dynamic(() => import('./ExpensesManager'), {
   loading: () => (
     <div className="py-12">
       <LoadingSpinner size="lg" />
@@ -13,6 +13,7 @@ const BankPageContent = dynamic(() => import('./BankPageContent'), {
   ssr: false,
 })
 
-export default function BankPage() {
-  return <BankPageContent />
+export default function ExpensesClient() {
+  return <ExpensesManager />
 }
+

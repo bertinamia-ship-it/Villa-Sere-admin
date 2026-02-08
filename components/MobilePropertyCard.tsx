@@ -8,7 +8,7 @@ import { Modal } from './ui/Modal'
 import { Button } from './ui/Button'
 import { Input } from './ui/Input'
 import { useToast } from './ui/Toast'
-import { t } from '@/lib/i18n/es'
+import { useI18n } from '@/components/I18nProvider'
 
 interface Property {
   id: string
@@ -17,8 +17,10 @@ interface Property {
 }
 
 function MobilePropertyCard() {
+  // Hooks deben ir primero, antes de cualquier return condicional
   const supabase = createClient()
   const { showToast } = useToast()
+  const { t } = useI18n()
   const [properties, setProperties] = useState<Property[]>([])
   const [activePropertyId, setActivePropertyId] = useState<string | null>(null)
   const [activeProperty, setActiveProperty] = useState<Property | null>(null)
@@ -113,7 +115,7 @@ function MobilePropertyCard() {
 
   async function handleCreateProperty() {
     if (!newPropertyName.trim()) {
-      showToast('El nombre de la propiedad es requerido', 'error')
+      showToast(t('propertySelector.propertyNameRequired'), 'error')
       return
     }
 
@@ -133,7 +135,7 @@ function MobilePropertyCard() {
         .maybeSingle()
 
       if (!profile?.tenant_id) {
-        showToast('Error: No se encontró tenant_id', 'error')
+        showToast(t('errors.tenantRequired'), 'error')
         setCreating(false)
         return
       }
@@ -159,7 +161,7 @@ function MobilePropertyCard() {
 
       if (error || !newProperty) {
         console.error('Error creating property:', error)
-        showToast('Error al crear la propiedad', 'error')
+        showToast(t('propertySelector.errorCreatingProperty'), 'error')
         setCreating(false)
         return
       }
@@ -177,7 +179,7 @@ function MobilePropertyCard() {
 
       // Reload properties
       await loadProperties()
-      showToast('Propiedad creada exitosamente', 'success')
+      showToast(t('propertySelector.propertyCreated'), 'success')
       setShowCreateModal(false)
       setNewPropertyName('')
       setNewPropertyLocation('')
@@ -186,7 +188,7 @@ function MobilePropertyCard() {
       window.dispatchEvent(new CustomEvent('propertyChanged'))
     } catch (error) {
       console.error('Error creating property:', error)
-      showToast('Error al crear la propiedad', 'error')
+      showToast(t('propertySelector.errorCreatingProperty'), 'error')
     } finally {
       setCreating(false)
     }
@@ -217,7 +219,7 @@ function MobilePropertyCard() {
         <div className="p-1.5 bg-slate-200 rounded-md">
           <Home className="h-3 w-3 text-slate-400" />
         </div>
-        <span className="text-xs font-medium text-slate-500">Sin propiedad</span>
+        <span className="text-xs font-medium text-slate-500">{t('propertySelector.noProperty')}</span>
       </div>
     )
   }
@@ -266,14 +268,15 @@ function MobilePropertyCard() {
         }
         size="full"
       >
-        <div className="space-y-3 pb-4">
-          {properties.length === 0 ? (
-            <div className="text-center py-12 text-slate-500">
-              <Home className="h-12 w-12 mx-auto mb-3 text-slate-300" />
-              <p className="font-medium">{t('propertySelector.noProperties')}</p>
-            </div>
-          ) : (
-            properties.map((property) => (
+              <div className="space-y-3 pb-4">
+                {properties.length === 0 ? (
+                  <div className="text-center py-12 text-slate-500">
+                    <Home className="h-12 w-12 mx-auto mb-3 text-slate-300" />
+                    <p className="font-medium">{t('propertySelector.noProperties')}</p>
+                  </div>
+                ) : (
+                  <>
+                    {properties.map((property) => (
               <button
                 key={property.id}
                 onClick={() => handlePropertyChange(property.id)}
@@ -313,9 +316,30 @@ function MobilePropertyCard() {
                   )}
                 </div>
               </button>
-            ))
-          )}
-        </div>
+                    ))}
+                    {/* Botón para crear nueva propiedad */}
+                    <button
+                      onClick={() => {
+                        setShowModal(false)
+                        setShowCreateModal(true)
+                      }}
+                      className="w-full text-left px-4 py-4 rounded-xl border-2 border-dashed border-blue-300 bg-blue-50/50 hover:bg-blue-100/70 hover:border-blue-400 active:scale-[0.98] transition-all duration-200 flex items-center gap-3 group"
+                    >
+                      <div className="p-2.5 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md group-hover:shadow-lg transition-shadow">
+                        <Plus className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold text-base text-blue-900 mb-0.5">
+                          {t('propertySelector.createNewProperty')}
+                        </div>
+                        <div className="text-sm text-blue-700">
+                          {t('propertySelector.addPropertyDescription')}
+                        </div>
+                      </div>
+                    </button>
+                  </>
+                )}
+              </div>
       </Modal>
 
       {/* Modal para crear propiedad */}
@@ -329,7 +353,7 @@ function MobilePropertyCard() {
         title={
           <div className="flex items-center gap-2">
             <Plus className="h-5 w-5 text-blue-500" />
-            <span className="font-semibold">Crear Nueva Propiedad</span>
+            <span className="font-semibold">{t('propertySelector.createNewProperty')}</span>
           </div>
         }
         size="full"
@@ -337,13 +361,13 @@ function MobilePropertyCard() {
         <div className="space-y-4 pb-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              Nombre de la Propiedad *
+              {t('propertySelector.propertyName')} *
             </label>
             <Input
               type="text"
               value={newPropertyName}
               onChange={(e) => setNewPropertyName(e.target.value)}
-              placeholder="ej. Villa Serena"
+              placeholder={t('propertySelector.propertyNamePlaceholder')}
               required
               autoFocus
             />
@@ -351,13 +375,13 @@ function MobilePropertyCard() {
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              Ubicación
+              {t('propertySelector.propertyLocation')}
             </label>
             <Input
               type="text"
               value={newPropertyLocation}
               onChange={(e) => setNewPropertyLocation(e.target.value)}
-              placeholder="ej. Los Cabos, Baja California"
+              placeholder={t('propertySelector.propertyLocationPlaceholder')}
             />
           </div>
 
@@ -372,7 +396,7 @@ function MobilePropertyCard() {
               className="flex-1"
               disabled={creating}
             >
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button
               variant="primary"
@@ -380,7 +404,7 @@ function MobilePropertyCard() {
               disabled={creating || !newPropertyName.trim()}
               className="flex-1"
             >
-              {creating ? 'Creando...' : 'Crear Propiedad'}
+              {creating ? t('common.creating') : t('propertySelector.createProperty')}
             </Button>
           </div>
         </div>

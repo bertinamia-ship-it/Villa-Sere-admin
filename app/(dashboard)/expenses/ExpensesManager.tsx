@@ -14,9 +14,11 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { t } from '@/lib/i18n/es'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { useI18n } from '@/components/I18nProvider'
 
 export default function ExpensesManager() {
+  const { t } = useI18n()
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [tickets, setTickets] = useState<MaintenanceTicket[]>([])
@@ -204,10 +206,7 @@ export default function ExpensesManager() {
   if (loading) {
     return (
       <div className="space-y-8">
-        <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('expenses.title')}</h1>
-          <p className="text-sm text-[#64748B] mt-1.5">{t('expenses.subtitle')}</p>
-        </div>
+        <PageHeader title={t('expenses.title')} subtitle={t('expenses.subtitle')} />
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
             <Card key={i} padding="md">
@@ -228,10 +227,7 @@ export default function ExpensesManager() {
   if (!hasProperty) {
     return (
       <div className="space-y-8">
-        <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('expenses.title')}</h1>
-          <p className="text-sm text-[#64748B] mt-1.5">{t('expenses.subtitle')}</p>
-        </div>
+        <PageHeader title={t('expenses.title')} subtitle={t('expenses.subtitle')} />
         <Card padding="lg">
           <EmptyState
             icon={<Download className="h-14 w-14" />}
@@ -247,16 +243,15 @@ export default function ExpensesManager() {
     <>
     <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
-        <div className="space-y-1.5">
-          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('expenses.title')}</h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1.5">
-            {expenses.length === 0 
-              ? t('expenses.emptyTitle')
-              : t('expenses.totalExpenses', { count: expenses.length })}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+      <PageHeader
+        title={t('expenses.title')}
+        subtitle={
+          expenses.length === 0 
+            ? t('expenses.emptyTitle')
+            : t('expenses.totalExpenses', { count: expenses.length })
+        }
+        rightSlot={
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <Button
             variant="secondary"
             size="sm"
@@ -275,8 +270,9 @@ export default function ExpensesManager() {
             <Plus className="h-4 w-4" />
             {t('expenses.addExpense')}
           </Button>
-        </div>
-      </div>
+          </div>
+        }
+      />
 
       {/* Month Selector */}
       <Card padding="md">

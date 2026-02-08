@@ -162,6 +162,11 @@ export const es = {
     statusConfirmed: 'Confirmada',
     statusCancelled: 'Cancelada',
     statusCompleted: 'Completada',
+    createBooking: 'Crear Reserva',
+    updateBooking: 'Actualizar Reserva',
+    deleteBookingTitle: 'Eliminar Reserva',
+    deleteBookingMessage: '¿Estás seguro de que quieres eliminar esta reserva? Esta acción no se puede deshacer.',
+    nightlyRate: 'Tarifa por Noche',
   },
 
   // Common
@@ -196,6 +201,7 @@ export const es = {
     no: 'No',
     confirm: 'Confirmar',
     close: 'Cerrar',
+    apply: 'Aplicar',
     optional: 'Opcional',
     required: 'Requerido',
     noData: 'No hay datos',
@@ -205,6 +211,10 @@ export const es = {
     previous: 'Anterior',
     finish: 'Finalizar',
     logout: 'Cerrar Sesión',
+    saving: 'Guardando...',
+    uploading: 'Subiendo...',
+    creating: 'Creando...',
+    update: 'Actualizar',
   },
 
   // Status
@@ -276,7 +286,10 @@ export const es = {
     minThreshold: 'Umbral Mínimo',
     location: 'Ubicación',
     notes: 'Notas',
+    notesPlaceholder: 'Notas adicionales...',
     photo: 'Foto',
+    removePhoto: 'Eliminar Foto',
+    uploadPhoto: 'Haz clic para subir foto',
     noItems: 'No hay artículos',
     noItemsDescription: 'Agrega artículos al inventario para comenzar',
     noPropertySelected: 'No hay propiedad seleccionada',
@@ -299,6 +312,8 @@ export const es = {
     importFailed: '{count} artículos fallaron al importar',
     importSuccess: 'Se importaron exitosamente {success} artículos',
     importError: 'Error al importar CSV',
+    noItemsFound: 'No se encontraron artículos',
+    updateItem: 'Actualizar Artículo',
   },
 
   // Maintenance
@@ -351,6 +366,7 @@ export const es = {
     emptyDescription: 'Crea tu primer ticket para llevar control de reparaciones y pendientes.',
     emptyAction: 'Crear ticket',
     tryDifferentFilters: 'Intenta ajustar los filtros para encontrar lo que buscas.',
+    selectOrCreatePropertyMaintenance: 'Selecciona o crea una propiedad para gestionar mantenimiento',
   },
 
   // Maintenance Plans
@@ -378,6 +394,7 @@ export const es = {
     delete: 'Eliminar',
     noPlans: 'No hay planes de mantenimiento',
     noPlansDescription: 'Crea planes recurrentes para automatizar el mantenimiento',
+    redirecting: 'Redirigiendo a mantenimientos recurrentes...',
     noPropertySelected: 'No hay propiedad seleccionada',
     selectOrCreatePropertyPlans: 'Por favor selecciona o crea una propiedad para gestionar planes de mantenimiento.',
     planSaved: 'Plan guardado exitosamente',
@@ -459,6 +476,7 @@ export const es = {
     taskSaved: 'Tarea guardada exitosamente',
     taskDeleted: 'Tarea eliminada exitosamente',
     taskCompleted: 'Tarea completada exitosamente',
+    confirmDelete: '¿Estás seguro de que quieres eliminar esta tarea? Esta acción no se puede deshacer.',
     saveError: 'Error al guardar tarea',
     deleteError: 'Error al eliminar tarea',
     completeError: 'Error al completar tarea',
@@ -524,6 +542,7 @@ export const es = {
     exportSuccess: 'Gastos exportados exitosamente',
     monthlySummary: 'Resumen Mensual',
     thisMonth: 'Este Mes',
+    noExpensesThisMonth: 'No hay gastos este mes',
   },
 
   // Vendors
@@ -540,10 +559,16 @@ export const es = {
     contactName: 'Nombre de Contacto',
     email: 'Email',
     phone: 'Teléfono',
+    whatsapp: 'WhatsApp',
     address: 'Dirección',
     notes: 'Notas',
+    notesPlaceholder: 'Notas adicionales sobre este proveedor...',
     noVendors: 'No hay proveedores',
     noVendorsDescription: 'Agrega proveedores para comenzar',
+    emptyTitle: 'Aún no tienes proveedores',
+    emptyDescription: 'Comienza agregando proveedores para gestionar tus servicios.',
+    noVendorsFound: 'No se encontraron proveedores',
+    tryDifferentFilters: 'Intenta ajustar los filtros para encontrar lo que buscas.',
     vendorDeleted: 'Proveedor eliminado exitosamente',
     vendorSaved: 'Proveedor guardado exitosamente',
     deleteError: 'Error al eliminar proveedor',
@@ -555,6 +580,7 @@ export const es = {
   // ToBuy
   toBuy: {
     title: 'Compras',
+    subtitle: 'Gestiona tu lista de compras',
     addItem: 'Agregar Artículo',
     addNewItem: 'Agregar Nuevo Artículo',
     editItem: 'Editar Artículo',
@@ -626,6 +652,9 @@ export const es = {
     maxUsers: 'Máximo de Usuarios',
     upgradeRequired: 'Actualización Requerida',
     upgradeMessage: 'Tu plan actual tiene límites. Actualiza para obtener más funcionalidades.',
+    basic: 'Básico',
+    premium: 'Premium',
+    paymentIntegrationComingSoon: 'La integración de pagos estará disponible pronto',
   },
 
   // Property Selector
@@ -636,10 +665,13 @@ export const es = {
     manageProperties: 'Gestionar Propiedades',
     selectProperty: 'Seleccionar propiedad',
     propertyLabel: 'Propiedad',
+    noProperty: 'Sin propiedad',
     noProperties: 'No hay propiedades',
     createFirstProperty: 'Crea tu Primera Propiedad',
     propertyName: 'Nombre de la propiedad',
+    propertyNameRequired: 'El nombre de la propiedad es requerido',
     propertyLocation: 'Ubicación',
+    propertyCreated: 'Propiedad creada exitosamente',
     deleteProperty: 'Eliminar Propiedad',
     confirmDeleteProperty: '¿Estás seguro de que deseas eliminar la propiedad "{name}"? Esta acción eliminará todos los datos asociados (reservas, gastos, inventario, etc.) y no se puede deshacer.',
     propertyDeleted: 'Propiedad eliminada correctamente',
@@ -652,6 +684,8 @@ export const es = {
     errorCreatingProperty: 'Error al crear propiedad',
     errorCreatingPropertyRetry: 'Error al crear propiedad. Por favor intenta de nuevo.',
     propertyCreatedFailedRetrieve: 'Error: Propiedad creada pero falló al recuperar datos.',
+    createNewProperty: 'Crear Nueva Propiedad',
+    addPropertyDescription: 'Agrega una nueva propiedad a tu cuenta',
   },
 
   // Calendar
@@ -695,6 +729,22 @@ export const es = {
     installDesktopSteps: '1. Busca el icono de instalación en la barra de direcciones\n2. Haz clic para instalar',
     alreadyInstalled: 'La app ya está instalada',
     notSupported: 'Tu navegador no soporta instalación de apps',
+    deleteProperties: 'Eliminar Propiedades',
+    deletePropertiesDescription: 'Elimina propiedades permanentemente',
+    deletePropertiesWarning: 'Elimina propiedades de forma permanente. Esta acción no se puede deshacer.',
+    verificationRequired: 'Verificación Requerida',
+    dangerousActionDetected: 'Acción peligrosa detectada',
+    confirmPasswordToDelete: 'Para eliminar propiedades, necesitas confirmar tu contraseña.',
+    confirmPasswordToReset: 'Para resetear todos los datos, necesitas confirmar tu contraseña.',
+    password: 'Contraseña',
+    passwordPlaceholder: 'Ingresa tu contraseña',
+    verifying: 'Verificando...',
+    incorrectPassword: 'Contraseña incorrecta. Por favor, intenta de nuevo.',
+    language: 'Idioma',
+    languageDescription: 'Cambia el idioma de la aplicación',
+    selectLanguage: 'Seleccionar Idioma',
+    spanish: 'Español',
+    english: 'Inglés',
   },
 
   // Bank
@@ -738,13 +788,17 @@ export const es = {
     dateRequired: 'La fecha es requerida',
     accountRequired: 'La cuenta es requerida',
     confirmDeleteAccount: '¿Estás seguro de que quieres eliminar esta cuenta?',
-    confirmDeleteTransaction: '¿Estás seguro de que quieres eliminar este movimiento?',
+    confirmDeleteTransaction: 'Eliminar Movimiento',
+    confirmDeleteTransactionMessage: '¿Estás seguro de que quieres eliminar este movimiento?',
     paidWith: 'Pagado con',
     selectAccount: 'Seleccionar cuenta',
     noAccount: 'Sin cuenta',
     loadError: 'Error al cargar cuentas',
     transactionNoteExpense: 'Gasto: {category}',
     inactive: 'Inactiva',
+    accountNamePlaceholder: 'ej. Caja chica principal',
+    notesPlaceholder: 'Notas opcionales',
+    transactionNotePlaceholder: 'Nota opcional',
   },
 
   // Errors
@@ -759,6 +813,11 @@ export const es = {
     validationError: 'Por favor completa todos los campos requeridos',
     propertyRequired: 'Por favor selecciona una propiedad primero',
     tenantRequired: 'Error: No se encontró tenant_id. Contacta soporte.',
+    amountGreaterThanZero: 'El monto debe ser mayor que 0',
+    authRequired: 'Autenticación requerida',
+    categoryRequired: 'La categoría es requerida',
+    csvUploadRequired: 'Se requiere subir un archivo CSV',
+    dateRequired: 'La fecha es requerida',
   },
 }
 
@@ -770,13 +829,19 @@ export function t(key: string, params?: Record<string, any>): string {
   for (const k of keys) {
     value = value?.[k]
     if (value === undefined) {
-      console.warn(`Translation key not found: ${key}`)
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`[i18n ES] Translation key not found: "${key}"`)
+      }
       return key
     }
   }
   
   if (typeof value !== 'string') {
-    console.warn(`Translation value is not a string: ${key}`)
+    // Only log in development
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[i18n ES] Translation value is not a string: "${key}" (got ${typeof value})`)
+    }
     return key
   }
   

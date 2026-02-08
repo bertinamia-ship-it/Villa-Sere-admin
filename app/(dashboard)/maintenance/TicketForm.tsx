@@ -55,25 +55,47 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
       property_id: propertyId,
     }
 
-    if (ticket) {
-      // Update: filter by id + property_id for security
-      const { error } = await supabase
-        .from('maintenance_tickets')
-        .update(dataToSave)
-        .eq('id', ticket.id)
-        .eq('property_id', propertyId)
+    try {
+      if (ticket) {
+        // Update: filter by id + property_id for security
+        const { error } = await supabase
+          .from('maintenance_tickets')
+          .update(dataToSave)
+          .eq('id', ticket.id)
+          .eq('property_id', propertyId)
 
-      if (!error) onClose()
-    } else {
-      // Insert: property_id included automatically
-      const { error } = await supabase
-        .from('maintenance_tickets')
-        .insert([dataToSave])
+        if (error) {
+          const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+          logError('TicketForm.update', error)
+          showToast(getUserFriendlyError(error, t), 'error')
+          setLoading(false)
+          return
+        }
+        showToast(t('maintenance.ticketSaved'), 'success')
+        onClose()
+      } else {
+        // Insert: property_id included automatically
+        const { error } = await supabase
+          .from('maintenance_tickets')
+          .insert([dataToSave])
 
-      if (!error) onClose()
+        if (error) {
+          const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+          logError('TicketForm.insert', error)
+          showToast(getUserFriendlyError(error, t), 'error')
+          setLoading(false)
+          return
+        }
+        showToast(t('maintenance.ticketSaved'), 'success')
+        onClose()
+      }
+    } catch (error) {
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('TicketForm.save', error)
+      showToast(getUserFriendlyError(error, t), 'error')
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -251,7 +273,8 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
             </label>
             {photoUrl ? (
               <div className="space-y-2">
-                <img src={photoUrl} alt="Upload" className="w-full h-48 object-cover rounded-lg" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photoUrl} alt="Upload" className="w-full h-48 object-cover rounded-lg" loading="lazy" decoding="async" />
                 <button
                   type="button"
                   onClick={() => setPhotoUrl('')}
@@ -292,7 +315,7 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
               onClick={onClose}
               className="px-6 py-3.5 border border-slate-300 rounded-xl font-semibold hover:bg-slate-50 transition-all duration-300 min-h-[44px] sm:w-auto w-full"
             >
-              Cancelar
+              {t('common.cancel')}
             </button>
           </div>
         </form>

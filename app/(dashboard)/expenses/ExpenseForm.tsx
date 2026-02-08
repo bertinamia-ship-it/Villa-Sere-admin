@@ -80,7 +80,9 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
       if (error) throw error
       setAccounts(data || [])
     } catch (error) {
-      console.error('Error loading accounts:', error)
+      const { logError } = await import('@/lib/utils/error-handler')
+      logError('ExpenseForm.loadAccounts', error)
+      // Silently fail - accounts are optional
     } finally {
       setLoadingAccounts(false)
     }
@@ -291,7 +293,7 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
                 required
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full border border-[#E5E7EB] rounded-lg px-3.5 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+                className="w-full border border-[#E5E7EB] rounded-lg px-3.5 py-3 sm:py-2.5 text-base sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all min-h-[44px] sm:min-h-0"
               />
             </div>
 
@@ -319,7 +321,7 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
             <select
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="w-full border border-[#E5E7EB] rounded-lg px-3.5 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+              className="w-full border border-[#E5E7EB] rounded-lg px-3.5 py-3 sm:py-2.5 text-base sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all min-h-[44px] sm:min-h-0"
             >
               {EXPENSE_CATEGORIES.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
@@ -334,7 +336,7 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
             <select
               value={formData.vendor_id}
               onChange={(e) => setFormData({ ...formData, vendor_id: e.target.value })}
-              className="w-full border border-[#E5E7EB] rounded-lg px-3.5 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+              className="w-full border border-[#E5E7EB] rounded-lg px-3.5 py-3 sm:py-2.5 text-base sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all min-h-[44px] sm:min-h-0"
             >
               <option value="">{t('expenses.noVendor')}</option>
               {vendors.map(vendor => (
@@ -401,7 +403,8 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
             </label>
             {receiptUrl ? (
               <div className="space-y-2">
-                <img src={receiptUrl} alt="Receipt" className="w-full h-48 object-cover rounded-lg" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={receiptUrl} alt="Receipt" className="w-full h-48 object-cover rounded-lg" loading="lazy" decoding="async" />
                 <button
                   type="button"
                   onClick={() => setReceiptUrl('')}

@@ -69,12 +69,8 @@ export default function MaintenanceList() {
         .maybeSingle()
       
       if (profileError) {
-        console.error('[MaintenanceList] Error fetching profile:', {
-          message: profileError.message,
-          details: profileError.details,
-          hint: profileError.hint,
-          code: profileError.code
-        })
+        const { logError } = await import('@/lib/utils/error-handler')
+        logError('MaintenanceList.loadTickets.profile', profileError)
       }
       
       tenantId = profile?.tenant_id || null
@@ -166,10 +162,7 @@ export default function MaintenanceList() {
   if (loading) {
     return (
       <div className="space-y-6 sm:space-y-8">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('maintenance.title')}</h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1.5">{t('maintenance.subtitle')}</p>
-        </div>
+        <PageHeader title={t('maintenance.title')} subtitle={t('maintenance.subtitle')} />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i} padding="md">
@@ -184,10 +177,7 @@ export default function MaintenanceList() {
   if (!hasProperty) {
     return (
       <div className="space-y-6 sm:space-y-8">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('maintenance.title')}</h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1.5">{t('maintenance.subtitle')}</p>
-        </div>
+        <PageHeader title={t('maintenance.title')} subtitle={t('maintenance.subtitle')} />
         <Card padding="lg">
           <EmptyState
             icon={<AlertCircle className="h-14 w-14" />}
@@ -202,25 +192,25 @@ export default function MaintenanceList() {
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
-        <div className="space-y-1">
-          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('maintenance.title')}</h1>
-          <p className="text-sm text-slate-600">{t('maintenance.subtitle')}</p>
-        </div>
-        {activeTab === 'tickets' && (
-          <Button
-            onClick={() => {
-              setEditingTicket(null)
-              setShowForm(true)
-            }}
-            size="sm"
-            className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
-          >
-            <Plus className="h-4 w-4" />
-            {t('maintenance.newTicket')}
-          </Button>
-        )}
-      </div>
+      <PageHeader
+        title={t('maintenance.title')}
+        subtitle={t('maintenance.subtitle')}
+        rightSlot={
+          activeTab === 'tickets' ? (
+            <Button
+              onClick={() => {
+                setEditingTicket(null)
+                setShowForm(true)
+              }}
+              size="sm"
+              className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
+            >
+              <Plus className="h-4 w-4" />
+              {t('maintenance.newTicket')}
+            </Button>
+          ) : null
+        }
+      />
 
       {/* Tabs */}
       <div className="flex gap-2 border-b border-[#E2E8F0] -mb-px">
@@ -265,13 +255,13 @@ export default function MaintenanceList() {
                   placeholder={t('maintenance.search')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 text-sm border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A] placeholder-[#94A3B8]"
+                  className="w-full pl-9 pr-3 py-3 sm:py-2.5 text-base sm:text-sm border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A] placeholder-[#94A3B8] min-h-[44px] sm:min-h-0"
                 />
               </div>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-2.5 text-sm border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A]"
+                className="px-3 py-3 sm:py-2.5 text-base sm:text-sm border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A] min-h-[44px] sm:min-h-0"
               >
                 <option value="all">{t('maintenance.allStatuses')}</option>
                 <option value="open">{t('status.open')}</option>
@@ -281,7 +271,7 @@ export default function MaintenanceList() {
               <select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
-                className="px-3 py-2.5 text-sm border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A]"
+                className="px-3 py-3 sm:py-2.5 text-base sm:text-sm border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A] min-h-[44px] sm:min-h-0"
               >
                 <option value="all">{t('maintenance.allPriorities')}</option>
                 {PRIORITIES.map(p => (
@@ -291,7 +281,7 @@ export default function MaintenanceList() {
               <select
                 value={roomFilter}
                 onChange={(e) => setRoomFilter(e.target.value)}
-                className="px-3 py-2.5 text-sm border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A]"
+                className="px-3 py-3 sm:py-2.5 text-base sm:text-sm border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A] min-h-[44px] sm:min-h-0"
               >
                 <option value="all">{t('maintenance.allRooms')}</option>
                 {ROOMS.map(room => (
@@ -341,7 +331,7 @@ export default function MaintenanceList() {
         </>
       ) : (
         <div className="text-center py-12 text-[#64748B]">
-          <p>Redirigiendo a mantenimientos recurrentes...</p>
+          <p>{t('maintenancePlans.redirecting')}</p>
         </div>
       )}
 

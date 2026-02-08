@@ -1,9 +1,10 @@
 /**
  * Centralized error handling and reporting
  * Ensures consistent error logging and user-friendly messages
+ * 
+ * Note: getUserFriendlyError accepts an optional translation function
+ * to support i18n. If not provided, defaults to Spanish.
  */
-
-import { t } from '@/lib/i18n/es'
 
 export interface SupabaseError {
   message?: string
@@ -27,39 +28,62 @@ export function extractErrorDetails(error: any): SupabaseError {
 }
 
 /**
- * Format error for console logging
+ * Format error for console logging (only in development)
  */
 export function logError(context: string, error: any): void {
-  const details = extractErrorDetails(error)
-  console.error(`[${context}] Error:`, {
-    message: details.message,
-    details: details.details,
-    hint: details.hint,
-    code: details.code,
-    status: details.status,
-    fullError: error,
-  })
+  // Only log in development
+  if (process.env.NODE_ENV === 'development') {
+    const details = extractErrorDetails(error)
+    console.error(`[${context}] Error:`, {
+      message: details.message,
+      details: details.details,
+      hint: details.hint,
+      code: details.code,
+      status: details.status,
+      fullError: error,
+    })
+  }
+}
+
+// Dynamic import to avoid circular dependencies
+let defaultT: ((key: string) => string) | null = null
+
+function getDefaultT(): (key: string) => string {
+  if (!defaultT) {
+    try {
+      const { t } = require('@/lib/i18n/es')
+      defaultT = t
+    } catch {
+      defaultT = (key: string) => key
+    }
+  }
+  return defaultT
 }
 
 /**
- * Get user-friendly error message (in Spanish)
+ * Get user-friendly error message
+ * @param error - The error object
+ * @param t - Translation function (optional, defaults to Spanish)
  */
-export function getUserFriendlyError(error: any): string {
+export function getUserFriendlyError(error: any, t?: (key: string) => string): string {
   const details = extractErrorDetails(error)
+  
+  // Use provided translation function or get default
+  const translate = t || getDefaultT()
   
   // Common error codes with specific messages
   if (details.code) {
     switch (details.code) {
       case 'PGRST116':
-        return t('errors.notFound')
+        return translate('errors.notFound')
       case '23505':
-        return t('errors.duplicateEntry')
+        return translate('errors.duplicateEntry')
       case '23503':
-        return t('errors.foreignKeyViolation')
+        return translate('errors.foreignKeyViolation')
       case '42501':
-        return t('errors.permissionDenied')
+        return translate('errors.permissionDenied')
       case '42P01':
-        return t('errors.tableNotFound')
+        return translate('errors.tableNotFound')
     }
   }
 
@@ -74,7 +98,5 @@ export function getUserFriendlyError(error: any): string {
   }
 
   // Fallback
-  return t('errors.unknownError')
+  return translate('errors.unknownError')
 }
-
-

@@ -3,10 +3,14 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Vendor } from '@/lib/types/database'
-import { Plus, Search, Pencil, Trash2, Phone, Mail, MessageCircle } from 'lucide-react'
+import { Plus, Search, Pencil, Trash2, Phone, Mail, MessageCircle, Users } from 'lucide-react'
 import VendorForm from './VendorForm'
 import { getCurrentTenantId } from '@/lib/utils/tenant'
 import { useI18n } from '@/components/I18nProvider'
+import { Card } from '@/components/ui/Card'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { Button } from '@/components/ui/Button'
+import { PageHeader } from '@/components/ui/PageHeader'
 
 export default function VendorList() {
   const { t } = useI18n()
@@ -43,19 +47,18 @@ export default function VendorList() {
         .maybeSingle()
 
       if (profileError) {
-        console.error('[VendorList] Error fetching profile:', {
-          message: profileError.message,
-          details: profileError.details,
-          hint: profileError.hint,
-          code: profileError.code
-        })
+        const { logError } = await import('@/lib/utils/error-handler')
+        logError('VendorList.loadVendors.profile', profileError)
         setVendors([])
         setLoading(false)
         return
       }
 
       if (!profile || !profile.tenant_id) {
-        console.warn('[VendorList] No profile or tenant_id found')
+        // Only log in dev - this is expected for some users
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[VendorList] No profile or tenant_id found')
+        }
         setVendors([])
         setLoading(false)
         return
@@ -70,9 +73,15 @@ export default function VendorList() {
 
       if (!error && data) {
         setVendors(data)
+      } else if (error) {
+        const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+        logError('VendorList.loadVendors.fetch', error)
+        showToast(getUserFriendlyError(error, t), 'error')
       }
     } catch (error) {
-      console.error('Error fetching vendors:', error)
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('VendorList.loadVendors', error)
+      showToast(getUserFriendlyError(error, t), 'error')
     } finally {
       setLoading(false)
     }
@@ -114,11 +123,18 @@ export default function VendorList() {
         .eq('id', id)
         .eq('tenant_id', profile.tenant_id)
 
-      if (!error) {
+      if (error) {
+        const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+        logError('VendorList.delete', error)
+        showToast(getUserFriendlyError(error, t), 'error')
+      } else {
         setVendors(vendors.filter(vendor => vendor.id !== id))
+        showToast(t('vendors.vendorDeleted'), 'success')
       }
     } catch (error) {
-      console.error('Error deleting vendor:', error)
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('VendorList.delete', error)
+      showToast(getUserFriendlyError(error, t), 'error')
     }
   }
 
@@ -140,18 +156,17 @@ export default function VendorList() {
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
-        <div className="space-y-1.5">
-          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('vendors.title')}</h1>
-          <p className="text-sm text-slate-600 leading-relaxed">{t('vendors.totalVendors', { count: String(vendors.length) })}</p>
-        </div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+      <PageHeader
+        title={t('vendors.title')}
+        subtitle={t('vendors.totalVendors', { count: String(vendors.length) })}
+        rightSlot={
+          <Button
+            onClick={() => setShowForm(true)}
+          className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
         >
-          <Plus className="h-5 w-5" />
+          <Plus className="h-4 w-4" />
           {t('vendors.addVendor')}
-        </button>
+        </Button>
       </div>
 
       {/* Search */}
@@ -170,9 +185,15 @@ export default function VendorList() {
 
       {/* Vendors List */}
       {filteredVendors.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-600">No se encontraron proveedores</p>
-        </div>
+        <Card padding="lg">
+          <EmptyState
+            icon={<Users className="h-14 w-14" />}
+            title={vendors.length === 0 ? t('vendors.emptyTitle') : t('vendors.noVendorsFound')}
+            description={vendors.length === 0 ? t('vendors.emptyDescription') : t('vendors.tryDifferentFilters')}
+            actionLabel={vendors.length === 0 ? t('vendors.addVendor') : undefined}
+            onAction={vendors.length === 0 ? () => setShowForm(true) : undefined}
+          />
+        </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredVendors.map(vendor => (

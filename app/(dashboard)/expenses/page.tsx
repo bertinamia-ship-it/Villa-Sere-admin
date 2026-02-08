@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import ExpensesManager from './ExpensesManager'
+import ExpensesClient from './ExpensesClient'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,5 +12,5 @@ export default async function ExpensesPage() {
     redirect('/login')
   }
 
-  return <ExpensesManager />
+  return <ExpensesClient />
 }

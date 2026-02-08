@@ -87,8 +87,9 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
         setCurrentAccount(accountData)
       }
     } catch (error) {
-      console.error('Error loading transactions:', error)
-      showToast(t('bank.loadError'), 'error')
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('AccountDetail.loadTransactions', error)
+      showToast(getUserFriendlyError(error, t), 'error')
     } finally {
       setLoading(false)
     }
@@ -111,7 +112,7 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
       const { error } = await deleteWithPropertyClient('account_transactions', deleteConfirm.transactionId)
       if (error) {
         logError('AccountDetail.deleteTransaction', error)
-        showToast(getUserFriendlyError(error), 'error')
+        showToast(getUserFriendlyError(error, t), 'error')
       } else {
         showToast(t('bank.transactionDeleted'), 'success')
         loadTransactions()
@@ -141,21 +142,21 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={onBack}>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Button variant="ghost" onClick={onBack} className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div>
-            <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{currentAccount.name}</h1>
-            <p className="text-sm text-[#64748B] mt-1.5">{t('bank.transactions')}</p>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl sm:text-2xl font-semibold text-[#0F172A] tracking-tight truncate">{currentAccount.name}</h1>
+            <p className="text-xs sm:text-sm text-[#64748B] mt-1">{t('bank.transactions')}</p>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => onEdit(currentAccount)}>
+        <div className="flex gap-2 sm:gap-2">
+          <Button variant="secondary" onClick={() => onEdit(currentAccount)} className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0">
             <Edit className="h-4 w-4" />
           </Button>
-          <Button variant="danger" onClick={() => onDelete(currentAccount.id)}>
+          <Button variant="danger" onClick={() => onDelete(currentAccount.id)} className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0">
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -163,18 +164,19 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
 
       {/* Account Summary */}
       <Card padding="md">
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-4">
+          <div className="flex-1 min-w-0">
             <p className="text-sm text-[#64748B]">{t('bank.currentBalance')}</p>
-            <p className="text-3xl font-bold text-[#0F172A] mt-1">{formatCurrency(currentAccount.current_balance)}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-[#0F172A] mt-1">{formatCurrency(currentAccount.current_balance)}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 w-full sm:w-auto">
             <Button
               variant="secondary"
               onClick={() => {
                 setTransactionDirection('in')
                 setShowTransactionForm(true)
               }}
+              className="w-full sm:w-auto min-h-[44px] justify-center"
             >
               <Plus className="h-4 w-4" />
               {t('bank.addMoney')}
@@ -185,6 +187,7 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
                 setTransactionDirection('out')
                 setShowTransactionForm(true)
               }}
+              className="w-full sm:w-auto min-h-[44px] justify-center"
             >
               <Minus className="h-4 w-4" />
               {t('bank.registerOutgoing')}
@@ -225,7 +228,7 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
                       {t('bank.transactionNote')}
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-medium text-slate-600 uppercase tracking-wider">
-                      Acciones
+                      {t('common.actions')}
                     </th>
                   </tr>
                 </thead>
@@ -327,7 +330,7 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
         onClose={() => setDeleteConfirm({ isOpen: false, transactionId: null })}
         onConfirm={handleDeleteTransaction}
         title={t('bank.confirmDeleteTransaction')}
-        message={t('bank.confirmDeleteTransaction')}
+        message={t('bank.confirmDeleteTransactionMessage')}
         variant="danger"
       />
     </div>

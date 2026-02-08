@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { useI18n } from '@/components/I18nProvider'
+import { PageHeader } from '@/components/ui/PageHeader'
 
 export default function InventoryList() {
   const { t } = useI18n()
@@ -175,10 +176,7 @@ export default function InventoryList() {
   if (loading) {
     return (
       <div className="space-y-8">
-        <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('inventory.title')}</h1>
-          <p className="text-sm text-[#64748B] mt-1">{t('inventory.subtitle')}</p>
-        </div>
+        <PageHeader title={t('inventory.title')} subtitle={t('inventory.subtitle')} />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card key={i} padding="none">
@@ -197,10 +195,7 @@ export default function InventoryList() {
   if (!hasProperty) {
     return (
       <div className="space-y-8">
-        <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('inventory.title')}</h1>
-          <p className="text-sm text-[#64748B] mt-1">{t('inventory.subtitle')}</p>
-        </div>
+        <PageHeader title={t('inventory.title')} subtitle={t('inventory.subtitle')} />
         <EmptyState
           icon={<Package className="h-14 w-14" />}
           title={t('inventory.noPropertySelected')}
@@ -227,6 +222,7 @@ export default function InventoryList() {
             variant="secondary"
             size="sm"
             onClick={() => setShowImport(true)}
+            className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
           >
             <Upload className="h-4 w-4" />
             {t('inventory.importCSV')}
@@ -235,6 +231,7 @@ export default function InventoryList() {
             variant="secondary"
             size="sm"
             onClick={handleExportCSV}
+            className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
           >
             <Download className="h-4 w-4" />
             {t('inventory.exportCSV')}
@@ -242,6 +239,7 @@ export default function InventoryList() {
           <Button
             size="sm"
             onClick={() => setShowForm(true)}
+            className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
           >
             <Plus className="h-4 w-4" />
             {t('inventory.addItem')}
@@ -259,7 +257,7 @@ export default function InventoryList() {
               placeholder={t('inventory.searchItems')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 bg-transparent border-0 focus:ring-0 text-sm text-[#0F172A] placeholder-[#94A3B8]"
+              className="flex-1 bg-transparent border-0 focus:ring-0 text-base sm:text-sm text-[#0F172A] placeholder-[#94A3B8] min-h-[44px] sm:min-h-0"
             />
           </div>
 
@@ -271,7 +269,7 @@ export default function InventoryList() {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#0F172A] bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+                className="w-full border border-[#E2E8F0] rounded-lg px-3 py-3 sm:py-2 text-base sm:text-sm text-[#0F172A] bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all min-h-[44px] sm:min-h-0"
               >
                 <option value="all">{t('inventory.allCategories')}</option>
                 {CATEGORIES.map(cat => (
@@ -287,7 +285,7 @@ export default function InventoryList() {
               <select
                 value={roomFilter}
                 onChange={(e) => setRoomFilter(e.target.value)}
-                className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#0F172A] bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+                className="w-full border border-[#E2E8F0] rounded-lg px-3 py-3 sm:py-2 text-base sm:text-sm text-[#0F172A] bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all min-h-[44px] sm:min-h-0"
               >
                 <option value="all">{t('inventory.allRooms')}</option>
                 {ROOMS.map(room => (

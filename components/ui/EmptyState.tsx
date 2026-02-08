@@ -1,6 +1,5 @@
 import { ReactNode } from 'react'
 import { Button } from './Button'
-import { t } from '@/lib/i18n/es'
 
 interface EmptyStateProps {
   icon?: ReactNode

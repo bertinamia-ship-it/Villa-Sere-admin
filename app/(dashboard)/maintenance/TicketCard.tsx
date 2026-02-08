@@ -40,20 +40,20 @@ export default function TicketCard({
             </span>
           </div>
         </div>
-        <div className="flex gap-1 ml-2">
+        <div className="flex gap-1 ml-2 shrink-0">
           <button
             onClick={() => onEdit(ticket)}
-            className="p-1.5 text-slate-500 hover:text-[#2563EB] hover:bg-[#2563EB]/10 rounded transition-all duration-150"
-            aria-label="Editar"
+            className="p-2 sm:p-1.5 text-slate-500 hover:text-[#2563EB] hover:bg-[#2563EB]/10 rounded transition-all duration-150 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
+            aria-label={t('common.edit')}
           >
-            <Pencil className="h-4 w-4" />
+            <Pencil className="h-5 w-5 sm:h-4 sm:w-4" />
           </button>
           <button
             onClick={() => onDelete(ticket.id)}
-            className="p-1.5 text-slate-500 hover:text-[#EF4444] hover:bg-[#EF4444]/10 rounded transition-all duration-150"
-            aria-label="Eliminar"
+            className="p-2 sm:p-1.5 text-slate-500 hover:text-[#EF4444] hover:bg-[#EF4444]/10 rounded transition-all duration-150 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
+            aria-label={t('common.delete')}
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-5 w-5 sm:h-4 sm:w-4" />
           </button>
         </div>
       </div>
@@ -85,11 +85,14 @@ export default function TicketCard({
 
         {ticket.photo_url && (
           <div className="mt-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 
               src={ticket.photo_url} 
               alt={t('maintenance.ticketPhoto')} 
               className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition"
               onClick={() => window.open(ticket.photo_url!, '_blank')}
+              loading="lazy"
+              decoding="async"
             />
           </div>
         )}

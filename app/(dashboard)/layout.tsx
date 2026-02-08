@@ -59,6 +59,7 @@ const getNavigation = (t: (key: string) => string): NavItem[] => [
     ]
   },
   { name: t('nav.billing'), href: '/billing', icon: CreditCard },
+  { name: t('nav.settings'), href: '/settings', icon: Settings },
 ]
 
 export default function DashboardLayout({
@@ -71,21 +72,37 @@ export default function DashboardLayout({
   const supabase = createClient()
   const { t, language } = useI18n()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set([t('nav.operation'), t('nav.finances')]))
   
-  // Get translated navigation - memoized
-  const navigation = useMemo(() => getNavigation(t), [t])
+  // Get translated navigation - memoized by language
+  const navigation = useMemo(() => getNavigation(t), [language])
+  
+  // Initialize expanded sections - use lazy initialization
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
+    try {
+      return new Set([t('nav.operation'), t('nav.finances')])
+    } catch {
+      return new Set()
+    }
+  })
   
   // Update expanded sections when language changes
   useEffect(() => {
     setExpandedSections(new Set([t('nav.operation'), t('nav.finances')]))
-  }, [language, t])
+  }, [language])
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await supabase.auth.signOut()
     router.push('/login')
     router.refresh()
-  }
+  }, [supabase, router])
+
+  const toggleMobileMenu = useCallback(() => {
+    setMobileMenuOpen(prev => !prev)
+  }, [])
+
+  const closeMobileMenu = useCallback(() => {
+    setMobileMenuOpen(false)
+  }, [])
 
   const toggleSection = useCallback((sectionName: string) => {
     setExpandedSections(prev => {
@@ -99,7 +116,11 @@ export default function DashboardLayout({
     })
   }, [])
 
+  // Memoize isActive to avoid recreating on every render
   const isActive = useCallback((href: string) => pathname === href, [pathname])
+  
+  // Memoize navigation items to prevent re-renders
+  const memoizedNavigation = useMemo(() => navigation, [navigation])
 
   // Close mobile menu on ESC key
   useEffect(() => {
@@ -143,7 +164,7 @@ export default function DashboardLayout({
 
           {/* Navigation */}
           <nav className="flex flex-1 flex-col space-y-1.5">
-                  {navigation.map((item) => {
+                  {memoizedNavigation.map((item) => {
               if ('href' in item) {
                 // Single item
                 const active = isActive(item.href)
@@ -160,6 +181,7 @@ export default function DashboardLayout({
                         <Link
                     key={item.name}
                           href={item.href}
+                          prefetch={item.href === '/dashboard' || item.href === '/calendario' ? true : undefined}
                         className={`group relative flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-out ${
                           active
                             ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 text-white shadow-lg shadow-blue-500/30'
@@ -225,6 +247,7 @@ export default function DashboardLayout({
                             <Link
                               key={child.name}
                               href={child.href}
+                              prefetch={child.href === '/dashboard' || child.href === '/calendario' ? true : undefined}
                               className={`flex items-center gap-x-3.5 rounded-xl px-4 py-2.5 text-sm transition-all duration-300 ${
                                 active
                                   ? 'text-white bg-gradient-to-r from-slate-700 via-slate-650 to-slate-600 font-semibold shadow-lg scale-[1.02] ring-1 ring-slate-500/30'
@@ -273,7 +296,7 @@ export default function DashboardLayout({
             
             {/* Botón Menú */}
             <button
-              onClick={() => setMobileMenuOpen(true)}
+              onClick={toggleMobileMenu}
               className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-slate-100 active:bg-slate-200 transition-all duration-200 flex-shrink-0"
               aria-label="Abrir menú"
               type="button"
@@ -289,7 +312,7 @@ export default function DashboardLayout({
         <>
           <div 
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
-            onClick={() => setMobileMenuOpen(false)}
+            onClick={closeMobileMenu}
           />
           <div 
             className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/60 z-[70] shadow-2xl backdrop-blur-xl transform transition-transform duration-300 ease-out lg:hidden safe-area-left safe-area-y flex flex-col"
@@ -298,32 +321,32 @@ export default function DashboardLayout({
             }}
           >
               {/* Header con Logo, Property Card y Botón Cerrar */}
-              <div className="shrink-0 px-4 pt-3 pb-3 border-b border-slate-700/50" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}>
+              <div className="shrink-0 px-4 pt-4 pb-3 border-b border-slate-700/50" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
                 {/* Logo y Botón Cerrar */}
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-md shadow-blue-500/20 ring-1 ring-blue-400/20 flex items-center justify-center">
-                      <Sparkles className="h-4 w-4 text-white" />
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-xl shadow-md shadow-blue-500/20 ring-1 ring-blue-400/20 flex items-center justify-center">
+                      <Sparkles className="h-4.5 w-4.5 text-white" />
                     </div>
-                    <span className="text-sm font-bold text-white tracking-tight">CasaPilot</span>
+                    <span className="text-base font-bold text-white tracking-tight">CasaPilot</span>
                   </div>
                   <button
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-700/50 active:bg-slate-700/70 transition-all duration-200"
+                    onClick={closeMobileMenu}
+                    className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-slate-700/50 active:bg-slate-700/70 transition-all duration-200"
                     aria-label="Cerrar menú"
                     type="button"
                   >
-                    <X className="h-4 w-4 text-white" />
-          </button>
+                    <X className="h-5 w-5 text-white" />
+                  </button>
                 </div>
-                <div className="mt-2">
+                <div className="mt-3">
                   <MobilePropertyCard />
                 </div>
-        </div>
+              </div>
 
               {/* Navigation - Scrollable */}
-              <nav className="flex-1 overflow-y-auto px-3 py-2.5 space-y-1">
-              {navigation.map((item) => {
+              <nav className="flex-1 overflow-y-auto px-4 py-3 space-y-1.5">
+              {memoizedNavigation.map((item) => {
                   if ('href' in item) {
                     const active = isActive(item.href)
                     const iconColors: Record<string, string> = {
@@ -338,7 +361,8 @@ export default function DashboardLayout({
                   <Link
                     key={item.name}
                     href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
+                    prefetch={item.href === '/dashboard' || item.href === '/calendario' ? true : undefined}
+                    onClick={closeMobileMenu}
                         className={`group relative flex items-center gap-x-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
                           active
                             ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md'
@@ -401,7 +425,8 @@ export default function DashboardLayout({
                                 <Link
                                   key={child.name}
                                   href={child.href}
-                                  onClick={() => setMobileMenuOpen(false)}
+                                  prefetch={child.href === '/dashboard' || child.href === '/calendario' ? true : undefined}
+                                  onClick={closeMobileMenu}
                                   className={`flex items-center gap-x-2.5 rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
                                     active
                                       ? 'text-white bg-slate-700/60 shadow-sm'
@@ -424,7 +449,7 @@ export default function DashboardLayout({
               </nav>
 
               {/* Bottom Menu - Settings y Logout */}
-              <div className="shrink-0 mt-auto pt-2.5 px-3 pb-3 border-t border-slate-700/50 safe-area-bottom space-y-1">
+              <div className="shrink-0 mt-auto pt-3 px-4 pb-4 border-t border-slate-700/50 safe-area-bottom space-y-1.5">
                 <Link
                   href="/settings"
                   onClick={() => setMobileMenuOpen(false)}

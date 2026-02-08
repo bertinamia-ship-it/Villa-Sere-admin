@@ -7,6 +7,7 @@ import { useState, useEffect, memo, useCallback } from 'react'
 import { User, LogOut } from 'lucide-react'
 import PropertySelector from './PropertySelector'
 import { getActivePropertyId } from '@/lib/utils/property-client'
+import { cache, CACHE_KEYS } from '@/lib/utils/cache'
 
 const sectionNames: Record<string, string> = {
   '/dashboard': 'Inicio',
@@ -39,32 +40,51 @@ function Header() {
     loadUser()
   }, [supabase])
 
-  useEffect(() => {
-    async function loadPropertyName() {
-      const propertyId = await getActivePropertyId()
-      if (propertyId) {
-        const { data } = await supabase
-          .from('properties')
-          .select('name')
-          .eq('id', propertyId)
-          .maybeSingle()
-        if (data?.name) {
-          setPropertyName(data.name)
-        } else {
-          setPropertyName(null)
-        }
+  const loadPropertyName = useCallback(async () => {
+    const propertyId = await getActivePropertyId()
+    if (propertyId) {
+      // Try cache first
+      const cacheKey = CACHE_KEYS.property(propertyId)
+      let cached = cache.get<{ name: string }>(cacheKey)
+      
+      if (cached?.name) {
+        setPropertyName(cached.name)
+        return
+      }
+
+      // Fetch from DB
+      const { data } = await supabase
+        .from('properties')
+        .select('name')
+        .eq('id', propertyId)
+        .maybeSingle()
+      
+      if (data?.name) {
+        setPropertyName(data.name)
+        // Cache the property name
+        cache.set(cacheKey, { name: data.name })
       } else {
         setPropertyName(null)
       }
+    } else {
+      setPropertyName(null)
     }
+  }, [supabase])
+
+  useEffect(() => {
     loadPropertyName()
 
     const handlePropertyChange = () => {
+      // Invalidate cache and reload
+      const propertyId = localStorage.getItem('activePropertyId')
+      if (propertyId) {
+        cache.invalidate(CACHE_KEYS.property(propertyId))
+      }
       loadPropertyName()
     }
     window.addEventListener('propertyChanged', handlePropertyChange)
     return () => window.removeEventListener('propertyChanged', handlePropertyChange)
-  }, [supabase])
+  }, [loadPropertyName])
 
   const handleLogout = useCallback(async () => {
     await supabase.auth.signOut()

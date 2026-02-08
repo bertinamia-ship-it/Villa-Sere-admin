@@ -12,6 +12,7 @@ import { Plus, ShoppingCart, Edit, Trash2, ExternalLink, Search } from 'lucide-r
 import PurchaseItemForm from './PurchaseItemForm'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { useI18n } from '@/components/I18nProvider'
+import { PageHeader } from '@/components/ui/PageHeader'
 
 export default function ToBuyPage() {
   const { t } = useI18n()
@@ -190,10 +191,7 @@ export default function ToBuyPage() {
   if (!hasProperty) {
     return (
       <div className="max-w-7xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('toBuy.title')}</h1>
-          <p className="mt-1 text-sm text-gray-500">{t('toBuy.subtitle')}</p>
-        </div>
+        <PageHeader title={t('toBuy.title')} subtitle={t('toBuy.subtitle')} />
         <EmptyState
           icon={<ShoppingCart className="h-12 w-12" />}
           title={t('toBuy.noPropertySelected')}
@@ -205,13 +203,12 @@ export default function ToBuyPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8 px-4 sm:px-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
-        <div className="space-y-1.5">
-          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('toBuy.title')}</h1>
-          <p className="text-sm text-slate-600 leading-relaxed">{t('toBuy.subtitle')}</p>
-        </div>
-        <Button 
-          onClick={() => {
+      <PageHeader
+        title={t('toBuy.title')}
+        subtitle={t('toBuy.subtitle')}
+        rightSlot={
+          <Button 
+            onClick={() => {
             setEditingItem(null)
             setShowForm(true)
           }}

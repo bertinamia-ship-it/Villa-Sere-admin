@@ -71,7 +71,7 @@ export default function AccountForm({ account, onClose, onSave }: AccountFormPro
         const { error } = await updateWithPropertyClient('financial_accounts', account.id, dataToSave)
         if (error) {
           logError('AccountForm.update', error)
-          showToast(getUserFriendlyError(error), 'error')
+          showToast(getUserFriendlyError(error, t), 'error')
         } else {
           showToast(t('bank.accountSaved'), 'success')
           onSave()
@@ -80,7 +80,7 @@ export default function AccountForm({ account, onClose, onSave }: AccountFormPro
         const { error } = await insertWithPropertyClient('financial_accounts', dataToSave)
         if (error) {
           logError('AccountForm.insert', error)
-          showToast(getUserFriendlyError(error), 'error')
+          showToast(getUserFriendlyError(error, t), 'error')
         } else {
           showToast(t('bank.accountSaved'), 'success')
           onSave()
@@ -88,7 +88,7 @@ export default function AccountForm({ account, onClose, onSave }: AccountFormPro
       }
     } catch (error) {
       logError('AccountForm.save', error)
-      showToast(getUserFriendlyError(error), 'error')
+      showToast(getUserFriendlyError(error, t), 'error')
     } finally {
       setLoading(false)
     }
@@ -106,7 +106,7 @@ export default function AccountForm({ account, onClose, onSave }: AccountFormPro
           label={t('bank.accountName')}
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          placeholder="ej. Caja chica principal"
+          placeholder={t('bank.accountNamePlaceholder')}
           required
         />
 
@@ -117,7 +117,7 @@ export default function AccountForm({ account, onClose, onSave }: AccountFormPro
           <select
             value={formData.account_type}
             onChange={(e) => setFormData({ ...formData, account_type: e.target.value as 'cash' | 'card' | 'bank' })}
-            className="w-full px-3 py-2 text-sm text-[#0F172A] bg-white border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+            className="w-full px-3 py-3 sm:py-2 text-base sm:text-sm text-[#0F172A] bg-white border border-[#E2E8F0] rounded-lg sm:rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all min-h-[44px] sm:min-h-0"
             required
           >
             <option value="cash">{t('bank.accountTypeCash')}</option>
@@ -134,7 +134,7 @@ export default function AccountForm({ account, onClose, onSave }: AccountFormPro
             <select
               value={formData.currency}
               onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-              className="w-full px-3 py-2 text-sm text-[#0F172A] bg-white border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
+              className="w-full px-3 py-3 sm:py-2 text-base sm:text-sm text-[#0F172A] bg-white border border-[#E2E8F0] rounded-lg sm:rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all min-h-[44px] sm:min-h-0"
             >
               <option value="USD">USD</option>
               <option value="MXN">MXN</option>
@@ -175,17 +175,17 @@ export default function AccountForm({ account, onClose, onSave }: AccountFormPro
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
             className="w-full px-3 py-2 text-sm text-[#0F172A] placeholder-[#64748B] bg-white border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
             rows={3}
-            placeholder="Notas opcionales"
+            placeholder={t('bank.notesPlaceholder')}
           />
         </div>
 
-        <div className="flex gap-2 pt-4">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 pt-4">
           <Button
             type="button"
             variant="secondary"
             onClick={onClose}
             disabled={loading}
-            className="flex-1"
+            className="w-full sm:flex-1 min-h-[44px] justify-center"
           >
             {t('common.cancel')}
           </Button>
@@ -193,7 +193,7 @@ export default function AccountForm({ account, onClose, onSave }: AccountFormPro
             type="submit"
             loading={loading}
             disabled={loading}
-            className="flex-1"
+            className="w-full sm:flex-1 min-h-[44px] justify-center"
           >
             {t('common.save')}
           </Button>

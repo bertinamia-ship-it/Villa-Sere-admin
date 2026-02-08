@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useMemo, memo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Building2, Plus, Loader2, ChevronDown, Home, Building, Trash2 } from 'lucide-react'
 import { Button } from './ui/Button'
@@ -10,6 +10,7 @@ import { ConfirmModal } from './ui/ConfirmModal'
 import TenantError from './TenantError'
 import { useToast } from './ui/Toast'
 import { t } from '@/lib/i18n/es'
+import { cache, CACHE_KEYS } from '@/lib/utils/cache'
 
 interface Property {
   id: string
@@ -17,7 +18,7 @@ interface Property {
   location: string | null
 }
 
-export default function PropertySelector() {
+function PropertySelector() {
   const supabase = createClient()
   const { showToast } = useToast()
   const [properties, setProperties] = useState<Property[]>([])
@@ -33,63 +34,78 @@ export default function PropertySelector() {
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; propertyId: string | null; propertyName: string }>({ isOpen: false, propertyId: null, propertyName: '' })
   const [deleting, setDeleting] = useState(false)
 
-  // Load properties and active property
-  useEffect(() => {
-    loadProperties()
-  }, [])
-
-  async function loadProperties() {
+  // Load properties and active property - MUST be defined before useEffect
+  const loadProperties = useCallback(async () => {
     setLoading(true)
     try {
-      // Get tenant_id from profile
+      // Get tenant_id from profile (with cache)
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         setLoading(false)
         return
       }
 
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('tenant_id, preferred_property_id')
-        .eq('id', user.id)
-        .maybeSingle()
+      // Try cache first
+      const profileCacheKey = CACHE_KEYS.profile(user.id)
+      let profile = cache.get<{ tenant_id: string | null; preferred_property_id: string | null }>(profileCacheKey)
 
-      if (profileError) {
-        console.error('[PropertySelector] Error fetching profile:', {
-          message: profileError.message,
-          details: profileError.details,
-          hint: profileError.hint,
-          code: profileError.code
-        })
-        setLoading(false)
-        return
-      }
+      if (!profile) {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('tenant_id, preferred_property_id')
+          .eq('id', user.id)
+          .maybeSingle()
 
-      if (!profile || !profile.tenant_id) {
-        console.error('[PropertySelector] CRITICAL: No profile or tenant_id found for user:', {
-          user_id: user.id,
-          profile_exists: !!profile,
-          tenant_id: profile?.tenant_id
-        })
-        setTenantError(
-          `Your account (${user.email}) is missing tenant information. ` +
-          `Please contact support or run: UPDATE profiles SET tenant_id = (SELECT id FROM tenants WHERE owner_id = '${user.id}') WHERE id = '${user.id}';`
-        )
-        setLoading(false)
-        return
+        if (profileError) {
+          console.error('[PropertySelector] Error fetching profile:', {
+            message: profileError.message,
+            details: profileError.details,
+            hint: profileError.hint,
+            code: profileError.code
+          })
+          setLoading(false)
+          return
+        }
+
+        if (!profileData || !profileData.tenant_id) {
+          console.error('[PropertySelector] CRITICAL: No profile or tenant_id found for user:', {
+            user_id: user.id,
+            profile_exists: !!profileData,
+            tenant_id: profileData?.tenant_id
+          })
+          setTenantError(
+            `Your account (${user.email}) is missing tenant information. ` +
+            `Please contact support or run: UPDATE profiles SET tenant_id = (SELECT id FROM tenants WHERE owner_id = '${user.id}') WHERE id = '${user.id}';`
+          )
+          setLoading(false)
+          return
+        }
+
+        profile = { tenant_id: profileData.tenant_id, preferred_property_id: profileData.preferred_property_id }
+        // Cache profile
+        cache.set(profileCacheKey, profile)
       }
 
       // Clear any previous tenant errors
       setTenantError(null)
 
-      // Get all properties for tenant
-      const { data: props } = await supabase
-        .from('properties')
-        .select('id, name, location')
-        .eq('tenant_id', profile.tenant_id)
-        .order('name')
+      // Get all properties for tenant (with cache)
+      const propertiesCacheKey = CACHE_KEYS.properties(profile.tenant_id!)
+      let props = cache.get<Property[]>(propertiesCacheKey)
 
-      setProperties(props || [])
+      if (!props) {
+        const { data: propsData } = await supabase
+          .from('properties')
+          .select('id, name, location')
+          .eq('tenant_id', profile.tenant_id!)
+          .order('name')
+
+        props = propsData || []
+        // Cache properties
+        cache.set(propertiesCacheKey, props)
+      }
+
+      setProperties(props)
 
       // Set active property: preferred → first property
       const activeId = profile.preferred_property_id || props?.[0]?.id || null
@@ -104,9 +120,40 @@ export default function PropertySelector() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [supabase])
 
-  async function handlePropertyChange(propertyId: string) {
+  // Load properties and active property on mount
+  useEffect(() => {
+    loadProperties()
+  }, [loadProperties])
+
+  // Get property icon component based on name (heuristic) - memoized
+  // MUST be before any conditional returns
+  const getPropertyIcon = useCallback((name: string) => {
+    const lowerName = name.toLowerCase()
+    
+    // Departamento / Apartamento
+    if (lowerName.includes('departamento') || lowerName.includes('apartamento') || 
+        lowerName.includes('depto') || lowerName.includes('apto') ||
+        lowerName.includes('apartment') || lowerName.includes('flat')) {
+      return <Building className="h-4 w-4 text-[#64748B]" />
+    }
+    
+    // Villa
+    if (lowerName.includes('villa') || lowerName.includes('casa grande')) {
+      return <Home className="h-4 w-4 text-[#64748B]" />
+    }
+    
+    // Default: Casa / Home
+    return <Home className="h-4 w-4 text-[#64748B]" />
+  }, [])
+
+  // Memoize active property - MUST be before any conditional returns
+  const activeProperty = useMemo(() => {
+    return properties.find(p => p.id === activePropertyId) || properties[0]
+  }, [properties, activePropertyId])
+
+  const handlePropertyChange = useCallback(async (propertyId: string) => {
     if (propertyId === activePropertyId) return
     
     setIsChanging(true)
@@ -118,7 +165,7 @@ export default function PropertySelector() {
     setActivePropertyId(propertyId)
     localStorage.setItem('activePropertyId', propertyId)
 
-    // Update preferred_property_id in profile
+    // Update preferred_property_id in profile and invalidate cache
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       const { error } = await supabase
@@ -135,10 +182,13 @@ export default function PropertySelector() {
           user_id: user.id,
           property_id: propertyId
         })
+      } else {
+        // Invalidate profile cache
+        cache.invalidate(CACHE_KEYS.profile(user.id))
       }
     }
 
-    // Trigger refresh to update all queries
+    // Trigger refresh to update all queries (non-blocking)
     window.dispatchEvent(new CustomEvent('propertyChanged', { detail: { propertyId } }))
     
     // Toast feedback
@@ -147,7 +197,7 @@ export default function PropertySelector() {
     }
     
     setIsChanging(false)
-  }
+  }, [activePropertyId, properties, supabase, showToast])
 
   async function handleCreateProperty() {
     if (!newPropertyName.trim()) {
@@ -270,7 +320,10 @@ export default function PropertySelector() {
         return
       }
 
-      // Reload properties and set as active
+      // Invalidate properties cache and reload
+      if (profile?.tenant_id) {
+        cache.invalidate(CACHE_KEYS.properties(profile.tenant_id))
+      }
       await loadProperties()
       if (newProperty) {
         await handlePropertyChange(newProperty.id)
@@ -342,7 +395,9 @@ export default function PropertySelector() {
         }
       }
 
-      // Reload properties
+      // Invalidate cache and reload properties
+      cache.invalidate(CACHE_KEYS.properties(profile.tenant_id))
+      cache.invalidate(CACHE_KEYS.profile(user.id))
       await loadProperties()
       showToast(t('propertySelector.propertyDeleted'), 'success')
       setDeleteConfirm({ isOpen: false, propertyId: null, propertyName: '' })
@@ -437,28 +492,6 @@ export default function PropertySelector() {
         </Modal>
       </div>
     )
-  }
-
-  const activeProperty = properties.find(p => p.id === activePropertyId) || properties[0]
-
-  // Get property icon component based on name (heuristic)
-  const getPropertyIcon = (name: string) => {
-    const lowerName = name.toLowerCase()
-    
-    // Departamento / Apartamento
-    if (lowerName.includes('departamento') || lowerName.includes('apartamento') || 
-        lowerName.includes('depto') || lowerName.includes('apto') ||
-        lowerName.includes('apartment') || lowerName.includes('flat')) {
-      return <Building className="h-4 w-4 text-[#64748B]" />
-    }
-    
-    // Villa
-    if (lowerName.includes('villa') || lowerName.includes('casa grande')) {
-      return <Home className="h-4 w-4 text-[#64748B]" />
-    }
-    
-    // Default: Casa / Home
-    return <Home className="h-4 w-4 text-[#64748B]" />
   }
 
   return (
@@ -621,4 +654,6 @@ export default function PropertySelector() {
     </div>
   )
 }
+
+export default memo(PropertySelector)
 

@@ -66,7 +66,7 @@ export default function TransactionForm({ account, direction, onClose, onSave }:
       const { error } = await insertWithPropertyClient('account_transactions', dataToSave)
       if (error) {
         logError('TransactionForm.insert', error)
-        showToast(getUserFriendlyError(error), 'error')
+        showToast(getUserFriendlyError(error, t), 'error')
       } else {
         showToast(t('bank.transactionSaved'), 'success')
         onSave()
@@ -114,17 +114,17 @@ export default function TransactionForm({ account, direction, onClose, onSave }:
             onChange={(e) => setFormData({ ...formData, note: e.target.value })}
             className="w-full px-3 py-2 text-sm text-[#0F172A] placeholder-[#64748B] bg-white border border-[#E2E8F0] rounded-md focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all"
             rows={3}
-            placeholder="Nota opcional"
+            placeholder={t('bank.transactionNotePlaceholder')}
           />
         </div>
 
-        <div className="flex gap-2 pt-4">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 pt-4">
           <Button
             type="button"
             variant="secondary"
             onClick={onClose}
             disabled={loading}
-            className="flex-1"
+            className="w-full sm:flex-1 min-h-[44px] justify-center"
           >
             {t('common.cancel')}
           </Button>
@@ -132,7 +132,7 @@ export default function TransactionForm({ account, direction, onClose, onSave }:
             type="submit"
             loading={loading}
             disabled={loading}
-            className="flex-1"
+            className="w-full sm:flex-1 min-h-[44px] justify-center"
           >
             {t('common.save')}
           </Button>

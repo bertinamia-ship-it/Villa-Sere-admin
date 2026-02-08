@@ -17,6 +17,7 @@ import BookingCalendar from './BookingCalendar'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { useI18n } from '@/components/I18nProvider'
+import { PageHeader } from '@/components/ui/PageHeader'
 
 interface MonthlyStats {
   income: number
@@ -60,7 +61,9 @@ export default function RentalsPage() {
     try {
       await Promise.all([loadBookings(), loadMonthlyStats()])
     } catch (error) {
-      console.error('Error loading data:', error)
+      const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
+      logError('RentalsPage.loadData', error)
+      showToast(getUserFriendlyError(error, t), 'error')
       showToast(t('rentals.loadError'), 'error')
     } finally {
       setLoading(false)
@@ -208,7 +211,7 @@ export default function RentalsPage() {
         if (error) {
           const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
           logError('RentalsPage.update', error)
-          showToast(getUserFriendlyError(error), 'error')
+          showToast(getUserFriendlyError(error, t), 'error')
           return
         }
         showToast(t('rentals.bookingUpdated'), 'success')
@@ -221,7 +224,7 @@ export default function RentalsPage() {
         if (error) {
           const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
           logError('RentalsPage.insert', error)
-          showToast(getUserFriendlyError(error), 'error')
+          showToast(getUserFriendlyError(error, t), 'error')
           return
         }
         showToast(t('rentals.bookingCreated'), 'success')
@@ -289,10 +292,7 @@ export default function RentalsPage() {
   if (!hasProperty) {
     return (
       <div className="max-w-7xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('rentals.title')}</h1>
-          <p className="mt-1 text-sm text-gray-500">{t('rentals.subtitle')}</p>
-        </div>
+        <PageHeader title={t('rentals.title')} subtitle={t('rentals.subtitle')} />
         <EmptyState
           icon={<CalendarIcon className="h-12 w-12" />}
           title={t('rentals.noPropertySelected')}
@@ -305,16 +305,15 @@ export default function RentalsPage() {
   return (
     <>
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8 px-4 sm:px-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">{t('rentals.title')}</h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1.5">{t('rentals.subtitle')}</p>
-        </div>
-        <Button 
-          onClick={() => {
-            setEditingBooking(null)
-            setShowForm(true)
-          }}
+      <PageHeader
+        title={t('rentals.title')}
+        subtitle={t('rentals.subtitle')}
+        rightSlot={
+          <Button 
+            onClick={() => {
+              setEditingBooking(null)
+              setShowForm(true)
+            }}
           className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
         >
           <Plus className="h-4 w-4" />
@@ -420,10 +419,10 @@ export default function RentalsPage() {
       {/* Booking Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 backdrop-blur-sm safe-area-y">
-          <div className="bg-white rounded-t-2xl sm:rounded-xl max-w-2xl w-full h-[95vh] sm:h-auto sm:max-h-[90vh] overflow-y-auto shadow-2xl border-t sm:border border-slate-200/60 flex flex-col">
-            <div className="sticky top-0 bg-white border-b border-slate-200/60 px-4 py-3 flex items-center justify-between z-10 safe-area-top">
-              <h2 className="text-lg font-semibold text-slate-900">
-                {editingBooking ? 'Editar Reserva' : 'Nueva Reserva'}
+          <div className="bg-white rounded-t-2xl sm:rounded-xl max-w-2xl w-full h-[95vh] sm:h-auto sm:max-h-[90vh] overflow-hidden shadow-2xl border-t sm:border border-slate-200/60 flex flex-col">
+            <div className="sticky top-0 bg-white border-b border-slate-200/60 px-4 py-3 flex items-center justify-between z-10 shrink-0 safe-area-top safe-area-x">
+              <h2 className="text-lg sm:text-xl font-semibold text-slate-900">
+                {editingBooking ? t('rentals.editBooking') : t('rentals.newBooking')}
               </h2>
               <button
                 onClick={() => {
@@ -433,10 +432,10 @@ export default function RentalsPage() {
                 className="p-2 -mr-2 text-slate-500 hover:text-slate-900 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                 aria-label="Cerrar"
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5 sm:h-6 sm:w-6" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto px-4 py-4 safe-area-x">
+            <div className="flex-1 min-h-0">
               <BookingForm
                 booking={editingBooking}
                 onSave={handleSave}

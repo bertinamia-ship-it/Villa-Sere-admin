@@ -14,8 +14,21 @@ const paddings = {
 }
 
 export function Card({ children, className = '', padding = 'md' }: CardProps) {
+  // Mobile: lighter effects, desktop: full effects
   return (
-    <div className={`bg-white/90 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-md transition-all duration-300 ease-out hover:shadow-lg hover:scale-[1.01] hover:border-slate-300/60 ${paddings[padding]} ${className}`}>
+    <div className={`
+      bg-white/90 
+      sm:backdrop-blur-sm 
+      rounded-xl 
+      border border-slate-200/60 
+      shadow-sm sm:shadow-md 
+      transition-all duration-300 ease-out 
+      hover:shadow-md sm:hover:shadow-lg 
+      hover:scale-[1.01] 
+      hover:border-slate-300/60 
+      ${paddings[padding]} 
+      ${className}
+    `}>
       {children}
     </div>
   )

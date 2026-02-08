@@ -14,6 +14,7 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { useToast } from '@/components/ui/Toast'
 import TaskForm from './TaskForm'
 import { useI18n } from '@/components/I18nProvider'
+import { PageHeader } from '@/components/ui/PageHeader'
 
 type FilterType = 'today' | 'week' | 'overdue' | 'all'
 type TaskStatus = 'pending' | 'in_progress' | 'done'
@@ -301,10 +302,7 @@ export default function TaskList() {
   if (!hasProperty) {
     return (
       <div className="space-y-8">
-        <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A] tracking-tight">{t('tasks.title')}</h1>
-          <p className="text-sm text-[#64748B] mt-1.5">{t('tasks.subtitle')}</p>
-        </div>
+        <PageHeader title={t('tasks.title')} subtitle={t('tasks.subtitle')} />
         <Card padding="lg">
           <EmptyState
             icon={<AlertCircle className="h-14 w-14" />}
@@ -319,20 +317,21 @@ export default function TaskList() {
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
-        <div className="space-y-1.5">
-          <h1 className="text-xl sm:text-2xl font-semibold text-[#0F172A] tracking-tight">{t('tasks.title')}</h1>
-          <p className="text-sm text-[#64748B] leading-relaxed">{t('tasks.subtitle')}</p>
-        </div>
-        <Button 
-          onClick={() => setShowForm(true)}
-          disabled={!hasProperty}
-          size="sm"
-        >
-          <Plus className="h-4 w-4" />
-          {t('tasks.createTask')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('tasks.title')}
+        subtitle={t('tasks.subtitle')}
+        rightSlot={
+          <Button 
+            onClick={() => setShowForm(true)}
+            disabled={!hasProperty}
+            size="sm"
+            className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
+          >
+            <Plus className="h-4 w-4" />
+            {t('tasks.createTask')}
+          </Button>
+        }
+      />
 
       {/* Filters */}
       <div className="flex gap-1 border-b border-[#E2E8F0]">
@@ -402,6 +401,7 @@ export default function TaskList() {
                       onClick={() => handleMarkDone(task.id)}
                       disabled={completingTaskId === task.id}
                       loading={completingTaskId === task.id}
+                      className="min-h-[44px] sm:min-h-0"
                     >
                       <CheckSquare className="h-4 w-4" />
                       {t('tasks.markCompleted')}
@@ -411,7 +411,7 @@ export default function TaskList() {
                   <select
                     value={task.status}
                     onChange={(e) => handleStatusChange(task.id, e.target.value as TaskStatus)}
-                    className="px-2.5 py-1.5 text-xs border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A]"
+                    className="px-2.5 py-2 sm:py-1.5 text-sm sm:text-xs border border-[#E2E8F0] rounded-lg bg-white focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all text-[#0F172A] min-h-[44px] sm:min-h-0"
                   >
                     {(['pending', 'in_progress', 'done'] as TaskStatus[]).map((status) => (
                       <option key={status} value={status}>{getStatusLabel(status)}</option>
@@ -422,16 +422,18 @@ export default function TaskList() {
                     size="sm"
                     variant="ghost"
                     onClick={() => handleEdit(task)}
+                    className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
                   >
-                    <Edit className="h-4 w-4" />
+                    <Edit className="h-5 w-5 sm:h-4 sm:w-4" />
                   </Button>
                   
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => setDeleteConfirm({ isOpen: true, taskId: task.id })}
+                    className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
                   >
-                    <Trash2 className="h-4 w-4 text-[#EF4444]" />
+                    <Trash2 className="h-5 w-5 sm:h-4 sm:w-4 text-[#EF4444]" />
                   </Button>
                 </div>
               </div>
@@ -454,7 +456,7 @@ export default function TaskList() {
         onClose={() => setDeleteConfirm({ isOpen: false, taskId: null })}
         onConfirm={handleDelete}
         title={t('tasks.delete')}
-        message="¿Estás seguro de que quieres eliminar esta tarea? Esta acción no se puede deshacer."
+        message={t('tasks.confirmDelete')}
         confirmText={t('tasks.delete')}
         variant="danger"
       />

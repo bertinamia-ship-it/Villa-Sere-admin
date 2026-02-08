@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input'
 import { Modal } from '@/components/ui/Modal'
 import { Settings, AlertTriangle, Trash2, Loader2, Download, Smartphone, Monitor, CheckCircle2, ChevronDown, Lock, Globe } from 'lucide-react'
 import { useI18n } from '@/components/I18nProvider'
+import { PageHeader } from '@/components/ui/PageHeader'
 import ResetDataButton from '@/app/(dashboard)/dashboard/ResetDataButton'
 import PropertyDeleteSection from '@/components/PropertyDeleteSection'
 import { useToast } from '@/components/ui/Toast'
@@ -145,7 +146,8 @@ export default function SettingsPage() {
 
       return true
     } catch (error) {
-      console.error('Error verifying password:', error)
+      const { logError } = await import('@/lib/utils/error-handler')
+      logError('Settings.verifyPassword', error)
       return false
     } finally {
       setVerifying(false)
@@ -164,7 +166,7 @@ export default function SettingsPage() {
     const isValid = await verifyPassword()
     
     if (!isValid) {
-      showToast(language === 'en' ? 'Incorrect password. Please try again.' : 'Contraseña incorrecta. Por favor, intenta de nuevo.', 'error')
+      showToast(t('settings.incorrectPassword'), 'error')
       setPassword('')
       return
     }
@@ -204,9 +206,7 @@ export default function SettingsPage() {
   if (checkingAuth) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-[#0F172A]">{t('settings.title')}</h1>
-        </div>
+        <PageHeader title={t('settings.title')} />
         <Card>
           <CardContent className="py-8 text-center">
             <Loader2 className="h-6 w-6 animate-spin text-[#64748B] mx-auto mb-2" />
@@ -219,10 +219,7 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold text-[#0F172A]">{t('settings.title')}</h1>
-        <p className="text-sm text-[#64748B] mt-1">{t('settings.subtitle')}</p>
-      </div>
+      <PageHeader title={t('settings.title')} subtitle={t('settings.subtitle')} />
 
       {/* SECCIÓN 1: Configuraciones Básicas */}
       <div className="space-y-6">
@@ -367,8 +364,8 @@ export default function SettingsPage() {
                   <Trash2 className="h-4.5 w-4.5 text-red-600" />
                 </div>
                 <div className="flex-1 text-left">
-                  <div className="text-sm font-medium text-slate-900">{language === 'en' ? 'Delete Properties' : 'Eliminar Propiedades'}</div>
-                  <div className="text-xs text-slate-500 mt-0.5">{language === 'en' ? 'Permanently delete properties' : 'Elimina propiedades permanentemente'}</div>
+                  <div className="text-sm font-medium text-slate-900">{t('settings.deleteProperties')}</div>
+                  <div className="text-xs text-slate-500 mt-0.5">{t('settings.deletePropertiesDescription')}</div>
                 </div>
                 <ChevronDown className="h-4 w-4 text-slate-400 rotate-[-90deg]" />
               </button>
@@ -382,8 +379,8 @@ export default function SettingsPage() {
                   <AlertTriangle className="h-4.5 w-4.5 text-red-600" />
                 </div>
                 <div className="flex-1 text-left">
-                  <div className="text-sm font-medium text-slate-900">{language === 'en' ? 'Reset All Data' : 'Resetear Todos los Datos'}</div>
-                  <div className="text-xs text-slate-500 mt-0.5">{language === 'en' ? 'Delete inventory, expenses and more' : 'Borra inventario, gastos y más'}</div>
+                  <div className="text-sm font-medium text-slate-900">{t('resetData.resetAllData')}</div>
+                  <div className="text-xs text-slate-500 mt-0.5">{t('resetData.description')}</div>
                 </div>
                 <ChevronDown className="h-4 w-4 text-slate-400 rotate-[-90deg]" />
               </button>
@@ -397,12 +394,12 @@ export default function SettingsPage() {
                         <div className="p-2 bg-red-100 rounded-lg">
                           <Trash2 className="h-5 w-5 text-red-600" />
                         </div>
-                        <span>{language === 'en' ? 'Delete Properties' : 'Eliminar Propiedades'}</span>
+                        <span>{t('settings.deleteProperties')}</span>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
                       <p className="text-sm text-slate-600 mb-4">
-                        {language === 'en' ? 'Permanently delete properties. This action cannot be undone.' : 'Elimina propiedades de forma permanente. Esta acción no se puede deshacer.'}
+                        {t('settings.deletePropertiesWarning')}
                       </p>
                       <PropertyDeleteSection />
                     </CardContent>
@@ -444,32 +441,32 @@ export default function SettingsPage() {
         title={
           <div className="flex items-center gap-2 text-red-600">
             <Lock className="h-5 w-5" />
-            <span className="font-semibold">{language === 'en' ? 'Verification Required' : 'Verificación Requerida'}</span>
+            <span className="font-semibold">{t('settings.verificationRequired')}</span>
           </div>
         }
       >
         <div className="space-y-4">
           <div className="p-4 bg-red-50 rounded-lg border border-red-200">
             <p className="text-sm font-medium text-red-900 mb-1">
-              {language === 'en' ? 'Dangerous action detected' : 'Acción peligrosa detectada'}
+              {t('settings.dangerousActionDetected')}
             </p>
             <p className="text-sm text-red-700">
-              {language === 'en' 
-                ? `To ${passwordAction === 'delete' ? 'delete properties' : 'reset all data'}, you need to confirm your password.`
-                : `Para ${passwordAction === 'delete' ? 'eliminar propiedades' : 'resetear todos los datos'}, necesitas confirmar tu contraseña.`
+              {passwordAction === 'delete' 
+                ? t('settings.confirmPasswordToDelete')
+                : t('settings.confirmPasswordToReset')
               }
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              {language === 'en' ? 'Password' : 'Contraseña'}
+              {t('settings.password')}
             </label>
             <Input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder={language === 'en' ? 'Enter your password' : 'Ingresa tu contraseña'}
+              placeholder={t('settings.passwordPlaceholder')}
               className="w-full"
               autoFocus
               onKeyDown={(e) => {
@@ -499,7 +496,7 @@ export default function SettingsPage() {
               disabled={verifying || !password.trim()}
               className="flex-1 bg-red-600 hover:bg-red-700 text-white"
             >
-              {verifying ? (language === 'en' ? 'Verifying...' : 'Verificando...') : t('common.confirm')}
+              {verifying ? t('settings.verifying') : t('common.confirm')}
             </Button>
           </div>
         </div>

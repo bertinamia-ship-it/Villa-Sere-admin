@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, memo } from 'react'
+import { useState, useEffect, memo, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { getActivePropertyId } from '@/lib/utils/property-client'
+import { cache, CACHE_KEYS } from '@/lib/utils/cache'
 import { Sparkles } from 'lucide-react'
 import { t } from '@/lib/i18n/es'
 
@@ -11,41 +12,63 @@ function PropertyHeader() {
   const [propertyName, setPropertyName] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    async function loadPropertyName() {
-      setLoading(true)
-      try {
-        const propertyId = await getActivePropertyId()
-        if (propertyId) {
-          const { data } = await supabase
-            .from('properties')
-            .select('name')
-            .eq('id', propertyId)
-            .maybeSingle()
-          if (data?.name) {
-            setPropertyName(data.name)
-          } else {
-            setPropertyName(null)
-          }
+  const loadPropertyName = useCallback(async () => {
+    setLoading(true)
+    try {
+      const propertyId = await getActivePropertyId()
+      if (propertyId) {
+        // Try cache first
+        const cacheKey = CACHE_KEYS.property(propertyId)
+        let cached = cache.get<{ name: string }>(cacheKey)
+        
+        if (cached?.name) {
+          setPropertyName(cached.name)
+          setLoading(false)
+          return
+        }
+
+        // Fetch from DB
+        const { data } = await supabase
+          .from('properties')
+          .select('name')
+          .eq('id', propertyId)
+          .maybeSingle()
+        
+        if (data?.name) {
+          setPropertyName(data.name)
+          // Cache the property name
+          cache.set(cacheKey, { name: data.name })
         } else {
           setPropertyName(null)
         }
-      } catch (error) {
-        console.error('Error loading property name:', error)
+      } else {
         setPropertyName(null)
-      } finally {
-        setLoading(false)
       }
+    } catch (error) {
+      // Only log in dev
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error loading property name:', error)
+      }
+      setPropertyName(null)
+    } finally {
+      setLoading(false)
     }
+  }, [supabase])
 
+  useEffect(() => {
     loadPropertyName()
 
     const handlePropertyChange = () => {
+      // Invalidate cache and reload
+      const propertyId = localStorage.getItem('activePropertyId')
+      if (propertyId) {
+        cache.invalidate(CACHE_KEYS.property(propertyId))
+      }
       loadPropertyName()
     }
     window.addEventListener('propertyChanged', handlePropertyChange)
     return () => window.removeEventListener('propertyChanged', handlePropertyChange)
-  }, [supabase])
+  }, [loadPropertyName])
 
   if (loading || !propertyName) {
     return null

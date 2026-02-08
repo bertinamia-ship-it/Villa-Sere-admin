@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import InventoryList from './InventoryList'
+import InventoryClient from './InventoryClient'
 
 export default async function InventoryPage() {
   const supabase = await createClient()
@@ -10,5 +10,5 @@ export default async function InventoryPage() {
     redirect('/login')
   }
 
-  return <InventoryList />
+  return <InventoryClient />
 }

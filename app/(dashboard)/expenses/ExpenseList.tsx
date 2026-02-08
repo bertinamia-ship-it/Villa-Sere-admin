@@ -3,6 +3,7 @@
 import { Expense, Vendor, MaintenanceTicket } from '@/lib/types/database'
 import { Pencil, Trash2, Calendar, FileText, Image as ImageIcon } from 'lucide-react'
 import { formatDate } from '@/lib/utils/formatters'
+import { useI18n } from '@/components/I18nProvider'
 
 interface ExpenseListProps {
   expenses: Expense[]
@@ -21,6 +22,7 @@ export default function ExpenseList({
   onEdit,
   onDelete
 }: ExpenseListProps) {
+  const { t } = useI18n()
   const [year, month] = selectedMonth.split('-')
   
   const filteredExpenses = expenses.filter(exp => {
@@ -42,7 +44,7 @@ export default function ExpenseList({
   if (filteredExpenses.length === 0) {
     return (
       <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-12 text-center">
-        <p className="text-sm text-[#64748B]">No hay gastos registrados este mes</p>
+        <p className="text-sm text-[#64748B]">{t('expenses.noExpensesThisMonth')}</p>
       </div>
     )
   }
@@ -56,19 +58,19 @@ export default function ExpenseList({
             <thead className="bg-slate-50/80 border-b border-slate-200/60">
               <tr>
                 <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                  Fecha
+                  {t('common.date')}
                 </th>
                 <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                  Categoría
+                  {t('common.category')}
                 </th>
                 <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                  Monto
+                  {t('common.amount')}
                 </th>
                 <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                  Detalles
+                  {t('common.details')}
                 </th>
                 <th className="px-6 py-3.5 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                  Acciones
+                  {t('common.actions')}
                 </th>
               </tr>
             </thead>
@@ -112,7 +114,7 @@ export default function ExpenseList({
                           className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 mt-1 transition-colors font-medium"
                         >
                           <ImageIcon className="h-3.5 w-3.5" />
-                          Ver Recibo
+                          {t('expenses.viewReceipt')}
                         </a>
                       )}
                     </td>
@@ -121,14 +123,14 @@ export default function ExpenseList({
                         <button
                           onClick={() => onEdit(expense)}
                           className="text-slate-500 hover:text-blue-600 transition-all duration-200 p-1.5 rounded-lg hover:bg-blue-50 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                          aria-label="Editar"
+                          aria-label={t('common.edit')}
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => onDelete(expense.id)}
                           className="text-slate-500 hover:text-red-600 transition-all duration-200 p-1.5 rounded-lg hover:bg-red-50 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                          aria-label="Eliminar"
+                          aria-label={t('common.delete')}
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -155,10 +157,10 @@ export default function ExpenseList({
                   <div className="flex items-center gap-2 mb-2">
                     <Calendar className="h-4 w-4 text-slate-500 shrink-0" />
                     <span className="text-sm font-medium text-slate-900">
-                      {new Date(expense.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {formatDate(expense.date)}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <span className="px-2.5 py-1 text-xs font-medium rounded-lg bg-blue-100 text-blue-700 border border-blue-200">
                       {expense.category}
                     </span>
@@ -176,17 +178,17 @@ export default function ExpenseList({
                     </div>
                   )}
                   {expense.notes && (
-                    <p className="text-xs text-slate-600 mt-2 leading-relaxed">{expense.notes}</p>
+                    <p className="text-xs text-slate-600 mt-2 leading-relaxed line-clamp-2">{expense.notes}</p>
                   )}
                   {expense.receipt_url && (
                     <a
                       href={expense.receipt_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 mt-2 transition-colors font-medium"
+                      className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 mt-2 transition-colors font-medium min-h-[44px]"
                     >
                       <ImageIcon className="h-3.5 w-3.5" />
-                      Ver Recibo
+                      {t('expenses.viewReceipt')}
                     </a>
                   )}
                 </div>
@@ -194,14 +196,14 @@ export default function ExpenseList({
                   <button
                     onClick={() => onEdit(expense)}
                     className="text-slate-500 hover:text-blue-600 transition-all duration-200 p-2 rounded-lg hover:bg-blue-50 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                    aria-label="Editar"
+                    aria-label={t('common.edit')}
                   >
                     <Pencil className="h-5 w-5" />
                   </button>
                   <button
                     onClick={() => onDelete(expense.id)}
                     className="text-slate-500 hover:text-red-600 transition-all duration-200 p-2 rounded-lg hover:bg-red-50 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                    aria-label="Eliminar"
+                    aria-label={t('common.delete')}
                   >
                     <Trash2 className="h-5 w-5" />
                   </button>

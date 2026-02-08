@@ -61,7 +61,7 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
       if (error) {
         const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
         logError('InventoryForm.update', error)
-        showToast(getUserFriendlyError(error), 'error')
+        showToast(getUserFriendlyError(error, t), 'error')
       } else {
         onClose()
       }
@@ -74,7 +74,7 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
       if (error) {
         const { logError, getUserFriendlyError } = await import('@/lib/utils/error-handler')
         logError('InventoryForm.insert', error)
-        showToast(getUserFriendlyError(error), 'error')
+        showToast(getUserFriendlyError(error, t), 'error')
       } else {
         onClose()
       }
@@ -108,20 +108,24 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">
+    <div className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 backdrop-blur-sm safe-area-y">
+      <div className="bg-white rounded-t-2xl sm:rounded-xl max-w-2xl w-full h-[95vh] sm:h-auto sm:max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border-t sm:border border-slate-200/60">
+        <div className="sticky top-0 bg-white border-b border-slate-200/60 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between z-10 shrink-0 safe-area-top safe-area-x">
+          <h2 className="text-lg sm:text-xl font-semibold text-slate-900">
             {item ? t('inventory.editItem') : t('inventory.addItem')}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            <X className="h-6 w-6" />
+          <button 
+            onClick={onClose} 
+            className="text-slate-500 hover:text-slate-900 transition-colors p-2 -mr-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label="Cerrar"
+          >
+            <X className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-4 py-4 sm:p-6 space-y-4 safe-area-x safe-area-bottom">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
               {t('inventory.name')} *
             </label>
             <input
@@ -129,20 +133,20 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400"
+              className="w-full border border-slate-200/60 rounded-lg px-3.5 sm:px-3 py-3 sm:py-2.5 text-base sm:text-sm text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all min-h-[44px] sm:min-h-0"
               placeholder="ej. Detergente"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
                 {t('inventory.category')} *
               </label>
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
+                className="w-full border border-slate-200/60 rounded-lg px-3.5 sm:px-3 py-3 sm:py-2.5 text-base sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all min-h-[44px] sm:min-h-0"
               >
                 {CATEGORIES.map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
@@ -151,13 +155,13 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
                 {t('inventory.location')} *
               </label>
               <select
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
+                className="w-full border border-slate-200/60 rounded-lg px-3.5 sm:px-3 py-3 sm:py-2.5 text-base sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all min-h-[44px] sm:min-h-0"
               >
                 {ROOMS.map(room => (
                   <option key={room} value={room}>{room}</option>
@@ -166,9 +170,9 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
                 {t('inventory.quantity')} *
               </label>
               <input
@@ -177,12 +181,12 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
                 min="0"
                 value={formData.quantity}
                 onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
+                className="w-full border border-slate-200/60 rounded-lg px-3.5 sm:px-3 py-3 sm:py-2.5 text-base sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all min-h-[44px] sm:min-h-0"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
                 {t('inventory.minThreshold')}
               </label>
               <input
@@ -190,45 +194,46 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
                 min="0"
                 value={formData.min_threshold}
                 onChange={(e) => setFormData({ ...formData, min_threshold: parseInt(e.target.value) || 0 })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
+                className="w-full border border-slate-200/60 rounded-lg px-3.5 sm:px-3 py-3 sm:py-2.5 text-base sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all min-h-[44px] sm:min-h-0"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notas
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              {t('inventory.notes')}
             </label>
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400"
-              placeholder="Notas adicionales..."
+              className="w-full border border-slate-200/60 rounded-lg px-3.5 sm:px-3 py-3 sm:py-2.5 text-base sm:text-sm text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+              placeholder={t('inventory.notesPlaceholder')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
               {t('inventory.photo')}
             </label>
             {photoUrl ? (
               <div className="space-y-2">
-                <img src={photoUrl} alt="Item" className="w-full h-48 object-cover rounded-lg" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photoUrl} alt="Item" className="w-full h-48 object-cover rounded-lg" loading="lazy" decoding="async" />
                 <button
                   type="button"
                   onClick={() => setPhotoUrl('')}
-                  className="text-sm text-red-600 hover:text-red-700"
+                  className="text-sm text-red-600 hover:text-red-700 min-h-[44px] px-3"
                 >
-                  Eliminar Foto
+                  {t('inventory.removePhoto')}
                 </button>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
+              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer hover:bg-slate-50">
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-600">
-                    {uploading ? 'Subiendo...' : 'Haz clic para subir foto'}
+                  <Upload className="h-8 w-8 text-slate-400 mb-2" />
+                  <p className="text-sm text-slate-600">
+                    {uploading ? t('common.uploading') : t('inventory.uploadPhoto')}
                   </p>
                 </div>
                 <input
@@ -242,20 +247,20 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
             )}
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4 sticky bottom-0 bg-white -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 border-t border-slate-200/60 safe-area-bottom">
             <button
               type="submit"
               disabled={loading || uploading}
-              className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition"
+              className="flex-1 bg-gradient-to-r from-slate-900 to-slate-800 text-white py-3.5 rounded-xl font-semibold hover:from-slate-800 hover:to-slate-700 disabled:opacity-50 transition-all duration-300 min-h-[44px] justify-center"
             >
-              {loading ? 'Guardando...' : item ? 'Actualizar Artículo' : 'Agregar Artículo'}
+              {loading ? t('common.saving') : item ? t('inventory.updateItem') : t('inventory.addItem')}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition"
+              className="px-6 py-3.5 border border-slate-300 rounded-xl font-semibold hover:bg-slate-50 transition-all duration-300 min-h-[44px] sm:w-auto w-full"
             >
-              Cancelar
+              {t('common.cancel')}
             </button>
           </div>
         </form>
