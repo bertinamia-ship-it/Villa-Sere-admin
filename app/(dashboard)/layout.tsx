@@ -23,7 +23,7 @@ import {
   Wallet,
   User
 } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import Header from '@/components/Header'
 import PropertyHeader from '@/components/PropertyHeader'
 import PropertySelector from '@/components/PropertySelector'
@@ -74,8 +74,8 @@ export default function DashboardLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set([t('nav.operation'), t('nav.finances')]))
   
-  // Get translated navigation
-  const navigation = getNavigation(t)
+  // Get translated navigation - memoized
+  const navigation = useMemo(() => getNavigation(t), [t])
   
   // Update expanded sections when language changes
   useEffect(() => {
@@ -88,17 +88,19 @@ export default function DashboardLayout({
     router.refresh()
   }
 
-  const toggleSection = (sectionName: string) => {
-    const newExpanded = new Set(expandedSections)
-    if (newExpanded.has(sectionName)) {
-      newExpanded.delete(sectionName)
-    } else {
-      newExpanded.add(sectionName)
-    }
-    setExpandedSections(newExpanded)
-  }
+  const toggleSection = useCallback((sectionName: string) => {
+    setExpandedSections(prev => {
+      const newExpanded = new Set(prev)
+      if (newExpanded.has(sectionName)) {
+        newExpanded.delete(sectionName)
+      } else {
+        newExpanded.add(sectionName)
+      }
+      return newExpanded
+    })
+  }, [])
 
-  const isActive = (href: string) => pathname === href
+  const isActive = useCallback((href: string) => pathname === href, [pathname])
 
   // Close mobile menu on ESC key
   useEffect(() => {
@@ -258,8 +260,33 @@ export default function DashboardLayout({
         </div>
       </div>
 
+      {/* Mobile Header Bar - Branding + Botón Menú - Se oculta cuando el menú está abierto */}
+      {!mobileMenuOpen && (
+        <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 border-b border-slate-200/60 z-[80] shadow-sm safe-area-top">
+          <div className="flex items-center justify-between h-14 px-3 gap-2 safe-area-x">
+            {/* Branding compacto */}
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <div className="w-6 h-6 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-sm shadow-blue-500/20 ring-1 ring-blue-400/20 flex items-center justify-center flex-shrink-0">
+                <Sparkles className="h-3.5 w-3.5 text-white" />
+              </div>
+              <span className="text-sm font-semibold text-slate-900 tracking-tight truncate">CasaPilot</span>
+            </div>
+            
+            {/* Botón Menú */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-slate-100 active:bg-slate-200 transition-all duration-200 flex-shrink-0"
+              aria-label="Abrir menú"
+              type="button"
+            >
+              <Menu className="h-5 w-5 text-slate-600" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Mobile menu overlay - z-index correcto y funcional */}
-        {mobileMenuOpen && (
+      {mobileMenuOpen && (
         <>
           <div 
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
@@ -272,29 +299,31 @@ export default function DashboardLayout({
             }}
           >
               {/* Header con Logo, Property Card y Botón Cerrar */}
-              <div className="shrink-0 px-4 pt-4 pb-3 border-b border-slate-700/50" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
+              <div className="shrink-0 px-4 pt-3 pb-3 border-b border-slate-700/50" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}>
                 {/* Logo y Botón Cerrar */}
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-md shadow-blue-500/20 ring-1 ring-blue-400/20 flex items-center justify-center">
-                      <Sparkles className="h-4.5 w-4.5 text-white" />
+                <div className="flex items-center justify-between mb-2.5">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-lg shadow-md shadow-blue-500/20 ring-1 ring-blue-400/20 flex items-center justify-center">
+                      <Sparkles className="h-4 w-4 text-white" />
                     </div>
-                    <span className="text-base font-bold text-white tracking-tight">CasaPilot</span>
+                    <span className="text-sm font-bold text-white tracking-tight">CasaPilot</span>
                   </div>
                   <button
                     onClick={() => setMobileMenuOpen(false)}
-                    className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-slate-700/50 active:bg-slate-700/70 transition-all duration-200"
+                    className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-700/50 active:bg-slate-700/70 transition-all duration-200"
                     aria-label="Cerrar menú"
                     type="button"
                   >
-                    <X className="h-5 w-5 text-white" />
+                    <X className="h-4 w-4 text-white" />
           </button>
                 </div>
-                <MobilePropertyCard />
+                <div className="mt-2">
+                  <MobilePropertyCard />
+                </div>
         </div>
 
               {/* Navigation - Scrollable */}
-              <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+              <nav className="flex-1 overflow-y-auto px-3 py-2.5 space-y-1">
               {navigation.map((item) => {
                   if ('href' in item) {
                     const active = isActive(item.href)
@@ -311,7 +340,7 @@ export default function DashboardLayout({
                     key={item.name}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                        className={`group relative flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                        className={`group relative flex items-center gap-x-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
                           active
                             ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md'
                             : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
@@ -341,7 +370,7 @@ export default function DashboardLayout({
                       <div key={item.name} className="space-y-1">
                         <button
                           onClick={() => toggleSection(item.name)}
-                          className={`w-full flex items-center justify-between gap-x-2 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
+                          className={`w-full flex items-center justify-between gap-x-2 rounded-lg px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
                             hasActiveChild
                               ? `${sectionColor.text} ${sectionColor.bg} shadow-sm`
                               : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700/40'
@@ -349,13 +378,13 @@ export default function DashboardLayout({
                         >
                           <span>{item.name}</span>
                           <ArrowRight
-                            className={`h-4 w-4 transition-all duration-200 ${
+                            className={`h-3.5 w-3.5 transition-all duration-200 ${
                               isExpanded ? 'rotate-90' : ''
                             } ${hasActiveChild ? sectionColor.icon : 'text-slate-500'}`}
                           />
                         </button>
                         {isExpanded && (
-                          <div className="ml-3 space-y-0.5 border-l-2 border-slate-700/50 pl-3">
+                          <div className="ml-2.5 space-y-0.5 border-l-2 border-slate-700/50 pl-2.5">
                             {item.children.map((child) => {
                               const active = isActive(child.href)
                               const childIconColors: Record<string, string> = {
@@ -374,13 +403,13 @@ export default function DashboardLayout({
                                   key={child.name}
                                   href={child.href}
                                   onClick={() => setMobileMenuOpen(false)}
-                                  className={`flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 ${
+                                  className={`flex items-center gap-x-2.5 rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
                                     active
                                       ? 'text-white bg-slate-700/60 shadow-sm'
                                       : 'text-slate-300 hover:text-white hover:bg-slate-700/40'
                                   }`}
                                 >
-                                  <child.icon className={`h-4.5 w-4.5 shrink-0 transition-all duration-200 ${
+                                  <child.icon className={`h-4 w-4 shrink-0 transition-all duration-200 ${
                                     active ? 'text-white' : childIconColor
                                   }`} />
                                   <span>{child.name}</span>
@@ -396,17 +425,17 @@ export default function DashboardLayout({
               </nav>
 
               {/* Bottom Menu - Settings y Logout */}
-              <div className="shrink-0 mt-auto pt-3 px-3 pb-4 border-t border-slate-700/50 safe-area-bottom space-y-1">
+              <div className="shrink-0 mt-auto pt-2.5 px-3 pb-3 border-t border-slate-700/50 safe-area-bottom space-y-1">
                 <Link
                   href="/settings"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-x-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
                     isActive('/settings')
                       ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md'
                       : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
                   }`}
                 >
-                  <Settings className={`h-5 w-5 shrink-0 ${isActive('/settings') ? 'text-white' : 'text-slate-400'}`} />
+                  <Settings className={`h-4.5 w-4.5 shrink-0 ${isActive('/settings') ? 'text-white' : 'text-slate-400'}`} />
                   <span className={isActive('/settings') ? 'font-semibold' : ''}>{t('nav.settings')}</span>
                 </Link>
               <button
@@ -414,9 +443,9 @@ export default function DashboardLayout({
                     handleLogout()
                     setMobileMenuOpen(false)
                   }}
-                  className="flex w-full items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
-              >
-                <LogOut className="h-5 w-5" />
+                  className="flex w-full items-center gap-x-2.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
+                >
+                  <LogOut className="h-4.5 w-4.5" />
                   <span>{t('common.logout')}</span>
               </button>
               </div>
@@ -432,20 +461,7 @@ export default function DashboardLayout({
           <PropertyHeader />
         </div>
         
-        {/* Botón ultra discreto para abrir menú móvil - Top Left */}
-        {!mobileMenuOpen && (
-          <button
-            onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden fixed top-2 left-2 z-[90] w-8 h-8 bg-white/70 backdrop-blur-sm rounded-lg shadow-sm border border-slate-200/40 flex items-center justify-center hover:bg-white/90 hover:border-slate-300/60 hover:shadow-md active:scale-95 transition-all duration-200 safe-area-top"
-            aria-label="Abrir menú"
-            type="button"
-            style={{ marginTop: 'max(0.5rem, env(safe-area-inset-top))', marginLeft: 'max(0.5rem, env(safe-area-inset-left))' }}
-          >
-            <Menu className="h-4 w-4 text-slate-600" />
-          </button>
-        )}
-        
-        <main className="py-4 px-4 sm:py-6 sm:px-6 min-h-screen lg:pt-5 pt-4 safe-area-x safe-area-bottom">
+        <main className="py-4 px-4 sm:py-6 sm:px-6 min-h-screen lg:pt-5 pt-16 safe-area-x safe-area-bottom" style={{ paddingTop: 'max(4rem, calc(1rem + env(safe-area-inset-top)))' }}>
           <div className="page-soft">
           {children}
           </div>
