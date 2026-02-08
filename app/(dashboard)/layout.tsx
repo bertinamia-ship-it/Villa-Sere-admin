@@ -23,11 +23,10 @@ import {
   Wallet,
   User
 } from 'lucide-react'
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, memo } from 'react'
 import Header from '@/components/Header'
 import PropertyHeader from '@/components/PropertyHeader'
 import PropertySelector from '@/components/PropertySelector'
-import MobilePropertySelector from '@/components/MobilePropertySelector'
 import MobilePropertyCard from '@/components/MobilePropertyCard'
 import BillingGuard from './BillingGuard'
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary'

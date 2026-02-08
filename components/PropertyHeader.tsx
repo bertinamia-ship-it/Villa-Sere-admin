@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { Sparkles } from 'lucide-react'
 import { t } from '@/lib/i18n/es'
 
-export default function PropertyHeader() {
+function PropertyHeader() {
   const supabase = createClient()
   const [propertyName, setPropertyName] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -73,4 +73,6 @@ export default function PropertyHeader() {
     </div>
   )
 }
+
+export default memo(PropertyHeader)
 

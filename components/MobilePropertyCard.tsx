@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { Home, Building, ChevronDown, Sparkles, Plus } from 'lucide-react'
@@ -16,7 +16,7 @@ interface Property {
   location: string | null
 }
 
-export default function MobilePropertyCard() {
+function MobilePropertyCard() {
   const supabase = createClient()
   const { showToast } = useToast()
   const [properties, setProperties] = useState<Property[]>([])
@@ -389,3 +389,5 @@ export default function MobilePropertyCard() {
   )
 }
 
+
+export default memo(MobilePropertyCard)

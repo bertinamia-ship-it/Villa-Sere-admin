@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo, useCallback } from 'react'
 import { User, LogOut } from 'lucide-react'
 import PropertySelector from './PropertySelector'
 import { getActivePropertyId } from '@/lib/utils/property-client'
@@ -23,7 +23,7 @@ const sectionNames: Record<string, string> = {
   '/billing': 'Facturación',
 }
 
-export default function Header() {
+function Header() {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
@@ -66,11 +66,11 @@ export default function Header() {
     return () => window.removeEventListener('propertyChanged', handlePropertyChange)
   }, [supabase])
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await supabase.auth.signOut()
     router.push('/login')
     router.refresh()
-  }
+  }, [supabase, router])
 
   const sectionName = sectionNames[pathname] || 'CasaPilot'
 
@@ -123,3 +123,5 @@ export default function Header() {
     </header>
   )
 }
+
+export default memo(Header)
