@@ -57,11 +57,19 @@ export function useTrialGuard(): TrialGuardResult {
         return
       }
 
-      const { data: tenant } = await supabase
+      const { data: tenant, error: tenantError } = await supabase
         .from('tenants')
         .select('subscription_status, trial_ends_at')
         .eq('id', profile.tenant_id)
         .maybeSingle()
+
+      // Silently handle errors (expected if tenant doesn't exist or RLS blocks)
+      // Don't log to console - we handle this gracefully
+      if (tenantError) {
+        setTrialInfo({ isActive: true, isExpired: false, daysRemaining: null })
+        setLoading(false)
+        return
+      }
 
       // If not trial, allow actions
       if (!tenant || tenant.subscription_status !== 'trial') {
