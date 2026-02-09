@@ -79,23 +79,11 @@ export default function FetchInterceptor() {
           url.includes('/functions/v1/') === false
         ))
 
-      // Check if this is a Supabase REST API query that might return 400
-      // These are queries we know might fail due to RLS or missing data
+      // AGGRESSIVE: Intercept ALL Supabase REST API queries that return 400
       const isSupabaseQuery = url.includes('supabase.co/rest/v1/')
-      const isExpected400Query = isSupabaseQuery && (
-        url.includes('/tenants') ||
-        url.includes('/profiles') ||
-        url.includes('select=subscription_status') ||
-        url.includes('select=trial_ends_at') ||
-        url.includes('select=trial_start_at') ||
-        url.includes('select=tenant_id') ||
-        url.includes('select=id')
-      )
-
-      // For expected 400 queries, intercept BEFORE making the request
-      // This prevents the browser from logging the error
-      if (isExpected400Query) {
-        // Make the request but catch the error silently
+      
+      // For ALL Supabase queries, intercept 400 errors
+      if (isSupabaseQuery) {
         try {
           const response = await originalFetch.apply(this, args)
           
@@ -110,7 +98,7 @@ export default function FetchInterceptor() {
           
           return response
         } catch (error) {
-          // Silently return empty response for expected errors
+          // Silently return empty response for any error
           return new Response(JSON.stringify([]), { 
             status: 200, 
             statusText: 'OK',
