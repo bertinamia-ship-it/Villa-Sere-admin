@@ -16,6 +16,7 @@ import { PageHeader } from '@/components/ui/PageHeader'
 export default function VendorList() {
   const { t } = useI18n()
   const { canWrite, showTrialBlockedToast } = useTrialGuard()
+  const { showToast } = useToast()
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [filteredVendors, setFilteredVendors] = useState<Vendor[]>([])
   const [loading, setLoading] = useState(true)
@@ -184,7 +185,8 @@ export default function VendorList() {
             <Plus className="h-4 w-4" />
             {t('vendors.addVendor')}
           </Button>
-      </div>
+        }
+      />
 
       {/* Search */}
       <div className="bg-white rounded-lg shadow p-4">
