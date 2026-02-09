@@ -46,11 +46,16 @@ export default function BillingGuard({ children }: { children: React.ReactNode }
           return
         }
 
-        const { data: tenant } = await supabase
+        const { data: tenant, error: tenantError } = await supabase
           .from('tenants')
           .select('subscription_status, trial_ends_at')
           .eq('id', profile.tenant_id)
-          .single()
+          .maybeSingle()
+
+        // Silently handle errors (expected if tenant doesn't exist or RLS blocks)
+        if (tenantError && process.env.NODE_ENV === 'development') {
+          console.warn('[BillingGuard] Tenant query error (handled gracefully):', tenantError.message)
+        }
 
         if (!tenant) {
           setLoading(false)

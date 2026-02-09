@@ -58,11 +58,17 @@ export async function getCurrentTenant(): Promise<Tenant | null> {
   }
 
   // Get tenant details
-  const { data: tenant } = await supabase
+  const { data: tenant, error: tenantError } = await supabase
     .from('tenants')
     .select('*')
     .eq('id', profile.tenant_id)
-    .single()
+    .maybeSingle()
+
+  // Silently handle errors (expected if tenant doesn't exist or RLS blocks)
+  if (tenantError && process.env.NODE_ENV === 'development') {
+    // Only log in development, not in production
+    console.warn('[getCurrentTenant] Tenant query error (handled gracefully):', tenantError.message)
+  }
 
   return tenant as Tenant | null
 }
@@ -87,11 +93,17 @@ export async function isTenantOwner(): Promise<boolean> {
     return false
   }
 
-  const { data: tenant } = await supabase
+  const { data: tenant, error: tenantError } = await supabase
     .from('tenants')
     .select('owner_id')
     .eq('owner_id', user.id)
-    .single()
+    .maybeSingle()
+
+  // Silently handle errors (expected if tenant doesn't exist or RLS blocks)
+  if (tenantError && process.env.NODE_ENV === 'development') {
+    // Only log in development, not in production
+    console.warn('[isTenantOwner] Tenant query error (handled gracefully):', tenantError.message)
+  }
 
   return !!tenant
 }

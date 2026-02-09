@@ -62,11 +62,16 @@ export default function BillingPage() {
       }
 
       // Get tenant details
-      const { data: tenantData } = await supabase
+      const { data: tenantData, error: tenantError } = await supabase
         .from('tenants')
         .select('id, name, subscription_status, subscription_plan, trial_ends_at, created_at')
         .eq('id', profile.tenant_id)
-        .single()
+        .maybeSingle()
+
+      // Silently handle errors (expected if tenant doesn't exist or RLS blocks)
+      if (tenantError && process.env.NODE_ENV === 'development') {
+        console.warn('[Billing] Tenant query error (handled gracefully):', tenantError.message)
+      }
 
       if (tenantData) {
         setTenant(tenantData as Tenant)

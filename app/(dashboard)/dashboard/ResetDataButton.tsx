@@ -59,11 +59,16 @@ export default function ResetDataButton() {
       }
 
       // Check if user is tenant owner
-      const { data: tenant } = await supabase
+      const { data: tenant, error: tenantError } = await supabase
         .from('tenants')
         .select('owner_id')
         .eq('id', profile.tenant_id)
-        .single()
+        .maybeSingle()
+
+      // Silently handle errors (expected if tenant doesn't exist or RLS blocks)
+      if (tenantError && process.env.NODE_ENV === 'development') {
+        console.warn('[ResetDataButton] Tenant query error (handled gracefully):', tenantError.message)
+      }
 
       setIsAuthorized(tenant?.owner_id === user.id)
     } catch (error) {
