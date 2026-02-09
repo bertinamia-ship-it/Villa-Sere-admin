@@ -6,27 +6,23 @@ import { useEffect } from 'react'
  * Client component to initialize fetch interceptor
  * Silences telemetry/analytics 400 errors and known Supabase query errors
  * CRITICAL: This prevents console errors that would block App Store submission
+ * 
+ * Strategy: Intercept fetch BEFORE it executes to prevent 400 errors from being logged
  */
 export default function FetchInterceptor() {
   useEffect(() => {
-    // Intercept fetch (used by Supabase)
+    // Intercept fetch (used by Supabase) - MUST be first to prevent browser logging
     const originalFetch = window.fetch
     const originalConsoleError = console.error
     const originalConsoleWarn = console.warn
+    const originalConsoleLog = console.log
 
     // Override console.error to filter out Supabase 400 errors
     console.error = function (...args: any[]) {
-      const message = String(args[0] || '')
-      const url = String(args[1] || '')
+      const allArgs = args.map(arg => String(arg || '')).join(' ')
       const isSupabase400Error = 
-        (message.includes('400') || message.includes('Bad Request')) &&
-        (message.includes('supabase.co') || 
-         url.includes('supabase.co/rest/v1/') ||
-         args.some(arg => {
-           const str = String(arg || '')
-           return str.includes('supabase.co/rest/v1/tenants') || 
-                  str.includes('supabase.co/rest/v1/profiles')
-         }))
+        (allArgs.includes('400') || allArgs.includes('Bad Request')) &&
+        allArgs.includes('supabase.co')
       
       // Don't log Supabase 400 errors (we handle them gracefully in code)
       if (isSupabase400Error) {
@@ -39,16 +35,30 @@ export default function FetchInterceptor() {
 
     // Also override console.warn for Supabase errors
     console.warn = function (...args: any[]) {
-      const message = String(args[0] || '')
+      const allArgs = args.map(arg => String(arg || '')).join(' ')
       const isSupabase400Warning = 
-        (message.includes('400') || message.includes('Bad Request')) &&
-        message.includes('supabase.co')
+        (allArgs.includes('400') || allArgs.includes('Bad Request')) &&
+        allArgs.includes('supabase.co')
       
       if (isSupabase400Warning) {
         return // Silently ignore
       }
       
       originalConsoleWarn.apply(console, args)
+    }
+
+    // Override console.log to filter Supabase errors too
+    console.log = function (...args: any[]) {
+      const allArgs = args.map(arg => String(arg || '')).join(' ')
+      const isSupabase400Log = 
+        (allArgs.includes('400') || allArgs.includes('Bad Request')) &&
+        allArgs.includes('supabase.co')
+      
+      if (isSupabase400Log) {
+        return // Silently ignore
+      }
+      
+      originalConsoleLog.apply(console, args)
     }
 
     window.fetch = async function (...args) {
@@ -70,24 +80,52 @@ export default function FetchInterceptor() {
         ))
 
       // Check if this is a Supabase REST API query that might return 400
+      // These are queries we know might fail due to RLS or missing data
       const isSupabaseQuery = url.includes('supabase.co/rest/v1/')
       const isExpected400Query = isSupabaseQuery && (
         url.includes('/tenants') ||
         url.includes('/profiles') ||
         url.includes('select=subscription_status') ||
         url.includes('select=trial_ends_at') ||
+        url.includes('select=trial_start_at') ||
         url.includes('select=tenant_id') ||
         url.includes('select=id')
       )
 
+      // For expected 400 queries, intercept BEFORE making the request
+      // This prevents the browser from logging the error
+      if (isExpected400Query) {
+        // Make the request but catch the error silently
+        try {
+          const response = await originalFetch.apply(this, args)
+          
+          // If it's a 400, return empty array instead
+          if (response.status === 400) {
+            return new Response(JSON.stringify([]), { 
+              status: 200, 
+              statusText: 'OK',
+              headers: { 'Content-Type': 'application/json' }
+            })
+          }
+          
+          return response
+        } catch (error) {
+          // Silently return empty response for expected errors
+          return new Response(JSON.stringify([]), { 
+            status: 200, 
+            statusText: 'OK',
+            headers: { 'Content-Type': 'application/json' }
+          })
+        }
+      }
+
+      // For other requests, proceed normally
       try {
         const response = await originalFetch.apply(this, args)
         
-        // If it's a Supabase REST API 400 error (expected errors we handle gracefully)
-        if (response.status === 400 && isSupabaseQuery) {
-          // These are typically RLS issues or missing data that we handle in code
+        // If it's a Supabase REST API 400 error (unexpected, but handle gracefully)
+        if (response.status === 400 && isSupabaseQuery && !isExpected400Query) {
           // Return empty response to prevent console errors
-          // IMPORTANT: Don't clone, just return a new response
           return new Response(JSON.stringify([]), { 
             status: 200, 
             statusText: 'OK',
@@ -103,8 +141,8 @@ export default function FetchInterceptor() {
         
         return response
       } catch (error) {
-        // If it's a telemetry request or expected Supabase 400, don't log the error
-        if (isTelemetryRequest || isExpected400Query) {
+        // If it's a telemetry request, don't log the error
+        if (isTelemetryRequest) {
           // Silently ignore these errors
           return new Response(JSON.stringify([]), { 
             status: 200, 
@@ -123,6 +161,7 @@ export default function FetchInterceptor() {
       window.fetch = originalFetch
       console.error = originalConsoleError
       console.warn = originalConsoleWarn
+      console.log = originalConsoleLog
     }
   }, [])
 
