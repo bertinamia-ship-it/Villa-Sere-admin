@@ -245,7 +245,8 @@ export default function ToBuyPage() {
             <Plus className="h-4 w-4" />
             {t('toBuy.addItem')}
           </Button>
-      </div>
+        }
+      />
 
       {/* Status Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
