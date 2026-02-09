@@ -8,6 +8,7 @@ import { X, Upload } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { useI18n } from '@/components/I18nProvider'
 import { useToast } from '@/components/ui/Toast'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 
 interface TicketFormProps {
   ticket?: MaintenanceTicket | null
@@ -32,9 +33,17 @@ export default function TicketForm({ ticket, vendors, onClose }: TicketFormProps
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
   const { showToast } = useToast()
+  const { canWrite, showTrialBlockedToast } = useTrialGuard()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Check trial guard
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
+    
     setLoading(true)
 
     const propertyId = await getActivePropertyId()

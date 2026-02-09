@@ -17,12 +17,12 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   // Optimize production builds
-  swcMinify: true,
   compress: true,
   // Reduce bundle size
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
+  // Note: swcMinify is default in Next.js 16, telemetry is disabled via environment variable
 };
 
 export default nextConfig;

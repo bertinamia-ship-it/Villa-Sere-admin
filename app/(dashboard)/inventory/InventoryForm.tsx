@@ -8,6 +8,7 @@ import { X, Upload } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { useToast } from '@/components/ui/Toast'
 import { useI18n } from '@/components/I18nProvider'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 
 interface InventoryFormProps {
   item?: InventoryItem | null
@@ -29,9 +30,17 @@ export default function InventoryForm({ item, onClose }: InventoryFormProps) {
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
   const { showToast } = useToast()
+  const { canWrite, showTrialBlockedToast } = useTrialGuard()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Check trial guard
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
+    
     setLoading(true)
 
     const propertyId = await getActivePropertyId()

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useToast } from '@/components/ui/Toast'
 import { useI18n } from '@/components/I18nProvider'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 
 interface TaskFormProps {
   task: Task | null
@@ -42,9 +43,17 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
   const { showToast } = useToast()
+  const { canWrite, showTrialBlockedToast } = useTrialGuard()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Check trial guard
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
+    
     setLoading(true)
 
     const propertyId = await getActivePropertyId()

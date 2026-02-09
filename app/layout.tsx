@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
 import { I18nProvider } from "@/components/I18nProvider";
+import FetchInterceptor from "@/components/FetchInterceptor";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -63,6 +64,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <FetchInterceptor />
         <div id="portal-root" />
         <I18nProvider>
           <ToastProvider>

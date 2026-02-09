@@ -7,6 +7,7 @@ import { Plus, Search, Pencil, Trash2, Phone, Mail, MessageCircle, Users } from 
 import VendorForm from './VendorForm'
 import { getCurrentTenantId } from '@/lib/utils/tenant'
 import { useI18n } from '@/components/I18nProvider'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Button } from '@/components/ui/Button'
@@ -14,6 +15,7 @@ import { PageHeader } from '@/components/ui/PageHeader'
 
 export default function VendorList() {
   const { t } = useI18n()
+  const { canWrite, showTrialBlockedToast } = useTrialGuard()
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [filteredVendors, setFilteredVendors] = useState<Vendor[]>([])
   const [loading, setLoading] = useState(true)
@@ -101,6 +103,10 @@ export default function VendorList() {
   }
 
   const handleDelete = async (id: string) => {
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
     if (!confirm(t('vendors.confirmDelete'))) return
 
     try {
@@ -139,6 +145,10 @@ export default function VendorList() {
   }
 
   const handleEdit = (vendor: Vendor) => {
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
     setEditingVendor(vendor)
     setShowForm(true)
   }
@@ -161,12 +171,19 @@ export default function VendorList() {
         subtitle={t('vendors.totalVendors', { count: String(vendors.length) })}
         rightSlot={
           <Button
-            onClick={() => setShowForm(true)}
-          className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
-        >
-          <Plus className="h-4 w-4" />
-          {t('vendors.addVendor')}
-        </Button>
+            onClick={() => {
+              if (!canWrite) {
+                showTrialBlockedToast()
+                return
+              }
+              setShowForm(true)
+            }}
+            disabled={!canWrite}
+            className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
+          >
+            <Plus className="h-4 w-4" />
+            {t('vendors.addVendor')}
+          </Button>
       </div>
 
       {/* Search */}
@@ -191,7 +208,13 @@ export default function VendorList() {
             title={vendors.length === 0 ? t('vendors.emptyTitle') : t('vendors.noVendorsFound')}
             description={vendors.length === 0 ? t('vendors.emptyDescription') : t('vendors.tryDifferentFilters')}
             actionLabel={vendors.length === 0 ? t('vendors.addVendor') : undefined}
-            onAction={vendors.length === 0 ? () => setShowForm(true) : undefined}
+            onAction={vendors.length === 0 ? () => {
+              if (!canWrite) {
+                showTrialBlockedToast()
+                return
+              }
+              setShowForm(true)
+            } : undefined}
           />
         </Card>
       ) : (
@@ -208,13 +231,15 @@ export default function VendorList() {
                 <div className="flex gap-1">
                   <button
                     onClick={() => handleEdit(vendor)}
-                    className="p-1 text-gray-600 hover:text-blue-600 transition"
+                    disabled={!canWrite}
+                    className="p-1 text-gray-600 hover:text-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(vendor.id)}
-                    className="p-1 text-gray-600 hover:text-red-600 transition"
+                    disabled={!canWrite}
+                    className="p-1 text-gray-600 hover:text-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>

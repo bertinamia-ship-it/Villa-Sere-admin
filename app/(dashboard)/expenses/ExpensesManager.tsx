@@ -16,6 +16,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { useI18n } from '@/components/I18nProvider'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 
 export default function ExpensesManager() {
   const { t } = useI18n()
@@ -57,12 +58,15 @@ export default function ExpensesManager() {
         .maybeSingle()
       
       if (profileError) {
-        console.error('[ExpensesManager] Error fetching profile:', {
-          message: profileError.message,
-          details: profileError.details,
-          hint: profileError.hint,
-          code: profileError.code
-        })
+        // Only log in development
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[ExpensesManager] Error fetching profile:', {
+            message: profileError.message,
+            details: profileError.details,
+            hint: profileError.hint,
+            code: profileError.code
+          })
+        }
       }
       
       tenantId = profile?.tenant_id || null
@@ -106,6 +110,12 @@ export default function ExpensesManager() {
 
   const handleDelete = async () => {
     if (!deleteConfirm.expenseId) return
+
+    // Check trial guard
+    if (blockAction('expenses.delete')) {
+      setDeleteConfirm({ isOpen: false, expenseId: null })
+      return
+    }
 
     setDeleting(true)
     const propertyId = await getActivePropertyId()
@@ -194,7 +204,7 @@ export default function ExpensesManager() {
     const dateRange = new Date().toISOString().split('T')[0]
     a.download = buildExportFilename({
       propertyName,
-      reportType: 'Gastos',
+      reportType: t('expenses.exportCSV'),
       dateRange,
       ext: 'csv'
     })

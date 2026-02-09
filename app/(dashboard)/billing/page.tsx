@@ -215,9 +215,9 @@ export default function BillingPage() {
               </div>
               <p className="text-sm text-blue-700">
                 {trialExpired ? (
-                  <>Tu trial expiró el {new Date(tenant.trial_ends_at).toLocaleDateString('es-ES')}</>
+                  <>{t('billing.trialExpiredOn')} {new Date(tenant.trial_ends_at).toLocaleDateString('es-ES')}</>
                 ) : (
-                  <>El trial termina el {new Date(tenant.trial_ends_at).toLocaleDateString('es-ES')}</>
+                  <>{t('billing.trialEndsOn')} {new Date(tenant.trial_ends_at).toLocaleDateString('es-ES')}</>
                 )}
               </p>
             </div>

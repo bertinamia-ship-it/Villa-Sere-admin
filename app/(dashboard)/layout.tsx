@@ -27,10 +27,13 @@ import { useState, useEffect, useCallback, useMemo, memo } from 'react'
 import Header from '@/components/Header'
 import PropertyHeader from '@/components/PropertyHeader'
 import PropertySelector from '@/components/PropertySelector'
+import TrialBanner from '@/components/TrialBanner'
 import MobilePropertyCard from '@/components/MobilePropertyCard'
 import BillingGuard from './BillingGuard'
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 import { useI18n } from '@/components/I18nProvider'
+import FetchInterceptor from '@/components/FetchInterceptor'
+import QAMode from '@/components/QAMode'
 
 // Navigation structure: compact and organized
 type NavItem = 
@@ -148,6 +151,9 @@ export default function DashboardLayout({
   return (
     <BillingGuard>
       <ErrorBoundary moduleName="Dashboard">
+        <FetchInterceptor />
+        <QAMode />
+        <TrialBanner />
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
       {/* Desktop Sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col">

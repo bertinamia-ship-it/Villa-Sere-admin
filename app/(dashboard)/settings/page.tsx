@@ -6,13 +6,14 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Modal } from '@/components/ui/Modal'
-import { Settings, AlertTriangle, Trash2, Loader2, Download, Smartphone, Monitor, CheckCircle2, ChevronDown, Lock, Globe } from 'lucide-react'
+import { Settings, AlertTriangle, Trash2, Loader2, Download, Smartphone, Monitor, CheckCircle2, ChevronDown, Lock, Globe, CreditCard, Clock, XCircle } from 'lucide-react'
 import { useI18n } from '@/components/I18nProvider'
 import { PageHeader } from '@/components/ui/PageHeader'
 import ResetDataButton from '@/app/(dashboard)/dashboard/ResetDataButton'
 import PropertyDeleteSection from '@/components/PropertyDeleteSection'
 import { useToast } from '@/components/ui/Toast'
 import { LanguageSelector } from '@/components/ui/LanguageSelector'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 
 export default function SettingsPage() {
   const [isAuthorized, setIsAuthorized] = useState(false)
@@ -28,6 +29,7 @@ export default function SettingsPage() {
   const supabase = createClient()
   const { showToast } = useToast()
   const { language, setLanguage, t } = useI18n()
+  const { isTrialActive, isTrialExpired, daysRemaining } = useTrialGuard()
 
   useEffect(() => {
     checkAuthorization()
@@ -115,7 +117,10 @@ export default function SettingsPage() {
 
       setIsAuthorized(tenant?.owner_id === user.id)
     } catch (error) {
-      console.error('Error checking authorization:', error)
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error checking authorization:', error)
+      }
       setIsAuthorized(false)
     } finally {
       setCheckingAuth(false)
@@ -221,9 +226,93 @@ export default function SettingsPage() {
     <div className="space-y-8">
       <PageHeader title={t('settings.title')} subtitle={t('settings.subtitle')} />
 
+      {/* SECCIÓN 0: Mi Plan */}
+      <div className="space-y-6">
+        <h2 className="text-lg font-semibold text-[#0F172A]">{t('settings.myPlan.title')}</h2>
+        
+        <Card className="border-slate-200/60 shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2.5 text-[#0F172A]">
+              <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg">
+                <CreditCard className="h-5 w-5 text-white" />
+              </div>
+              <span>{t('settings.myPlan.planStatus')}</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-4">
+            {/* Status Badge */}
+            <div className="flex items-center gap-3">
+              {isTrialExpired ? (
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg">
+                  <XCircle className="h-4 w-4 text-red-600" />
+                  <span className="text-sm font-medium text-red-700">{t('settings.myPlan.trialExpired')}</span>
+                </div>
+              ) : isTrialActive ? (
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg">
+                  <Clock className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm font-medium text-blue-700">
+                    {daysRemaining !== null
+                      ? daysRemaining === 1
+                        ? t('trial.daysRemainingSingular')
+                        : t('trial.daysRemaining', { days: String(daysRemaining) })
+                      : t('settings.myPlan.trialActive')
+                    }
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-700">{t('settings.myPlan.activePlan')}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Price */}
+            <div className="pt-2 border-t border-slate-200">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-700">{t('settings.myPlan.planStatus')}</span>
+                <span className="text-lg font-semibold text-[#0F172A]">{t('settings.myPlan.pricePerProperty')}</span>
+              </div>
+            </div>
+
+            {/* Coming Soon */}
+            <div className="pt-2 border-t border-slate-200">
+              <p className="text-sm text-slate-600 italic">{t('settings.myPlan.paymentsComingSoon')}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* SECCIÓN 1: Configuraciones Básicas */}
       <div className="space-y-6">
         <h2 className="text-lg font-semibold text-[#0F172A]">{t('settings.general')}</h2>
+        
+        {/* QA Mode Reset (DEV ONLY) */}
+        {process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_QA_MODE === 'true' && (
+          <Card className="border-yellow-200 bg-yellow-50">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-yellow-900 mb-1">QA Mode Active</h3>
+                  <p className="text-sm text-yellow-700">Development testing mode enabled</p>
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    localStorage.removeItem('activePropertyId')
+                    localStorage.removeItem('app-language')
+                    sessionStorage.clear()
+                    window.location.reload()
+                  }}
+                  className="bg-yellow-100 hover:bg-yellow-200 text-yellow-900"
+                >
+                  Reset QA (Clear Local + activePropertyId)
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
         
         {/* Language Selector */}
         <Card className="border-slate-200/60 shadow-sm hover:shadow-md transition-shadow">

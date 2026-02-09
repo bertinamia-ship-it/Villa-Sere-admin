@@ -10,6 +10,7 @@ import { useToast } from '@/components/ui/Toast'
 import { useI18n } from '@/components/I18nProvider'
 import { insertWithPropertyClient, updateWithPropertyClient, deleteWithPropertyClient } from '@/lib/supabase/query-helpers-client'
 import { logError, getUserFriendlyError } from '@/lib/utils/error-handler'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 
 interface ExpenseFormProps {
   expense?: Expense | null
@@ -36,6 +37,7 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
   const supabase = createClient()
   const { showToast } = useToast()
   const { t } = useI18n()
+  const { canWrite, showTrialBlockedToast } = useTrialGuard()
 
   useEffect(() => {
     loadAccounts()
@@ -90,6 +92,13 @@ export default function ExpenseForm({ expense, vendors, tickets, onClose }: Expe
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Check trial guard
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
+    
     setLoading(true)
 
     const propertyId = await getActivePropertyId()

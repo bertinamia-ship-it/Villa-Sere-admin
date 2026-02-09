@@ -12,6 +12,7 @@ import { ArrowLeft, Plus, Minus, Edit, Trash2 } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { insertWithPropertyClient, deleteWithPropertyClient } from '@/lib/supabase/query-helpers-client'
 import { useI18n } from '@/components/I18nProvider'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 import { logError, getUserFriendlyError } from '@/lib/utils/error-handler'
 import { formatDate, formatCurrency } from '@/lib/utils/formatters'
 import TransactionForm from './TransactionForm'
@@ -29,6 +30,7 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
   const { t } = useI18n()
   const supabase = createClient()
   const { showToast } = useToast()
+  const { canWrite, showTrialBlockedToast } = useTrialGuard()
   const [loading, setLoading] = useState(true)
   const [transactions, setTransactions] = useState<AccountTransaction[]>([])
   const [showTransactionForm, setShowTransactionForm] = useState(false)
@@ -101,6 +103,11 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
 
   const handleDeleteTransaction = async () => {
     if (!deleteConfirm.transactionId) return
+    if (!canWrite) {
+      showTrialBlockedToast()
+      setDeleteConfirm({ isOpen: false, transactionId: null })
+      return
+    }
 
     try {
       const propertyId = await getActivePropertyId()
@@ -153,10 +160,32 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
           </div>
         </div>
         <div className="flex gap-2 sm:gap-2">
-          <Button variant="secondary" onClick={() => onEdit(currentAccount)} className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0">
+          <Button 
+            variant="secondary" 
+            onClick={() => {
+              if (!canWrite) {
+                showTrialBlockedToast()
+                return
+              }
+              onEdit(currentAccount)
+            }} 
+            disabled={!canWrite}
+            className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
+          >
             <Edit className="h-4 w-4" />
           </Button>
-          <Button variant="danger" onClick={() => onDelete(currentAccount.id)} className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0">
+          <Button 
+            variant="danger" 
+            onClick={() => {
+              if (!canWrite) {
+                showTrialBlockedToast()
+                return
+              }
+              onDelete(currentAccount.id)
+            }} 
+            disabled={!canWrite}
+            className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
+          >
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -173,9 +202,14 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
             <Button
               variant="secondary"
               onClick={() => {
+                if (!canWrite) {
+                  showTrialBlockedToast()
+                  return
+                }
                 setTransactionDirection('in')
                 setShowTransactionForm(true)
               }}
+              disabled={!canWrite}
               className="w-full sm:w-auto min-h-[44px] justify-center"
             >
               <Plus className="h-4 w-4" />
@@ -184,9 +218,14 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
             <Button
               variant="secondary"
               onClick={() => {
+                if (!canWrite) {
+                  showTrialBlockedToast()
+                  return
+                }
                 setTransactionDirection('out')
                 setShowTransactionForm(true)
               }}
+              disabled={!canWrite}
               className="w-full sm:w-auto min-h-[44px] justify-center"
             >
               <Minus className="h-4 w-4" />
@@ -255,7 +294,14 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setDeleteConfirm({ isOpen: true, transactionId: transaction.id })}
+                          onClick={() => {
+                            if (!canWrite) {
+                              showTrialBlockedToast()
+                              return
+                            }
+                            setDeleteConfirm({ isOpen: true, transactionId: transaction.id })
+                          }}
+                          disabled={!canWrite}
                         >
                           <Trash2 className="h-4 w-4 text-red-600" />
                         </Button>
@@ -297,7 +343,14 @@ export default function AccountDetail({ account, onBack, onEdit, onDelete, onRef
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setDeleteConfirm({ isOpen: true, transactionId: transaction.id })}
+                    onClick={() => {
+                      if (!canWrite) {
+                        showTrialBlockedToast()
+                        return
+                      }
+                      setDeleteConfirm({ isOpen: true, transactionId: transaction.id })
+                    }}
+                    disabled={!canWrite}
                     className="shrink-0 min-w-[44px] min-h-[44px]"
                   >
                     <Trash2 className="h-5 w-5 text-red-600" />

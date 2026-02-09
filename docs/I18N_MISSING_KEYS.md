@@ -1,15 +1,15 @@
 # Auditoría i18n - Keys Faltantes
 
-**Fecha:** 2026-02-08  
+**Fecha:** 2026-02-09  
 **Objetivo:** Encontrar todas las keys usadas en el código que no existen en los diccionarios
 
 ---
 
 ## Resumen
 
-- **Keys usadas en código:** 521
-- **Keys en es.ts:** 722
-- **Keys en en.ts:** 699
+- **Keys usadas en código:** 554
+- **Keys en es.ts:** 765
+- **Keys en en.ts:** 743
 - **Keys dinámicas encontradas:** 0
 
 ---

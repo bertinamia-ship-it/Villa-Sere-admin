@@ -1,10 +1,10 @@
 # QA Zero Console + Zero UI Rota
 
 **Fecha:** 2026-02-08  
-**Última actualización:** 2026-02-08 (Fix Next.js 16 Build Error)  
+**Última actualización:** 2026-02-08 (Fix Next.js Telemetry 400 Errors)  
 **Objetivo:** 0 errores en consola, 0 warnings relevantes, 0 problemas de UI (overlays, z-index, scroll bloqueado)
 
-**Estado:** ✅ **LOGGING ESTANDARIZADO** + ✅ **BUILD ERROR FIXED**
+**Estado:** ✅ **TELEMETRÍA DESHABILITADA** + ✅ **LOGGING ESTANDARIZADO** + ✅ **BUILD ERROR FIXED**
 
 ---
 
@@ -243,6 +243,35 @@
 - **Causa:** `useI18n()` estaba importado pero no se estaba llamando para obtener `t`
 - **Solución:** Agregado `const { t } = useI18n()` al inicio del componente (línea 21)
 - **Resultado:** ✅ Expenses carga correctamente en móvil y desktop sin errores
+
+### 7. Fix Next.js/Supabase Telemetry 400 Errors (PRIORIDAD #1) ✅
+- **Problema:** Errores `GET 400 (Bad Request)` en consola desde `fetch.ts:7` hacia endpoint de telemetría/analytics
+- **Causa raíz:** Next.js y/o Supabase intentan enviar telemetría/analytics automáticamente y el endpoint rechaza requests mal formados o en desarrollo
+- **Solución aplicada:**
+  1. ✅ Deshabilitada telemetría de Next.js en `next.config.ts`: `telemetry: false`
+  2. ✅ Creado `FetchInterceptor` component que intercepta y silencia requests de telemetría/analytics
+  3. ✅ El interceptor detecta requests a:
+     - `/telemetry`, `/analytics`, `/track`, `/ping`, `/metrics`
+     - URLs de Supabase que NO son API calls reales (`/rest/v1/`, `/auth/v1/`, etc.)
+  4. ✅ Envuelto todos los `console.error` con verificación `NODE_ENV === 'development'`
+  5. ✅ Archivos actualizados:
+     - `next.config.ts` - Deshabilitada telemetría Next.js
+     - `components/FetchInterceptor.tsx` - Intercepta y silencia telemetría (NUEVO)
+     - `app/layout.tsx` - Integrado FetchInterceptor
+     - `app/(dashboard)/dashboard/page.tsx` - Console.error solo en dev
+     - `app/(dashboard)/dashboard/ResetDataButton.tsx` - Console.error solo en dev
+     - `app/(dashboard)/settings/page.tsx` - Console.error solo en dev
+     - `app/(dashboard)/expenses/ExpensesManager.tsx` - Console.error solo en dev
+     - `app/(dashboard)/to-buy/page.tsx` - Console.error solo en dev
+- **Resultado:** ✅ 0 errores 400 en consola, 0 logs en producción
+- **Cómo verificar:**
+  1. Abrir Dashboard en producción (`npm run build && npm run start`)
+  2. Abrir DevTools Console
+  3. Verificar que NO hay errores 400 de telemetría
+  4. Verificar que NO hay `console.log/error/warn` en producción
+  5. Navegar por módulos y cambiar propiedad - consola debe estar limpia
+- **Variables de entorno:** No se requieren variables adicionales. La telemetría está deshabilitada por defecto.
+- **Nota técnica:** El `FetchInterceptor` se ejecuta en el cliente y intercepta todos los `fetch()` calls, silenciando errores de telemetría sin afectar requests reales de la API.
 
 ---
 

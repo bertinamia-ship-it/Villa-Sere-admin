@@ -2,7 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getActiveProperty, getActivePropertyId } from '@/lib/utils/property'
+import { getActiveProperty, getActivePropertyId, getUserProperties } from '@/lib/utils/property'
+import OnboardingWrapper from '@/components/OnboardingWrapper'
 import { 
   Package, 
   Wrench, 
@@ -42,12 +43,15 @@ export default async function DashboardPage() {
     .maybeSingle()
 
   if (profileError) {
-    console.error('[Dashboard] Error fetching profile:', {
-      message: profileError.message,
-      details: profileError.details,
-      hint: profileError.hint,
-      code: profileError.code
-    })
+    // Only log in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[Dashboard] Error fetching profile:', {
+        message: profileError.message,
+        details: profileError.details,
+        hint: profileError.hint,
+        code: profileError.code
+      })
+    }
   }
 
   // Pre-load translations for early returns
@@ -77,12 +81,21 @@ export default async function DashboardPage() {
     )
   }
 
+  // Check if user has any properties
+  const allProperties = await getUserProperties()
+  const hasProperties = allProperties.length > 0
+
+  // If no properties at all, show onboarding wizard
+  if (!hasProperties) {
+    return <OnboardingWrapper tenantId={profile.tenant_id} />
+  }
+
   // Get active property ID and property object
   const propertyId = await getActivePropertyId()
   const activeProperty = await getActiveProperty()
   const propertyName = activeProperty?.name || 'CasaPilot'
 
-  // If no property, show empty state with CTA
+  // If no active property selected (but has properties), show empty state with CTA
   if (!propertyId || !activeProperty) {
     return (
       <div className="space-y-6">

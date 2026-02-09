@@ -11,6 +11,7 @@ import { getActivePropertyId } from '@/lib/utils/property-client'
 import { insertWithPropertyClient, updateWithPropertyClient } from '@/lib/supabase/query-helpers-client'
 import { useI18n } from '@/components/I18nProvider'
 import { logError, getUserFriendlyError } from '@/lib/utils/error-handler'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 
 interface AccountFormProps {
   account: FinancialAccount | null
@@ -20,6 +21,7 @@ interface AccountFormProps {
 
 export default function AccountForm({ account, onClose, onSave }: AccountFormProps) {
   const { t } = useI18n()
+  const { canWrite, showTrialBlockedToast } = useTrialGuard()
   const [formData, setFormData] = useState({
     name: account?.name || '',
     account_type: account?.account_type || ('cash' as 'cash' | 'card' | 'bank'),
@@ -34,6 +36,13 @@ export default function AccountForm({ account, onClose, onSave }: AccountFormPro
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Check trial guard
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
+    
     setLoading(true)
 
     const propertyId = await getActivePropertyId()

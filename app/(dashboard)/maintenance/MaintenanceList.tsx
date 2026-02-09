@@ -12,7 +12,9 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { useI18n } from '@/components/I18nProvider'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -20,6 +22,7 @@ type TabType = 'tickets' | 'recurrent'
 
 export default function MaintenanceList() {
   const { t } = useI18n()
+  const { canWrite, showTrialBlockedToast } = useTrialGuard()
   const [tickets, setTickets] = useState<MaintenanceTicket[]>([])
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [filteredTickets, setFilteredTickets] = useState<MaintenanceTicket[]>([])
@@ -130,6 +133,10 @@ export default function MaintenanceList() {
   }
 
   const handleEdit = (ticket: MaintenanceTicket) => {
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
     setEditingTicket(ticket)
     setShowForm(true)
   }
@@ -199,9 +206,14 @@ export default function MaintenanceList() {
           activeTab === 'tickets' ? (
             <Button
               onClick={() => {
+                if (!canWrite) {
+                  showTrialBlockedToast()
+                  return
+                }
                 setEditingTicket(null)
                 setShowForm(true)
               }}
+              disabled={!canWrite}
               size="sm"
               className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
             >
@@ -311,6 +323,10 @@ export default function MaintenanceList() {
                   vendorName={vendors.find(v => v.id === ticket.vendor_id)?.company_name || null}
                   onEdit={handleEdit}
                   onDelete={async (id: string) => {
+                    if (!canWrite) {
+                      showTrialBlockedToast()
+                      return
+                    }
                     const propertyId = await getActivePropertyId()
                     if (!propertyId) return
                     const { error } = await supabase

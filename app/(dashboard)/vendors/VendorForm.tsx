@@ -7,6 +7,7 @@ import { X } from 'lucide-react'
 import { getCurrentTenantId } from '@/lib/utils/tenant'
 import { useI18n } from '@/components/I18nProvider'
 import { useToast } from '@/components/ui/Toast'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 
 interface VendorFormProps {
   vendor?: Vendor | null
@@ -26,9 +27,17 @@ export default function VendorForm({ vendor, onClose }: VendorFormProps) {
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
   const { showToast } = useToast()
+  const { canWrite, showTrialBlockedToast } = useTrialGuard()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Check trial guard
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
+    
     setLoading(true)
 
     try {

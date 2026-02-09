@@ -12,10 +12,12 @@ import { Plus, ShoppingCart, Edit, Trash2, ExternalLink, Search } from 'lucide-r
 import PurchaseItemForm from './PurchaseItemForm'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { useI18n } from '@/components/I18nProvider'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 import { PageHeader } from '@/components/ui/PageHeader'
 
 export default function ToBuyPage() {
   const { t } = useI18n()
+  const { canWrite, showTrialBlockedToast } = useTrialGuard()
   const supabase = createClient()
   const { showToast } = useToast()
   const [loading, setLoading] = useState(true)
@@ -49,7 +51,10 @@ export default function ToBuyPage() {
       if (error) throw error
       setItems(data || [])
     } catch (error) {
-      console.error('Error loading items:', error)
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error loading items:', error)
+      }
       showToast(t('toBuy.loadError'), 'error')
     } finally {
       setLoading(false)
@@ -93,6 +98,10 @@ export default function ToBuyPage() {
   }
 
   async function handleSave(item: Partial<PurchaseItem>) {
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
     try {
       const propertyId = await getActivePropertyId()
       if (!propertyId) {
@@ -122,12 +131,19 @@ export default function ToBuyPage() {
       setEditingItem(null)
       loadItems()
     } catch (error) {
-      console.error('Error saving item:', error)
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error saving item:', error)
+      }
       showToast(t('toBuy.saveError'), 'error')
     }
   }
 
   async function handleDelete(id: string) {
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
     if (!confirm(t('toBuy.confirmDelete'))) return
 
     try {
@@ -147,12 +163,19 @@ export default function ToBuyPage() {
       showToast(t('toBuy.itemDeleted'), 'success')
       loadItems()
     } catch (error) {
-      console.error('Error deleting item:', error)
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error deleting item:', error)
+      }
       showToast(t('toBuy.deleteError'), 'error')
     }
   }
 
   function handleEdit(item: PurchaseItem) {
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
     setEditingItem(item)
     setShowForm(true)
   }
@@ -209,14 +232,19 @@ export default function ToBuyPage() {
         rightSlot={
           <Button 
             onClick={() => {
-            setEditingItem(null)
-            setShowForm(true)
-          }}
-          className="w-full sm:w-auto"
-        >
-          <Plus className="h-4 w-4" />
-          {t('toBuy.addItem')}
-        </Button>
+              if (!canWrite) {
+                showTrialBlockedToast()
+                return
+              }
+              setEditingItem(null)
+              setShowForm(true)
+            }}
+            disabled={!canWrite}
+            className="w-full sm:w-auto"
+          >
+            <Plus className="h-4 w-4" />
+            {t('toBuy.addItem')}
+          </Button>
       </div>
 
       {/* Status Summary */}
@@ -324,7 +352,13 @@ export default function ToBuyPage() {
             title={t('toBuy.noItems')}
             description={t('toBuy.noItemsDescription')}
             action={
-              <Button onClick={() => setShowForm(true)}>
+              <Button onClick={() => {
+                if (!canWrite) {
+                  showTrialBlockedToast()
+                  return
+                }
+                setShowForm(true)
+              }} disabled={!canWrite}>
                 <Plus className="h-4 w-4" />
                 {t('toBuy.addItem')}
               </Button>
@@ -387,6 +421,7 @@ export default function ToBuyPage() {
                     size="sm"
                     variant="ghost"
                     onClick={() => handleEdit(item)}
+                    disabled={!canWrite}
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -394,6 +429,7 @@ export default function ToBuyPage() {
                     size="sm"
                     variant="ghost"
                     onClick={() => handleDelete(item.id)}
+                    disabled={!canWrite}
                   >
                     <Trash2 className="h-4 w-4 text-red-600" />
                   </Button>

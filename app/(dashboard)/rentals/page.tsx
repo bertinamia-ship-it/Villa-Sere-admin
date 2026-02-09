@@ -17,6 +17,7 @@ import BookingCalendar from './BookingCalendar'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { useI18n } from '@/components/I18nProvider'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 import { PageHeader } from '@/components/ui/PageHeader'
 
 interface MonthlyStats {
@@ -31,6 +32,7 @@ export default function RentalsPage() {
   const supabase = createClient()
   const { showToast } = useToast()
   const { t } = useI18n()
+  const { canWrite, showTrialBlockedToast } = useTrialGuard()
   const [loading, setLoading] = useState(true)
   const [hasProperty, setHasProperty] = useState(true)
   const [bookings, setBookings] = useState<Booking[]>([])
@@ -141,6 +143,10 @@ export default function RentalsPage() {
   }
 
   async function handleSave(booking: Partial<Booking>) {
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
     try {
       const propertyId = await getActivePropertyId()
       if (!propertyId) {
@@ -241,11 +247,20 @@ export default function RentalsPage() {
   }
 
   function handleDeleteClick(id: string) {
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
     setDeleteConfirm({ isOpen: true, bookingId: id })
   }
 
   async function handleDelete() {
     if (!deleteConfirm.bookingId) return
+    if (!canWrite) {
+      showTrialBlockedToast()
+      setDeleteConfirm({ isOpen: false, bookingId: null })
+      return
+    }
 
     setDeleting(true)
     try {
@@ -277,6 +292,10 @@ export default function RentalsPage() {
   }
 
   function handleEdit(booking: Booking) {
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
     setEditingBooking(booking)
     setShowForm(true)
   }
@@ -311,14 +330,19 @@ export default function RentalsPage() {
         rightSlot={
           <Button 
             onClick={() => {
+              if (!canWrite) {
+                showTrialBlockedToast()
+                return
+              }
               setEditingBooking(null)
               setShowForm(true)
             }}
-          className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
-        >
-          <Plus className="h-4 w-4" />
-          {t('rentals.addBooking')}
-        </Button>
+            disabled={!canWrite}
+            className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
+          >
+            <Plus className="h-4 w-4" />
+            {t('rentals.addBooking')}
+          </Button>
       </div>
 
       {/* Monthly Stats */}

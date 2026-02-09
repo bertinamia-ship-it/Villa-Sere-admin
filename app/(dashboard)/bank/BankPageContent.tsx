@@ -12,6 +12,7 @@ import { Plus, Wallet, CreditCard, Building2, Coins } from 'lucide-react'
 import { getActivePropertyId } from '@/lib/utils/property-client'
 import { useI18n } from '@/components/I18nProvider'
 import { PageHeader } from '@/components/ui/PageHeader'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 import AccountForm from './AccountForm'
 import AccountDetail from './AccountDetail'
 
@@ -19,6 +20,7 @@ export default function BankPageContent() {
   const { t } = useI18n()
   const supabase = createClient()
   const { showToast } = useToast()
+  const { canWrite, showTrialBlockedToast } = useTrialGuard()
   const [loading, setLoading] = useState(true)
   const [accounts, setAccounts] = useState<FinancialAccount[]>([])
   const [selectedAccount, setSelectedAccount] = useState<FinancialAccount | null>(null)
@@ -82,11 +84,19 @@ export default function BankPageContent() {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleEdit = (account: FinancialAccount) => {
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
     setEditingAccount(account)
     setShowForm(true)
   }
 
   const handleDelete = async (accountId: string) => {
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
     if (!confirm(t('bank.confirmDeleteAccount'))) return
 
     try {
@@ -170,9 +180,14 @@ export default function BankPageContent() {
         rightSlot={
           <Button 
             onClick={() => {
+              if (!canWrite) {
+                showTrialBlockedToast()
+                return
+              }
               setEditingAccount(null)
               setShowForm(true)
             }}
+            disabled={!canWrite}
             className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
           >
             <Plus className="h-4 w-4" />
@@ -189,6 +204,10 @@ export default function BankPageContent() {
             description={t('bank.noAccountsDescription')}
             actionLabel={t('bank.newAccount')}
             onAction={() => {
+              if (!canWrite) {
+                showTrialBlockedToast()
+                return
+              }
               setEditingAccount(null)
               setShowForm(true)
             }}

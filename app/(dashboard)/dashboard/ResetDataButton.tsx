@@ -38,12 +38,15 @@ export default function ResetDataButton() {
         .maybeSingle()
 
       if (profileError) {
-        console.error('[ResetDataButton] Error fetching profile:', {
-          message: profileError.message,
-          details: profileError.details,
-          hint: profileError.hint,
-          code: profileError.code
-        })
+        // Only log in development
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[ResetDataButton] Error fetching profile:', {
+            message: profileError.message,
+            details: profileError.details,
+            hint: profileError.hint,
+            code: profileError.code
+          })
+        }
         setIsAuthorized(false)
         setCheckingAuth(false)
         return
@@ -64,7 +67,10 @@ export default function ResetDataButton() {
 
       setIsAuthorized(tenant?.owner_id === user.id)
     } catch (error) {
-      console.error('Error checking authorization:', error)
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error checking authorization:', error)
+      }
       setIsAuthorized(false)
     } finally {
       setCheckingAuth(false)
@@ -100,7 +106,10 @@ export default function ResetDataButton() {
         window.location.reload()
       }, 2000)
     } catch (error) {
-      console.error('Reset error:', error)
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Reset error:', error)
+      }
       showToast(
         error instanceof Error ? error.message : t('resetData.resetError'),
         'error'

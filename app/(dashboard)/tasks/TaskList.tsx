@@ -14,6 +14,7 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { useToast } from '@/components/ui/Toast'
 import TaskForm from './TaskForm'
 import { useI18n } from '@/components/I18nProvider'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 import { PageHeader } from '@/components/ui/PageHeader'
 
 type FilterType = 'today' | 'week' | 'overdue' | 'all'
@@ -21,6 +22,7 @@ type TaskStatus = 'pending' | 'in_progress' | 'done'
 
 export default function TaskList() {
   const { t } = useI18n()
+  const { canWrite, showTrialBlockedToast } = useTrialGuard()
   
   const getStatusLabel = (status: TaskStatus): string => {
     return t(`tasks.statusLabels.${status}`)
@@ -213,6 +215,11 @@ export default function TaskList() {
 
   const handleDelete = async () => {
     if (!deleteConfirm.taskId) return
+    if (!canWrite) {
+      showTrialBlockedToast()
+      setDeleteConfirm({ isOpen: false, taskId: null })
+      return
+    }
 
     const propertyId = await getActivePropertyId()
     if (!propertyId) return
@@ -236,6 +243,10 @@ export default function TaskList() {
   }
 
   const handleEdit = (task: Task) => {
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
     setEditingTask(task)
     setShowForm(true)
   }
@@ -322,8 +333,14 @@ export default function TaskList() {
         subtitle={t('tasks.subtitle')}
         rightSlot={
           <Button 
-            onClick={() => setShowForm(true)}
-            disabled={!hasProperty}
+            onClick={() => {
+              if (!canWrite) {
+                showTrialBlockedToast()
+                return
+              }
+              setShowForm(true)
+            }}
+            disabled={!hasProperty || !canWrite}
             size="sm"
             className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
           >
@@ -358,7 +375,13 @@ export default function TaskList() {
             title={tasks.length === 0 ? t('tasks.emptyTitle') : t('tasks.noTasks')}
             description={tasks.length === 0 ? t('tasks.emptyDescription') : t('tasks.tryDifferentFilters')}
             actionLabel={tasks.length === 0 ? t('tasks.emptyAction') : undefined}
-            onAction={tasks.length === 0 ? () => setShowForm(true) : undefined}
+            onAction={tasks.length === 0 ? () => {
+              if (!canWrite) {
+                showTrialBlockedToast()
+                return
+              }
+              setShowForm(true)
+            } : undefined}
           />
         </Card>
       ) : (
@@ -422,6 +445,7 @@ export default function TaskList() {
                     size="sm"
                     variant="ghost"
                     onClick={() => handleEdit(task)}
+                    disabled={!canWrite}
                     className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
                   >
                     <Edit className="h-5 w-5 sm:h-4 sm:w-4" />

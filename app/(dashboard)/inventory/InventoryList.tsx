@@ -16,10 +16,12 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { useI18n } from '@/components/I18nProvider'
+import { useTrialGuard } from '@/hooks/useTrialGuard'
 import { PageHeader } from '@/components/ui/PageHeader'
 
 export default function InventoryList() {
   const { t } = useI18n()
+  const { canWrite, showTrialBlockedToast } = useTrialGuard()
   const [items, setItems] = useState<InventoryItem[]>([])
   const [filteredItems, setFilteredItems] = useState<InventoryItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -93,6 +95,10 @@ export default function InventoryList() {
   }
 
   const handleDeleteClick = (id: string) => {
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
     setDeleteConfirm({ isOpen: true, itemId: id })
   }
 
@@ -122,6 +128,10 @@ export default function InventoryList() {
   }
 
   const handleEdit = (item: InventoryItem) => {
+    if (!canWrite) {
+      showTrialBlockedToast()
+      return
+    }
     setEditingItem(item)
     setShowForm(true)
   }
@@ -238,7 +248,14 @@ export default function InventoryList() {
           </Button>
           <Button
             size="sm"
-            onClick={() => setShowForm(true)}
+            onClick={() => {
+              if (!canWrite) {
+                showTrialBlockedToast()
+                return
+              }
+              setShowForm(true)
+            }}
+            disabled={!canWrite}
             className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
           >
             <Plus className="h-4 w-4" />
@@ -305,7 +322,13 @@ export default function InventoryList() {
             title={items.length === 0 ? t('inventory.emptyTitle') : t('inventory.noItemsFound')}
             description={items.length === 0 ? t('inventory.emptyDescription') : t('inventory.tryDifferentFilters')}
             actionLabel={items.length === 0 ? t('inventory.emptyAction') : undefined}
-            onAction={items.length === 0 ? () => setShowForm(true) : undefined}
+            onAction={items.length === 0 ? () => {
+              if (!canWrite) {
+                showTrialBlockedToast()
+                return
+              }
+              setShowForm(true)
+            } : undefined}
           />
         </Card>
       ) : (
@@ -334,14 +357,16 @@ export default function InventoryList() {
                   <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={() => handleEdit(item)}
-                      className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                      disabled={!canWrite}
+                      className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                       aria-label={t('common.edit')}
                     >
                       <Pencil className="h-5 w-5" />
                     </button>
                     <button
                       onClick={() => handleDeleteClick(item.id)}
-                      className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                      disabled={!canWrite}
+                      className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                       aria-label={t('common.delete')}
                     >
                       <Trash2 className="h-5 w-5" />
