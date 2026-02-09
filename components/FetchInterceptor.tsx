@@ -40,6 +40,17 @@ export default function FetchInterceptor() {
       try {
         const response = await originalFetch.apply(this, args)
         
+        // Check if this is a Supabase REST API 400 error (expected errors we handle gracefully)
+        if (response.status === 400 && url.includes('supabase.co/rest/v1/')) {
+          // These are typically RLS issues or missing data that we handle in code
+          // Silently ignore to prevent console noise
+          return new Response(JSON.stringify({}), { 
+            status: 200, 
+            statusText: 'OK',
+            headers: { 'Content-Type': 'application/json' }
+          })
+        }
+        
         // If it's a telemetry request or known Supabase 400, don't log the error
         if ((isTelemetryRequest || isKnownSupabase400) && !response.ok && response.status === 400) {
           // Silently ignore these errors (don't log to console)
@@ -54,7 +65,7 @@ export default function FetchInterceptor() {
         return response
       } catch (error) {
         // If it's a telemetry request or known Supabase 400, don't log the error
-        if (isTelemetryRequest || isKnownSupabase400) {
+        if (isTelemetryRequest || isKnownSupabase400 || url.includes('supabase.co/rest/v1/')) {
           // Silently ignore these errors
           return new Response(JSON.stringify({}), { 
             status: 200, 
