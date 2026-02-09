@@ -61,11 +61,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="CasaPilot" />
         {/* CRITICAL: Intercept fetch and console BEFORE React loads to prevent 400 errors from being logged */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){const o=window.fetch;window.fetch=function(...a){const u=typeof a[0]==='string'?a[0]:a[0]?.url||'';if(u.includes('supabase.co/rest/v1/')){return o.apply(this,a).then(r=>{if(r.status===400){return new Response(JSON.stringify([]),{status:200,statusText:'OK',headers:{'Content-Type':'application/json'}});}return r;}).catch(()=>new Response(JSON.stringify([]),{status:200,statusText:'OK',headers:{'Content-Type':'application/json'}}));}return o.apply(this,a);};const e=console.error,w=console.warn,l=console.log;console.error=function(...a){const s=a.map(x=>String(x||'')).join(' ');if(s.includes('supabase.co')&&(s.includes('400')||s.includes('Bad Request')||s.includes('GET')))return;e.apply(console,a);};console.warn=function(...a){const s=a.map(x=>String(x||'')).join(' ');if(s.includes('supabase.co')&&(s.includes('400')||s.includes('Bad Request')))return;w.apply(console,a);};console.log=function(...a){const s=a.map(x=>String(x||'')).join(' ');if(s.includes('supabase.co')&&(s.includes('400')||s.includes('Bad Request')))return;l.apply(console,a);};window.addEventListener('error',function(e){if(e.message&&e.message.includes('supabase.co')&&(e.message.includes('400')||e.message.includes('Bad Request'))){e.preventDefault();e.stopPropagation();return false;}},true);window.addEventListener('unhandledrejection',function(e){const r=String(e.reason||'');if(r.includes('supabase.co')&&(r.includes('400')||r.includes('Bad Request'))){e.preventDefault();return false;}});})();`,
-          }}
-        />
+        <script src="/supabase-error-interceptor.js" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
